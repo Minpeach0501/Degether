@@ -12,7 +12,6 @@ public class ResponseDto<T> {
     private boolean ok;
     private String message;
     private T result;
-    private T results;
 
     private Long projectId;
 }

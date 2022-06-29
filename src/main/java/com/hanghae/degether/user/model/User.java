@@ -1,4 +1,4 @@
-package com.hanghae.degether.User.model;
+package com.hanghae.degether.user.model;
 
 
 import lombok.Getter;

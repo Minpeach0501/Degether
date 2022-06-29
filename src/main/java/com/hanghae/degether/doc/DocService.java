@@ -1,10 +1,10 @@
 package com.hanghae.degether.doc;
 
-import com.hanghae.degether.User.User;
-import com.hanghae.degether.User.UserRepository;
-import com.hanghae.degether.User.security.UserDetailsImpl;
-import com.hanghae.degether.project.Project;
-import com.hanghae.degether.project.ProjectRepository;
+
+import com.hanghae.degether.user.model.UserDetailsImpl;
+import com.hanghae.degether.user.model.User;
+import com.hanghae.degether.project.model.Project;
+import com.hanghae.degether.project.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,10 +17,10 @@ public class DocService {
 
     private final DocRepository docRepository;
     private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
+    private final com.hanghae.degether.User.repository.UserRepository userRepository;
 
     @Autowired
-    public DocService(DocRepository docRepository, ProjectRepository projectRepository, UserRepository userRepository){
+    public DocService(DocRepository docRepository, ProjectRepository projectRepository, com.hanghae.degether.User.repository.UserRepository userRepository){
         this.docRepository = docRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;

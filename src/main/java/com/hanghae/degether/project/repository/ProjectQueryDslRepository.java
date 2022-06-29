@@ -1,11 +1,8 @@
 package com.hanghae.degether.project.repository;
 
-import com.hanghae.degether.project.dto.ProjectResponseDto;
-import com.hanghae.degether.project.model.Language;
+import com.hanghae.degether.project.dto.ProjectDto;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.EnumPath;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -22,10 +19,10 @@ import static org.apache.logging.log4j.util.Strings.isEmpty;
 public class ProjectQueryDslRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
-    public List<ProjectResponseDto.Get> getProjectsBySearch(String search, String language, String genre, String step){
+    public List<ProjectDto.Response> getProjectsBySearch(String search, String language, String genre, String step){
 
         return jpaQueryFactory
-                        .select(Projections.bean(ProjectResponseDto.Get.class,
+                        .select(Projections.bean(ProjectDto.Response.class,
                                 project.thumbnail,
                                 project.projectName,
                                 project.projectDescription,
