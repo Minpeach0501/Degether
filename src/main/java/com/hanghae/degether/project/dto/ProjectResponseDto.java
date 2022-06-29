@@ -1,8 +1,8 @@
 package com.hanghae.degether.project.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.hanghae.degether.project.model.Genre;
+import com.hanghae.degether.project.model.Language;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,7 +13,9 @@ import java.util.List;
 public class ProjectResponseDto {
     @Getter
     @Setter
+    @Builder
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class Get{
         private String thumbnail;
         private String projectName;
@@ -25,7 +27,7 @@ public class ProjectResponseDto {
         private String figma;
         private LocalDate deadLine;
         private String step;
-        private List<String> language;
-        private List<String> genre;
+        private List<Language> language;
+        private List<Genre> genre;
     }
 }

@@ -61,7 +61,7 @@ public class ProjectController {
     //찜하기, 찜삭제
     @PostMapping("/projectZzim/{projectId}")
     public ResponseDto<?> projectZzim(@PathVariable Long projectId) {
-        projectService.projectZzim(projectId)
+        projectService.projectZzim(projectId);
         return ResponseDto.builder()
                 .ok(true)
                 .message("요청 성공")

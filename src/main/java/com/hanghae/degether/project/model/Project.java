@@ -1,5 +1,6 @@
 package com.hanghae.degether.project.model;
 
+import com.hanghae.degether.project.dto.ProjectResponseDto;
 import com.hanghae.degether.user.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,4 +50,45 @@ public class Project extends Timestamped {
     @OneToMany
     @JoinColumn(name = "project_id")
     private List<Comment> comments;
+
+    public ProjectResponseDto.Get update(
+                                            String projectName,
+                                            String projectDescription,
+                                            int feCount,
+                                            int beCount,
+                                            int deCount,
+                                            String github,
+                                            String figma,
+                                            LocalDate deadLine,
+                                            String step,
+                                            List<Language> language,
+                                            List<Genre> genre,
+                                            String thumbnail) {
+            this.projectName = projectName;
+            this.projectDescription = projectDescription;
+            this.feCount = feCount;
+            this.beCount = beCount;
+            this.deCount = deCount;
+            this.github = github;
+            this.figma = figma;
+            this.deadLine = deadLine;
+            this.step = step;
+            this.language = language;
+            this.genre = genre;
+            this.thumbnail = thumbnail;
+            return ProjectResponseDto.Get.builder()
+                    .projectName(projectName)
+                    .projectDescription(projectDescription)
+                    .feCount(feCount)
+                    .beCount(beCount)
+                    .deCount(deCount)
+                    .github(github)
+                    .figma(figma)
+                    .deadLine(deadLine)
+                    .step(step)
+                    .language(language)
+                    .genre(genre)
+                    .thumbnail(thumbnail)
+                    .build();
+    }
 }

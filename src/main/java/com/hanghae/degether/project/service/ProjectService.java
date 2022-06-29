@@ -83,6 +83,35 @@ public class ProjectService {
 
     }
 
+    @Transactional
     public ProjectResponseDto.Get modifyProject(Long projectId, ProjectRequestDto.Create projectRequestDto, MultipartFile multipartFile) {
+        User user = CommonUtil.getUser();
+        Project project = projectRepository.findById(projectId).orElseThrow(()-> new IllegalArgumentException(ExceptionMessage.NOT_EXIST_PROJECT));
+        if (!project.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED_PROJECT);
+        }
+        String thumbnail = project.getThumbnail();
+        if (!multipartFile.isEmpty()) {
+            //프로젝트 수정시 새로운 multipartfile이 오면 이미지 수정
+            //기존이미지 삭제
+            s3Uploader.deleteFromS3(project.getThumbnail());
+            //새로운 이미지 업로드
+            thumbnail = s3Uploader.upload(multipartFile, S3Dir);
+        }
+        return project.update(
+                projectRequestDto.getProjectName(),
+                projectRequestDto.getProjectDescription(),
+                projectRequestDto.getFeCount(),
+                projectRequestDto.getBeCount(),
+                projectRequestDto.getDeCount(),
+                projectRequestDto.getGithub(),
+                projectRequestDto.getFigma(),
+                projectRequestDto.getDeadLine(),
+                projectRequestDto.getStep(),
+                projectRequestDto.getLanguage(),
+                projectRequestDto.getGenre(),
+                thumbnail
+        );
     }
+
 }
