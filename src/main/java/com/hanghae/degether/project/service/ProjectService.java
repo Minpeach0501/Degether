@@ -72,7 +72,6 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<?> getProjects(String search, String language, String genre, String step) {
-        //TODO: queryDsl 알아보기
         return projectQueryDslRepository.getProjectsBySearch(search, language, genre, step);
         // return projectRepository.findAllBySearchQuery(search, language, genre, step);
     }

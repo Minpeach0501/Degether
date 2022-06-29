@@ -20,7 +20,7 @@ public class ProjectQueryDslRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     public List<ProjectDto.Response> getProjectsBySearch(String search, String language, String genre, String step){
-
+        //TODO: 성능 개선 필요
         return jpaQueryFactory
                         .select(Projections.bean(ProjectDto.Response.class,
                                 project.thumbnail,
@@ -39,11 +39,13 @@ public class ProjectQueryDslRepository {
                             )
                         )
                         .from(project)
+                .leftJoin(project.language,language1)
+                .on(languageContains(language))
+                .leftJoin(project.genre,genre1)
+                .on(genreContains(genre))
                         .where(
-                                searchContains("search"),
-                                languageContains("language"),
-                                genreContains("genre"),
-                                stepEq("step")
+                                searchContains(search),
+                                stepEq(step)
                         )
                 .fetch();
     }
@@ -53,10 +55,10 @@ public class ProjectQueryDslRepository {
         return isEmpty(search) ? null : project.projectName.contains(search);
     }
     private Predicate languageContains(String language) {
-        return isEmpty(language) ? null : project.language.contains(language1);
+        return isEmpty(language) ? null : language1.language.eq(language);
     }
     private Predicate genreContains(String genre) {
-        return isEmpty(genre) ? null : project.genre.contains(genre1);
+        return isEmpty(genre) ? null : genre1.genre.contains(genre);
     }
     private Predicate stepEq(String step) {
         return isEmpty(step) ? null : project.step.eq(step);
