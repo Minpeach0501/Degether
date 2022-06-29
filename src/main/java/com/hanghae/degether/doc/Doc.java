@@ -43,17 +43,17 @@ public class Doc extends Timestamped{
     @DateTimeFormat(pattern = "yyyy-mm-dd")
     private LocalDate endDate;
 
-    @Column(nullable = false)
+
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
+
     @ManyToOne
-    @JoinColumn(name = "project_id")
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-    @Column(nullable = true)
+
     @ManyToOne
     @JoinColumn(name = "incharge_id")
     private User inCharge;

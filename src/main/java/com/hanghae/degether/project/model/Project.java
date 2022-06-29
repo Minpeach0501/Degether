@@ -40,9 +40,11 @@ public class Project extends Timestamped {
     private LocalDate deadLine;
     @Column
     private String step;
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
     private List<Language> languages;
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
     private List<Genre> genres;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

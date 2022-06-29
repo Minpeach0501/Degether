@@ -34,14 +34,14 @@ public class ProjectQueryDslRepository {
                                 project.deadLine,
                                 project.step,
                                 //TODO: Entity가 아닌 ElementCollection select 방법 찾기
-                                project.language,
-                                project.genre
+                                project.languages,
+                                project.genres
                             )
                         )
                         .from(project)
-                .leftJoin(project.language,language1)
+                .leftJoin(project.languages,language1)
                 .on(languageContains(language))
-                .leftJoin(project.genre,genre1)
+                .leftJoin(project.genres,genre1)
                 .on(genreContains(genre))
                         .where(
                                 searchContains(search),

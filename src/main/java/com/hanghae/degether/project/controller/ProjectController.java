@@ -121,7 +121,7 @@ public class ProjectController {
     }
 
     // 지원자 삭제, 멤버 강제추방
-    @PostMapping("/addUser/{projectId}/{userId}")
+    @DeleteMapping("/kickUser/{projectId}/{userId}")
     public ResponseDto<?> kickUser(@PathVariable Long projectId, @PathVariable Long userId) {
         projectService.kickUser(projectId, userId);
         return ResponseDto.builder()

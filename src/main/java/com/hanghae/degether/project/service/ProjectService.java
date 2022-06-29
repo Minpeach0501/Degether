@@ -13,7 +13,9 @@ import com.hanghae.degether.project.repository.*;
 import com.hanghae.degether.project.util.CommonUtil;
 import com.hanghae.degether.project.util.S3Uploader;
 import com.hanghae.degether.user.model.User;
+import com.hanghae.degether.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +34,8 @@ public class ProjectService {
     private final ProjectQueryDslRepository projectQueryDslRepository;
     private final S3Uploader s3Uploader;
     private final String S3Dir = "projectThumbnail";
+    private final UserRepository userRepository;
+
     @Transactional
     public Long createProject(ProjectDto.Request projectRequestDto, MultipartFile multipartFile) {
         User user = CommonUtil.getUser();
@@ -186,7 +190,7 @@ public class ProjectService {
     public ProjectDto.Response getProjectMain(Long projectId) {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
-        if (!userProjectRepository.existsByProjectAndUserAndTeam(project, user, true)) {
+        if (!userProjectRepository.existsByProjectAndUserAndIsTeam(project, user, true)) {
             throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
         }
         List<UserProject> userProjects = userProjectRepository.findAllByProject(project);
@@ -250,9 +254,12 @@ public class ProjectService {
         if (!project.getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
         }
-        UserProject userProject = userProjectRepository.findByProjectAndUserId(project, userId).orElseThrow(()->{
-            throw new IllegalArgumentException(ExceptionMessage.NOT_APPLY);
-        });
+        User userSearch = userRepository.findById(userId).orElseThrow(()->
+                new IllegalArgumentException("??")
+        );
+        UserProject userProject = userProjectRepository.findByProjectAndUser(project, userSearch).orElseThrow(()->
+                new IllegalArgumentException(ExceptionMessage.NOT_APPLY)
+        );
         if (userProject.isTeam()) {
             throw new IllegalArgumentException(ExceptionMessage.DUPLICATED_JOIN);
         }
@@ -265,9 +272,12 @@ public class ProjectService {
         if (!project.getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
         }
-        UserProject userProject = userProjectRepository.findByProjectAndUserId(project, userId).orElseThrow(()->{
-            throw new IllegalArgumentException(ExceptionMessage.NOT_APPLY);
-        });
+        User userSearch = userRepository.findById(userId).orElseThrow(()->
+                new IllegalArgumentException("??")
+        );
+        UserProject userProject = userProjectRepository.findByProjectAndUser(project, userSearch).orElseThrow(()->
+            new IllegalArgumentException(ExceptionMessage.NOT_APPLY)
+        );
         userProjectRepository.delete(userProject);
     }
 }
