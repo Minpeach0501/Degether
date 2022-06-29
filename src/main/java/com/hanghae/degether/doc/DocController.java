@@ -1,7 +1,7 @@
 package com.hanghae.degether.doc;
 
 
-import com.hanghae.degether.User.security.UserDetailsImpl;
+import com.hanghae.degether.user.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;

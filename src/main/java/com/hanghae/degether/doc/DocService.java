@@ -1,10 +1,10 @@
 package com.hanghae.degether.doc;
 
-import com.hanghae.degether.User.User;
-import com.hanghae.degether.User.UserRepository;
-import com.hanghae.degether.User.security.UserDetailsImpl;
 import com.hanghae.degether.project.Project;
 import com.hanghae.degether.project.ProjectRepository;
+import com.hanghae.degether.user.UserRepository;
+import com.hanghae.degether.user.model.User;
+import com.hanghae.degether.user.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

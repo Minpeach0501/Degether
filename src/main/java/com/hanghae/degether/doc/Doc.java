@@ -1,8 +1,8 @@
 package com.hanghae.degether.doc;
 
 
-import com.hanghae.degether.User.User;
-import com.hanghae.degether.project.Project;
+import com.hanghae.degether.user.model.User;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
