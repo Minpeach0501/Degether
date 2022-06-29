@@ -1,8 +1,8 @@
-package com.hanghae.degether.security;
+package com.hanghae.degether.User.security;
 
 
 
-import com.hanghae.degether.model.User;
+import com.hanghae.degether.User.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

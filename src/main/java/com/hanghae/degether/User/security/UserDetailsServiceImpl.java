@@ -1,10 +1,10 @@
-package com.hanghae.degether.security;
+package com.hanghae.degether.User.security;
 
 
 
 
-import com.hanghae.degether.model.User;
-import com.hanghae.degether.repository.UserRepository;
+import com.hanghae.degether.User.model.User;
+import com.hanghae.degether.User.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

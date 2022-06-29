@@ -1,6 +1,6 @@
-package com.hanghae.degether.repository;
+package com.hanghae.degether.User.repository;
 
-import com.hanghae.degether.model.User;
+import com.hanghae.degether.User.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

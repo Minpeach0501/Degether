@@ -1,8 +1,8 @@
-package com.hanghae.degether.controller;
+package com.hanghae.degether.User.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.hanghae.degether.dto.LoginResponseDto;
-import com.hanghae.degether.service.KakaoService;
+import com.hanghae.degether.User.dto.LoginResponseDto;
+import com.hanghae.degether.User.service.KakaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

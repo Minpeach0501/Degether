@@ -1,4 +1,4 @@
-package com.hanghae.degether.dto;
+package com.hanghae.degether.User.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.hanghae.degether.security;
+package com.hanghae.degether.User.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

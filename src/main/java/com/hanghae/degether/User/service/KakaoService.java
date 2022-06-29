@@ -1,13 +1,13 @@
-package com.hanghae.degether.service;
+package com.hanghae.degether.User.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hanghae.degether.dto.LoginResponseDto;
-import com.hanghae.degether.dto.KakaoUserInfoDto;
-import com.hanghae.degether.model.User;
-import com.hanghae.degether.repository.UserRepository;
-import com.hanghae.degether.security.JwtTokenProvider;
+import com.hanghae.degether.User.dto.LoginResponseDto;
+import com.hanghae.degether.User.dto.KakaoUserInfoDto;
+import com.hanghae.degether.User.model.User;
+import com.hanghae.degether.User.repository.UserRepository;
+import com.hanghae.degether.User.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
