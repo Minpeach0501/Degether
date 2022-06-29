@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,8 +17,7 @@ public class DocDto {
     private String nickname;
     private String inCharge;
     private String docStatus;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate createdDate;
+    private LocalDateTime createdDate;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
     @DateTimeFormat(pattern = "yyyy-MM-dd")

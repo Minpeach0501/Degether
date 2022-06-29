@@ -4,6 +4,7 @@ import com.hanghae.degether.project.exception.ExceptionMessage;
 import com.hanghae.degether.project.model.Project;
 import com.hanghae.degether.project.repository.ProjectRepository;
 import com.hanghae.degether.user.model.User;
+import com.hanghae.degether.user.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.context.SecurityContextHolder;

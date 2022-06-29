@@ -1,7 +1,8 @@
 package com.hanghae.degether.doc;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.hanghae.degether.user.User;
+
+import com.hanghae.degether.user.model.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;

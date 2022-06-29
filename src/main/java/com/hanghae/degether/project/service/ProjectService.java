@@ -29,7 +29,6 @@ public class ProjectService {
     private final UserProjectRepository userProjectRepository;
     private final ZzimRepository zzimRepository;
     private final DocRepository docRepository;
-    private final CommentRepository commentRepository;
     private final ProjectQueryDslRepository projectQueryDslRepository;
     private final S3Uploader s3Uploader;
     private final String S3Dir = "projectThumbnail";
@@ -198,24 +197,24 @@ public class ProjectService {
                 .user(
                         userProjects.stream().filter((UserProject::isTeam))
                                 .map((userProjectList) -> {
-                                    User user = userProjectList.getUser();
+                                    User userStream = userProjectList.getUser();
                                     return UserDto.builder()
-                                            .userId(user.getId())
-                                            .profileUrl(user.getProfileUrl())
-                                            .role(user.getRole())
-                                            .nickname(user.getNickname())
+                                            .userId(userStream.getId())
+                                            .profileUrl(userStream.getProfileUrl())
+                                            .role(userStream.getRole())
+                                            .nickname(userStream.getNickname())
                                             .build();
                                 }).collect(Collectors.toList())
                 )
                 .applyUser(
                         userProjects.stream().filter((userProject -> !userProject.isTeam()))
                                 .map((userProjectList) -> {
-                                    User user = userProjectList.getUser();
+                                    User userStream = userProjectList.getUser();
                                     return UserDto.builder()
-                                            .userId(user.getId())
-                                            .profileUrl(user.getProfileUrl())
-                                            .role(user.getRole())
-                                            .nickname(user.getNickname())
+                                            .userId(userStream.getId())
+                                            .profileUrl(userStream.getProfileUrl())
+                                            .role(userStream.getRole())
+                                            .nickname(userStream.getNickname())
                                             .build();
                                 }).collect(Collectors.toList())
                 )
