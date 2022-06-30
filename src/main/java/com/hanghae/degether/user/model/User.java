@@ -41,7 +41,7 @@ public class User {
     private String intro;
 
     @Column
-    private boolean status =true ;
+    private boolean status = true ;
 
 
     public User(String username, String nickname, String profileUrl, String password) {

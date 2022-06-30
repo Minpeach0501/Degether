@@ -9,9 +9,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.hanghae.degether.project.model.QProject.project;
-import static com.hanghae.degether.project.model.QLanguage.language1;
 import static com.hanghae.degether.project.model.QGenre.genre1;
+import static com.hanghae.degether.project.model.QLanguage.language1;
+import static com.hanghae.degether.project.model.QProject.project;
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
 @Repository

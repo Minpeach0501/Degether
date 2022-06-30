@@ -47,11 +47,9 @@ public class KakaoService {
 
         User kakaouser = registerKakaoUserIfNeed(kakaoUserInfo);
 
+       return kakaoUsersAuthorizationInput(kakaouser, response);
 
 
-        kakaoUsersAuthorizationInput(kakaouser, response);
-
-        return  new LoginResponseDto(true,"성공");
     }
 
     private String getAccessToken(String code) throws JsonProcessingException {
@@ -145,11 +143,21 @@ public class KakaoService {
 //    }
 
     // 5. response Header에 JWT 토큰 추가
-    private void kakaoUsersAuthorizationInput(User kakaouser, HttpServletResponse response) {
+    private LoginResponseDto kakaoUsersAuthorizationInput(User kakaouser, HttpServletResponse response) {
         // response header에 token 추가
 
         String token = jwtTokenProvider.createToken(kakaouser.getUsername());
-//        response.addHeader("Authorization", "BEARER" + " " + token);
 
+        try {
+            if (kakaouser.isStatus() == false) {
+                token = null;
+                throw new NullPointerException("탈퇴한 회원입니다.");
+            }
+            response.addHeader("Authorization", "BEARER" + " " + token);
+            return new LoginResponseDto(true, "성공");
+        } catch (NullPointerException e) {
+            String message = e.getMessage();
+            return new LoginResponseDto(false, message);
+        }
     }
 }

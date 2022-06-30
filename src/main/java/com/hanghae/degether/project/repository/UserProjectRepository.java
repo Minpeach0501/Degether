@@ -2,6 +2,7 @@ package com.hanghae.degether.project.repository;
 
 import com.hanghae.degether.project.model.Project;
 import com.hanghae.degether.project.model.UserProject;
+import com.hanghae.degether.user.dto.MyProjectResDto;
 import com.hanghae.degether.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -19,4 +20,6 @@ public interface UserProjectRepository extends JpaRepository<UserProject, Long> 
     // Optional<UserProject> findByProjectAndUserId(Project project, Long userId);
     Optional<UserProject> findByProjectAndUser(Project project, User user);
 
+
+    List<MyProjectResDto> findAllByUserAndisTeam(User user, boolean isTeam);
 }

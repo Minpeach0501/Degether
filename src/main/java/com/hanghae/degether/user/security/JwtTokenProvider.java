@@ -51,8 +51,8 @@ public class JwtTokenProvider {
                 .signWith(SignatureAlgorithm.HS256, secretKey)//사용할 암호화 알고리즘
                 //signature에 들어갈 secret값 세팅
                 .compact();
-
-        response.addHeader(AUTH_HEADER,token);
+//              두개의 AUTHORIZATION이 만들어지는걸 방지
+//              response.addHeader(AUTH_HEADER,token);
         return token;
     }
 

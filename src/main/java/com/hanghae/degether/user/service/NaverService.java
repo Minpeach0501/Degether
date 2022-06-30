@@ -56,10 +56,11 @@ public class NaverService {
         User naverUser = registerKakaoUserIfNeed(naverUserInfo);
 
 
+        return naverUsersAuthorizationInput(naverUser, response);
 
-        kakaoUsersAuthorizationInput(naverUser, response);
+
 //인증받은 사용자의 정보를 이용하여 LoginResponse 를 생성하여 반환한다.
-        return  new LoginResponseDto(true,"성공");
+
 
     }
 
@@ -136,7 +137,7 @@ public class NaverService {
         return new SocialUserInfoDto( nickname, username, profileUrl);
     }
 
-    // 3. 카카오ID로 회원가입 처리
+    // 3. email로 db 유무 확인후 회원가입 처리
     private User registerKakaoUserIfNeed(SocialUserInfoDto naverUserInfo) {
         // DB 에 중복된 email이 있는지 확인
         String username = naverUserInfo.getEmail();
@@ -161,11 +162,20 @@ public class NaverService {
 
 
     // 4. response Header에 JWT 토큰 추가
-    private void kakaoUsersAuthorizationInput(User kakaouser, HttpServletResponse response) {
-        // response header에 token 추가
-
-        String token = jwtTokenProvider.createToken(kakaouser.getUsername());
-        // 이미 jwt 토큰이 jwttokenprovider 에서 발급되기때문에 한번더 해줄필요가 없다.
-//        response.addHeader("Authorization", "BEARER" + " " + token);
+    private LoginResponseDto naverUsersAuthorizationInput(User naverUser, HttpServletResponse response) {
+        String token = jwtTokenProvider.createToken(naverUser.getUsername());
+        // exception 발생시켜서 stauts 값으로 탈퇴한 회원들을 판별하기때문에
+        // 토큰값 안넘겨주고 dto값 반환
+        try {
+            if (naverUser.isStatus() == false) {
+                token = null;
+                throw new NullPointerException("탈퇴한 회원입니다.");
+            }
+            response.addHeader("Authorization", "BEARER" + " " + token);
+            return new LoginResponseDto(true, "성공");
+        } catch (NullPointerException e) {
+            String message = e.getMessage();
+            return new LoginResponseDto(false, message);
+        }
     }
 }
