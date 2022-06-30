@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -40,19 +41,20 @@ public class Project extends Timestamped {
     private LocalDate deadLine;
     @Column
     private String step;
-    @OneToMany(fetch = FetchType.LAZY)
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "project_id")
     private List<Language> languages;
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "project_id")
     private List<Genre> genres;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "project_id")
     private List<Comment> comments;
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<UserProject> userProjects;
 
     public ProjectDto.Response update(
@@ -78,7 +80,8 @@ public class Project extends Timestamped {
         this.figma = figma;
         this.deadLine = deadLine;
         this.step = step;
-        this.languages = language;
+        this.languages.clear();
+        this.languages.addAll(language);
         this.genres = genre;
         this.thumbnail = thumbnail;
         return ProjectDto.Response.builder()
@@ -91,8 +94,8 @@ public class Project extends Timestamped {
                 .figma(figma)
                 .deadLine(deadLine)
                 .step(step)
-                .language(language)
-                .genre(genre)
+                .language(language.stream().map((Language::getLanguage)).collect(Collectors.toList()))
+                .genre(genre.stream().map((Genre::getGenre)).collect(Collectors.toList()))
                 .thumbnail(thumbnail)
                 .build();
     }

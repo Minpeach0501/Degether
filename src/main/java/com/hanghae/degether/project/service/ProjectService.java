@@ -6,23 +6,25 @@ import com.hanghae.degether.project.dto.DocDto;
 import com.hanghae.degether.project.dto.ProjectDto;
 import com.hanghae.degether.project.dto.UserDto;
 import com.hanghae.degether.project.exception.ExceptionMessage;
-import com.hanghae.degether.project.model.Project;
-import com.hanghae.degether.project.model.UserProject;
-import com.hanghae.degether.project.model.Zzim;
+import com.hanghae.degether.project.model.*;
 import com.hanghae.degether.project.repository.*;
 import com.hanghae.degether.project.util.CommonUtil;
 import com.hanghae.degether.project.util.S3Uploader;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
+import com.hanghae.degether.user.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ProjectService {
@@ -34,6 +36,7 @@ public class ProjectService {
     private final S3Uploader s3Uploader;
     private final String S3Dir = "projectThumbnail";
     private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public Long createProject(ProjectDto.Request projectRequestDto, MultipartFile multipartFile) {
@@ -56,12 +59,13 @@ public class ProjectService {
                     .figma(projectRequestDto.getFigma())
                     .deadLine(projectRequestDto.getDeadLine())
                     .step(projectRequestDto.getStep())
-                    .languages(projectRequestDto.getLanguage())
-                    .genres(projectRequestDto.getGenre())
+                    .languages(projectRequestDto.getLanguage().stream().map((string)-> Language.builder().language(string).build()).collect(Collectors.toList()))
+                    .genres(projectRequestDto.getGenre().stream().map((string)-> Genre.builder().genre(string).build()).collect(Collectors.toList()))
                     .user(user)
                     .build());
             userProjectRepository.save(UserProject.builder()
                     .project(savedProject)
+                    .isTeam(true)
                     .user(user)
                     .build());
             return savedProject.getId();
@@ -73,9 +77,34 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public List<?> getProjects(String search, String language, String genre, String step) {
-        return projectQueryDslRepository.getProjectsBySearch(search, language, genre, step);
-        // return projectRepository.findAllBySearchQuery(search, language, genre, step);
+    public List<?> getProjects(String search, String language, String genre, String step, String token) {
+        User user = CommonUtil.getUserByToken(token, jwtTokenProvider);
+        // List<Project> list = projectQueryDslRepository.getProjectsBySearch(search, language, genre, step);
+        // List<Project> list = projectRepository.findAllByProjectNameContainsAndLanguages_LanguageAndGenres_GenreAndStep("프로젝트", "spring", "앱", "기획");
+        return projectQueryDslRepository.getProjectsBySearch(search, language, genre, step).stream().map(project -> {
+            boolean isZzim;
+            if(user==null) isZzim = false;
+            else {
+                isZzim = zzimRepository.existsByProjectAndUser(project,user);
+            }
+            return ProjectDto.Response.builder()
+                    .projectId(project.getId())
+                    .thumbnail(project.getThumbnail())
+                    .projectName(project.getProjectName())
+                    .projectDescription(project.getProjectDescription())
+                    .feCount(project.getFeCount())
+                    .beCount(project.getBeCount())
+                    .deCount(project.getDeCount())
+                    .github(project.getGithub())
+                    .figma(project.getFigma())
+                    .deadLine(project.getDeadLine())
+                    .step(project.getStep())
+                    .language(project.getLanguages().stream().map(Language::getLanguage).collect(Collectors.toList()))
+                    .genre(project.getGenres().stream().map(Genre::getGenre).collect(Collectors.toList()))
+                    .step(project.getStep())
+                    .isZzim(isZzim)
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     @Transactional
@@ -97,6 +126,7 @@ public class ProjectService {
 
     @Transactional
     public ProjectDto.Response modifyProject(Long projectId, ProjectDto.Request projectRequestDto, MultipartFile multipartFile) {
+        //TODO: language update시 삭제 안되는 문제 해결
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!project.getUser().getId().equals(user.getId())) {
@@ -110,6 +140,7 @@ public class ProjectService {
             //새로운 이미지 업로드
             thumbnail = s3Uploader.upload(multipartFile, S3Dir);
         }
+
         return project.update(
                 projectRequestDto.getProjectName(),
                 projectRequestDto.getProjectDescription(),
@@ -120,8 +151,8 @@ public class ProjectService {
                 projectRequestDto.getFigma(),
                 projectRequestDto.getDeadLine(),
                 projectRequestDto.getStep(),
-                projectRequestDto.getLanguage(),
-                projectRequestDto.getGenre(),
+                projectRequestDto.getLanguage().stream().map((string)-> Language.builder().language(string).build()).collect(Collectors.toList()),
+                projectRequestDto.getGenre().stream().map((string)-> Genre.builder().genre(string).build()).collect(Collectors.toList()),
                 thumbnail
         );
     }
@@ -132,7 +163,7 @@ public class ProjectService {
         return userProjectRepository.existsByProjectAndUserNot(project, user);
     }
 
-
+    @Transactional
     public void deleteProject(Long projectId) {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
@@ -143,6 +174,7 @@ public class ProjectService {
             //이미지 삭제
             s3Uploader.deleteFromS3(project.getThumbnail());
         }
+        zzimRepository.deleteByProject(project);
         projectRepository.delete(project);
     }
 
@@ -161,8 +193,8 @@ public class ProjectService {
                 .figma(project.getFigma())
                 .deadLine(project.getDeadLine())
                 .step(project.getStep())
-                .language(project.getLanguages())
-                .genre(project.getGenres())
+                .language(project.getLanguages().stream().map(Language::getLanguage).collect(Collectors.toList()))
+                .genre(project.getGenres().stream().map(Genre::getGenre).collect(Collectors.toList()))
                 .comment(
                         project.getComments().stream().map(comment -> CommentDto.Response.builder()
                                 .commentId(comment.getId())
@@ -195,6 +227,9 @@ public class ProjectService {
         List<UserProject> userProjects = userProjectRepository.findAllByProject(project);
         return ProjectDto.Response.builder()
                 .projectName(project.getProjectName())
+                .feCount(project.getFeCount())
+                .beCount(project.getBeCount())
+                .deCount(project.getDeCount())
                 .github(project.getGithub())
                 .figma(project.getFigma())
                 .user(
