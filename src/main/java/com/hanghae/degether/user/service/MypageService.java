@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,8 @@ public class MypageService {
         this.userRepository = userRepository;
 
     }
-        // 와 드디어완성
+
+    @Transactional
     public MyPageResDto getuserInfo(MypageReqDto mypageReqDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         String profileUrl = mypageReqDto.getProfileUrl();
@@ -66,7 +68,7 @@ public class MypageService {
         }
 
         // 내가 참여한 모든 프로 젝트들 불러오기
-        List<MyProjectResDto> myproject = userProjectRepository.findAllByUserAndisTeam(user, true);
+        List<MyProjectResDto> myproject = userProjectRepository.findAllByUserAndIsTeam(user, true);
 
 
         ResultDto resultDto = new ResultDto(profileUrl,role,nickname,languages,github,figma,intro,Zzim,myproject);
@@ -74,6 +76,8 @@ public class MypageService {
         return new MyPageResDto(true,"마이페이지 정보를 가져왔습니다.", resultDto);
     }
 
+
+    @Transactional
     public LoginResponseDto deleteUser(UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         user.setStatus(false);

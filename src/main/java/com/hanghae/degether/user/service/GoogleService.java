@@ -17,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -45,6 +46,7 @@ public class GoogleService   {
     }
 
     // 구글 로그인
+    @Transactional
     public LoginResponseDto googleLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
 
         // 인가코드로 엑세스토큰 가져오기

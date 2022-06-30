@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -46,6 +47,7 @@ public class NaverService {
 
 
 
+    @Transactional
     public LoginResponseDto naverLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
         //todo 프론트에서 받은 인가코드를 기반으로 인증서버에게 인증 받고,
         // 인증받은 사용자의 정보를 이용하여 SocialUserInfoDto를 생성하여 반환한다.
