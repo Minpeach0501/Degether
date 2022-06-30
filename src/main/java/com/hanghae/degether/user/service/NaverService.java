@@ -101,7 +101,7 @@ public class NaverService {
 
 
         } catch (HttpClientErrorException e) {
-            throw new NullPointerException("오류입니다");
+            throw new IllegalArgumentException("오류입니다");
         }
     }
 
@@ -168,16 +168,13 @@ public class NaverService {
         String token = jwtTokenProvider.createToken(naverUser.getUsername());
         // exception 발생시켜서 stauts 값으로 탈퇴한 회원들을 판별하기때문에
         // 토큰값 안넘겨주고 dto값 반환
-        try {
-            if (naverUser.isStatus() == false) {
-                token = null;
-                throw new NullPointerException("탈퇴한 회원입니다.");
-            }
-            response.addHeader("Authorization", "BEARER" + " " + token);
-            return new LoginResponseDto(true, "성공");
-        } catch (NullPointerException e) {
-            String message = e.getMessage();
-            return new LoginResponseDto(false, message);
+
+        if (naverUser.isStatus() == false) {
+            token = null;
+            throw new IllegalArgumentException("탈퇴한 회원입니다.");
         }
+        response.addHeader("Authorization", "BEARER" + " " + token);
+        return new LoginResponseDto(true, "성공");
+
     }
 }

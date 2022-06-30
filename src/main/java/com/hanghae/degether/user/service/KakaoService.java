@@ -150,16 +150,13 @@ public class KakaoService {
 
         String token = jwtTokenProvider.createToken(kakaouser.getUsername());
 
-        try {
-            if (kakaouser.isStatus() == false) {
-                token = null;
-                throw new NullPointerException("탈퇴한 회원입니다.");
-            }
-            response.addHeader("Authorization", "BEARER" + " " + token);
-            return new LoginResponseDto(true, "성공");
-        } catch (NullPointerException e) {
-            String message = e.getMessage();
-            return new LoginResponseDto(false, message);
+
+        if (kakaouser.isStatus() == false) {
+            token = null;
+            throw new IllegalArgumentException("탈퇴한 회원입니다.");
         }
+        response.addHeader("Authorization", "BEARER" + " " + token);
+        return new LoginResponseDto(true, "성공");
+
     }
 }
