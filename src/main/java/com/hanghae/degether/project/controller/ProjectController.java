@@ -3,9 +3,13 @@ package com.hanghae.degether.project.controller;
 import com.hanghae.degether.project.dto.ProjectDto;
 import com.hanghae.degether.project.dto.ResponseDto;
 import com.hanghae.degether.project.service.ProjectService;
+import com.hanghae.degether.user.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,7 +20,7 @@ public class ProjectController {
     // 프로젝트 생성
     @PostMapping("/project")
     public ResponseDto<?> createProject(
-            @RequestPart ProjectDto.Request projectRequestDto,
+            @Valid @RequestPart ProjectDto.Request projectRequestDto,
             @RequestPart(value = "thumbnail") MultipartFile multipartFile) {
         return ResponseDto.builder()
                 .ok(true)
@@ -28,7 +32,7 @@ public class ProjectController {
     @PutMapping("/project/{projectId}")
     public ResponseDto<?> modifyProject(
             @PathVariable Long projectId,
-            @RequestPart ProjectDto.Request projectRequestDto,
+            @Valid @RequestPart ProjectDto.Request projectRequestDto,
             @RequestPart(value = "thumbnail") MultipartFile multipartFile) {
         return ResponseDto.builder()
                 .ok(true)
@@ -43,11 +47,13 @@ public class ProjectController {
             @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "language", required = false) String language,
             @RequestParam(value = "genre", required = false) String genre,
-            @RequestParam(value = "step", required = false) String step) {
+            @RequestParam(value = "step", required = false) String step,
+            @RequestHeader(value = "Authorization",required = false) String token
+    ) {
         return ResponseDto.builder()
                 .ok(true)
                 .message("요청 성공")
-                .result(projectService.getProjects(search, language, genre, step))
+                .result(projectService.getProjects(search, language, genre, step, token))
                 .build();
     }
 
