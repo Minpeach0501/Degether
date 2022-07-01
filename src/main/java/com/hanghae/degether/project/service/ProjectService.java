@@ -1,6 +1,6 @@
 package com.hanghae.degether.project.service;
 
-import com.hanghae.degether.doc.DocRepository;
+import com.hanghae.degether.doc.repository.DocRepository;
 import com.hanghae.degether.project.dto.CommentDto;
 import com.hanghae.degether.project.dto.DocDto;
 import com.hanghae.degether.project.dto.ProjectDto;
@@ -15,10 +15,8 @@ import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
