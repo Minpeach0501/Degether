@@ -1,7 +1,8 @@
-package com.hanghae.degether.doc;
+package com.hanghae.degether.doc.repository;
 
 
 
+import com.hanghae.degether.doc.model.Doc;
 import com.hanghae.degether.project.model.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 

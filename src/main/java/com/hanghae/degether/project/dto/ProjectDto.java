@@ -27,15 +27,15 @@ public class ProjectDto {
 
         @NotNull(message = "올바른 값을 입력해 주세요.")
         @PositiveOrZero(message = "0 이상의 숫자를 입력해 주세요.")
-        private int feCount;
+        private Integer feCount;
 
         @NotNull(message = "올바른 값을 입력해 주세요.")
         @PositiveOrZero(message = "0 이상의 숫자를 입력해 주세요.")
-        private int beCount;
+        private Integer beCount;
 
         @NotNull(message = "올바른 값을 입력해 주세요.")
         @PositiveOrZero(message = "0 이상의 숫자를 입력해 주세요.")
-        private int deCount;
+        private Integer deCount;
 
         private String github;
 
@@ -44,8 +44,8 @@ public class ProjectDto {
         private LocalDate deadLine;
 
         private String step;
-        private List<Language> language;
-        private List<Genre> genre;
+        private List<String> language;
+        private List<String> genre;
     }
     @Getter
     @Setter
@@ -54,6 +54,7 @@ public class ProjectDto {
     @AllArgsConstructor
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Response{
+        private Long projectId;
         private String thumbnail;
         private String projectName;
         private String projectDescription;
@@ -64,13 +65,14 @@ public class ProjectDto {
         private String figma;
         private LocalDate deadLine;
         private String step;
-        private List<Language> language;
-        private List<Genre> genre;
+        private List<String> language;
+        private List<String> genre;
         private List<CommentDto.Response> comment;
         private List<UserDto> user;
         private List<UserDto> applyUser;
         private List<DocDto> notice;
         private List<DocDto> todo;
+        private Boolean isZzim;
     }
 
 

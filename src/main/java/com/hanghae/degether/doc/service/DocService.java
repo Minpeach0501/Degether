@@ -1,6 +1,14 @@
-package com.hanghae.degether.doc;
+package com.hanghae.degether.doc.service;
 
 
+import com.hanghae.degether.doc.dto.DocRequestDto;
+import com.hanghae.degether.doc.dto.DocResponseDto;
+import com.hanghae.degether.doc.dto.StatusDto;
+import com.hanghae.degether.doc.model.Doc;
+import com.hanghae.degether.doc.model.Folder;
+import com.hanghae.degether.doc.dto.ResponseDto;
+import com.hanghae.degether.doc.repository.DocRepository;
+import com.hanghae.degether.doc.repository.FolderRepository;
 import com.hanghae.degether.project.model.Project;
 import com.hanghae.degether.project.repository.ProjectRepository;
 import com.hanghae.degether.user.model.User;
@@ -12,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class DocService {
@@ -19,20 +28,23 @@ public class DocService {
     private final DocRepository docRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final FolderRepository folderRepository;
 
     @Autowired
-    public DocService(DocRepository docRepository, ProjectRepository projectRepository, UserRepository userRepository){
+    public DocService(DocRepository docRepository, ProjectRepository projectRepository, UserRepository userRepository, FolderRepository folderRepository){
         this.docRepository = docRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
+        this.folderRepository = folderRepository;
     }
 
     @Transactional
-    public ResponseDto<Object> createDoc(Long projectId, DocRequestDto docRequestDto, UserDetailsImpl userDetails) {
+    public ResponseDto<Object> createDoc(Long projectId, DocRequestDto docRequestDto, UserDetailsImpl userDetails, Long folderId) {
         Project project = projectRepository.findById(projectId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
         User user = userDetails.getUser();
         User user1 = userRepository.findById(docRequestDto.getInCharge()).orElseThrow(()->new IllegalArgumentException("존재하지 않는 유저입니다."));
-        Doc doc = new Doc(project, docRequestDto, user, user1);
+        Folder folder = folderRepository.findById(folderId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 폴더입니다."));
+        Doc doc = new Doc(project, docRequestDto, user, user1, folder);
         docRepository.save(doc);
         return new ResponseDto<>(true, "작성성공");
     }
@@ -41,9 +53,9 @@ public class DocService {
         Project project = projectRepository.findById(projectId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
         List<DocResponseDto> docs = new ArrayList<>();
         for(Doc doc : docRepository.findAllByProjectOrderByCreatedDateDesc(project)){
-            docs.add(new DocResponseDto(doc.getId(), doc.getTitle(), doc.getUser().getNickname()));
+            docs.add(new DocResponseDto(doc.getId(), doc.getTitle(), doc.getUser().getNickname(), doc.getFolder().getId()));
         }
-        return new ResponseDto<List<DocResponseDto>>(true,"요청성공",docs);
+        return new ResponseDto<>(true, "요청성공", docs);
     }
 
     @Transactional
@@ -57,7 +69,7 @@ public class DocService {
     @Transactional
     public ResponseDto<Object> updateDoc(Long docId, DocRequestDto docRequestDto, UserDetailsImpl userDetails) {
         Doc doc = docRepository.findById(docId).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 문서입니다."));
-        if(userDetails.getUser().getId() != doc.getId()){
+        if(!Objects.equals(userDetails.getUser().getId(), doc.getId())){
             return new ResponseDto<>(false,"작성자만 수정할 수 있습니다.");
         }
         User user = userRepository.findById(docRequestDto.getInCharge()).orElseThrow(()->new IllegalArgumentException("존재하지 않는 유저입니다."));
@@ -68,7 +80,7 @@ public class DocService {
     @Transactional
     public ResponseDto<Object> deleteDoc(Long docId, UserDetailsImpl userDetails) {
         Doc doc = docRepository.findById(docId).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 문서입니다."));
-        if(userDetails.getUser().getId() != doc.getId()){
+        if(!Objects.equals(userDetails.getUser().getId(), doc.getId())){
             return new ResponseDto<>(false,"작성자만 삭제할 수 있습니다.");
         }
         docRepository.deleteById(docId);
@@ -80,18 +92,25 @@ public class DocService {
         Project project = projectRepository.findById(projectId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
         List<DocResponseDto> docs = new ArrayList<>();
         for(Doc doc : docRepository.findAllByProjectOrderByCreatedDateDesc(project)){
-            docs.add(new DocResponseDto(doc.getId(), doc.getTitle(), doc.getUser().getNickname()));
+            docs.add(new DocResponseDto(doc,doc.getInCharge()));
         }
-        return new ResponseDto<List<DocResponseDto>>(true,"요청성공",docs);
+        return new ResponseDto<>(true, "요청성공", docs);
     }
 
     @Transactional
     public ResponseDto<Object> docStatus(Long docId, StatusDto statusDto, UserDetailsImpl userDetails) {
         Doc doc = docRepository.findById(docId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 문서입니다."));
-        if(userDetails.getUser().getId() != doc.getUser().getId()){
+        if(!Objects.equals(userDetails.getUser().getId(), doc.getUser().getId())){
             return new ResponseDto<>(false,"작성자만 수정 가능합니다.");
         }
         doc.update(statusDto);
         return new ResponseDto<>(true, "수정 완료");
+    }
+
+    public ResponseDto<?> updateFolder(Long docId, Long folderId) {
+        Doc doc = docRepository.findById(docId).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 문서입니다."));
+        Folder folder = folderRepository.findById(folderId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 폴더입니다."));
+        doc.update(folder);
+        return  new ResponseDto<>(true,"이동 성공.");
     }
 }

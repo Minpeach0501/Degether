@@ -1,11 +1,16 @@
-package com.hanghae.degether.doc;
+package com.hanghae.degether.doc.model;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.hanghae.degether.doc.dto.DocRequestDto;
+import com.hanghae.degether.doc.dto.StatusDto;
 import com.hanghae.degether.project.model.Project;
+import com.hanghae.degether.project.model.Timestamped;
 import com.hanghae.degether.user.model.User;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -14,7 +19,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Doc extends Timestamped{
+public class Doc extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,19 +63,11 @@ public class Doc extends Timestamped{
     @JoinColumn(name = "incharge_id")
     private User inCharge;
 
-    public Doc(Project project,DocRequestDto docRequestDto,User user) {
-        this.title = docRequestDto.getTitle();
-        this.content = docRequestDto.getContent();
-        this.docStatus = docRequestDto.getDocStatus();
-        this.notice = docRequestDto.getNotice();
-        this.onGoing = docRequestDto.getOnGoing();
-        this.startDate = docRequestDto.getStartDate();
-        this.endDate = docRequestDto.getEndDate();
-        this.user = user;
-        this.project = project;
-    }
+    @ManyToOne
+    @JoinColumn(name = "folder_id")
+    private Folder folder;
 
-    public Doc(Project project, DocRequestDto docRequestDto, User user, User user2) {
+    public Doc(Project project, DocRequestDto docRequestDto, User user, User user2, Folder folder) {
         this.title = docRequestDto.getTitle();
         this.content = docRequestDto.getContent();
         this.docStatus = docRequestDto.getDocStatus();
@@ -81,6 +78,7 @@ public class Doc extends Timestamped{
         this.user = user;
         this.project = project;
         this.inCharge = user2;
+        this.folder = folder;
     }
 
     public void update(DocRequestDto docRequestDto, User user){
@@ -97,4 +95,9 @@ public class Doc extends Timestamped{
     public void update(StatusDto statusDto) {
         this.docStatus = statusDto.getDocStatus();
     }
+
+    public void update(Folder folder) {
+        this.folder = folder;
+    }
+
 }

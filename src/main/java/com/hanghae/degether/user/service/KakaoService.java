@@ -15,6 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -38,6 +39,7 @@ public class KakaoService {
     }
 
 
+    @Transactional
     public LoginResponseDto kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
 // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getAccessToken(code);
@@ -148,16 +150,13 @@ public class KakaoService {
 
         String token = jwtTokenProvider.createToken(kakaouser.getUsername());
 
-        try {
-            if (kakaouser.isStatus() == false) {
-                token = null;
-                throw new NullPointerException("탈퇴한 회원입니다.");
-            }
-            response.addHeader("Authorization", "BEARER" + " " + token);
-            return new LoginResponseDto(true, "성공");
-        } catch (NullPointerException e) {
-            String message = e.getMessage();
-            return new LoginResponseDto(false, message);
+
+        if (kakaouser.isStatus() == false) {
+            token = null;
+            throw new IllegalArgumentException("탈퇴한 회원입니다.");
         }
+        response.addHeader("Authorization", "BEARER" + " " + token);
+        return new LoginResponseDto(true, "성공");
+
     }
 }

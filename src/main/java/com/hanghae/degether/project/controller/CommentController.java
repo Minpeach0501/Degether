@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
     private final CommentService commentService;
 
-    @GetMapping("/comment/{projectId}")
+    @PostMapping("/comment/{projectId}")
     public ResponseDto<?> createComment(@PathVariable Long projectId, @RequestBody CommentDto.Request commentRequestDto) {
         return ResponseDto.builder()
                 .ok(true)

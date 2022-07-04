@@ -13,5 +13,9 @@ public interface ZzimRepository extends JpaRepository<Zzim, Long> {
 
     void deleteByUserAndProject(User user, Project project);
 
+    boolean existsByProjectAndUser(Project project, User user);
+
+    void deleteByProject(Project project);
+
     List<Zzim> findAllByUser(User user);
 }

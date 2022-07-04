@@ -1,7 +1,8 @@
-package com.hanghae.degether.doc;
+package com.hanghae.degether.doc.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import com.hanghae.degether.doc.model.Doc;
 import com.hanghae.degether.user.model.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,7 @@ public class DocResponseDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private String nickname;
+    private Long folderId;
 
     @DateTimeFormat(pattern = "yyyy-mm-dd")
     private LocalDateTime createdDate;
@@ -51,10 +53,11 @@ public class DocResponseDto {
         this.endDate = doc.getEndDate();
     }
 
-    public DocResponseDto(Long id, String title, String nickname) {
+    public DocResponseDto(Long id, String title, String nickname, Long folderId) {
         this.id = id;
         this.title = title;
         this.nickname = nickname;
+        this.folderId = folderId;
     }
 
 

@@ -1,11 +1,9 @@
-package com.hanghae.degether.doc;
+package com.hanghae.degether.doc.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @NoArgsConstructor
 @Setter
@@ -29,9 +27,8 @@ public class ResponseDto<T> {
 //    }
 
     public ResponseDto(boolean ok, String message, T t) {
-        this.ok =ok;
+        this.ok = ok;
         this.message = message;
         this.result = t;
     }
 }
-

@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -46,6 +47,7 @@ public class NaverService {
 
 
 
+    @Transactional
     public LoginResponseDto naverLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
         //todo 프론트에서 받은 인가코드를 기반으로 인증서버에게 인증 받고,
         // 인증받은 사용자의 정보를 이용하여 SocialUserInfoDto를 생성하여 반환한다.
@@ -99,7 +101,7 @@ public class NaverService {
 
 
         } catch (HttpClientErrorException e) {
-            throw new NullPointerException("오류입니다");
+            throw new IllegalArgumentException("오류입니다");
         }
     }
 
@@ -166,16 +168,13 @@ public class NaverService {
         String token = jwtTokenProvider.createToken(naverUser.getUsername());
         // exception 발생시켜서 stauts 값으로 탈퇴한 회원들을 판별하기때문에
         // 토큰값 안넘겨주고 dto값 반환
-        try {
-            if (naverUser.isStatus() == false) {
-                token = null;
-                throw new NullPointerException("탈퇴한 회원입니다.");
-            }
-            response.addHeader("Authorization", "BEARER" + " " + token);
-            return new LoginResponseDto(true, "성공");
-        } catch (NullPointerException e) {
-            String message = e.getMessage();
-            return new LoginResponseDto(false, message);
+
+        if (naverUser.isStatus() == false) {
+            token = null;
+            throw new IllegalArgumentException("탈퇴한 회원입니다.");
         }
+        response.addHeader("Authorization", "BEARER" + " " + token);
+        return new LoginResponseDto(true, "성공");
+
     }
 }

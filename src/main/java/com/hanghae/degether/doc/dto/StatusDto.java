@@ -1,4 +1,4 @@
-package com.hanghae.degether.doc;
+package com.hanghae.degether.doc.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
