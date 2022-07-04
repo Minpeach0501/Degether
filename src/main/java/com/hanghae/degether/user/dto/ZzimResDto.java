@@ -15,14 +15,14 @@ public class ZzimResDto {
     private List<Genre> genre;
     private String step;
 
- public ZzimResDto(Zzim zzim) {
+    public ZzimResDto(Zzim zzim) {
 
-  this.projectId = zzim.getProject().getId();
-  this.projectName = zzim.getProject().getProjectName();
-  this.projectDescription = zzim.getProject().getProjectDescription();
-  this.thumbnail = zzim.getProject().getThumbnail();
-  this.language = zzim.getProject().getLanguages();
-  this.genre = zzim.getProject().getGenres();
-  this.step = zzim.getProject().getStep();
- }
+     this.projectId = zzim.getProject().getId();
+     this.projectName = zzim.getProject().getProjectName();
+     this.projectDescription = zzim.getProject().getProjectDescription();
+     this.thumbnail = zzim.getProject().getThumbnail();
+     this.language = zzim.getProject().getLanguages();
+     this.genre = zzim.getProject().getGenres();
+     this.step = zzim.getProject().getStep();
+    }
 }

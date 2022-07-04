@@ -41,6 +41,12 @@ public class User {
     private String intro;
 
     @Column
+    private String email;
+
+    @Column
+    private String phoneNumber;
+
+    @Column
     private boolean status = true ;
 
 
