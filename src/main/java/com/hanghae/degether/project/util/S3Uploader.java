@@ -68,7 +68,11 @@ public class S3Uploader {
     }
     public String getOriginalFileName(String fileUrl, String dirName) {
         // 원본 파일 이름
-        return fileUrl.replace(baseUrl + dirName + "/", "").substring(36);
+        return getFileName(fileUrl).replace(dirName+"/","").substring(36);
+    }
+    public String getFileName(String fileUrl) {
+        // 원본 파일 이름
+        return fileUrl.replace(baseUrl, "");
     }
 
     // S3에 이미지 업로드
@@ -82,6 +86,7 @@ public class S3Uploader {
 
     // 업로드된 S3 파일 삭제
     public void deleteFromS3(String source) {
+        System.out.println(source);
         amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, source));
     }
 }

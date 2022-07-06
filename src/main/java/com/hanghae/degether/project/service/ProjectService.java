@@ -84,9 +84,9 @@ public class ProjectService {
             return savedProject.getId();
         } catch (Exception e) {
             log.info("delete Img");
-            s3Uploader.deleteFromS3(thumbnailUrl);
+            s3Uploader.deleteFromS3(s3Uploader.getFileName(thumbnailUrl));
             for (String infoFileUrl : infoFileUrls) {
-                s3Uploader.deleteFromS3(infoFileUrl);
+                s3Uploader.deleteFromS3(s3Uploader.getFileName(infoFileUrl));
             }
             throw e;
         }
@@ -167,7 +167,7 @@ public class ProjectService {
         if (!multipartFile.isEmpty()) {
             //프로젝트 수정시 새로운 multipartfile이 오면 이미지 수정
             //기존이미지 삭제
-            s3Uploader.deleteFromS3(project.getThumbnail());
+            s3Uploader.deleteFromS3(s3Uploader.getFileName(project.getThumbnail()));
             //새로운 이미지 업로드
             thumbnail = s3Uploader.upload(multipartFile, S3ThumbnailDir);
         }
@@ -201,6 +201,7 @@ public class ProjectService {
         if (fileUrl != null) {
             //파일 삭제, 수정
             infoFiles.remove(fileUrl);
+            s3Uploader.deleteFromS3(s3Uploader.getFileName(fileUrl));
         }
         if (!infoFile.isEmpty()) {
             //파일 추가, 수정
@@ -226,7 +227,10 @@ public class ProjectService {
         }
         if (!project.getThumbnail().isEmpty() && !"".equals(project.getThumbnail())) {
             //이미지 삭제
-            s3Uploader.deleteFromS3(project.getThumbnail());
+            s3Uploader.deleteFromS3(s3Uploader.getFileName(project.getThumbnail()));
+        }
+        for (String infoFileUrl : project.getInfoFiles()) {
+            s3Uploader.deleteFromS3(s3Uploader.getFileName(infoFileUrl));
         }
         zzimRepository.deleteByProject(project);
         projectRepository.delete(project);
