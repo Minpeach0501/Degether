@@ -14,6 +14,7 @@ public interface ZzimRepository extends JpaRepository<Zzim, Long> {
     void deleteByUserAndProject(User user, Project project);
 
     boolean existsByProjectAndUser(Project project, User user);
+    long countByProject(Project project);
 
     void deleteByProject(Project project);
 

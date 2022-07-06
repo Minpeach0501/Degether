@@ -24,6 +24,8 @@ public class S3Uploader {
 
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;  // S3 버킷 이름
+    @Value("${cloud.aws.s3.baseUrl}")
+    public String baseUrl;  // S3 버킷 이름
     public Long maxUploadSize = 1024 * 1024 * 50L; // 50mb
 
     // 이미지 업로드
@@ -63,6 +65,10 @@ public class S3Uploader {
     private String createFileName(String originalFilename, String dirName) {
         // 랜덤한 이미지파일 이름 생성
         return dirName + "/" + UUID.randomUUID() + originalFilename;
+    }
+    public String getOriginalFileName(String fileUrl, String dirName) {
+        // 원본 파일 이름
+        return fileUrl.replace(baseUrl + dirName + "/", "").substring(36);
     }
 
     // S3에 이미지 업로드

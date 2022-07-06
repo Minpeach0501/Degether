@@ -64,15 +64,38 @@ public class ProjectDto {
         private String github;
         private String figma;
         private LocalDate deadLine;
+        private long dDay;
         private String step;
         private List<String> language;
         private List<String> genre;
+        private List<ProjectDto.File> infoFiles;
         private List<CommentDto.Response> comment;
         private List<UserDto> user;
         private List<UserDto> applyUser;
         private List<DocDto> notice;
         private List<DocDto> todo;
         private Boolean isZzim;
+        private long zzimCount;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class Slice{
+        private Boolean isLast;
+        private List<ProjectDto.Response> list;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class File{
+        private String fileName;
+        private String fileUrl;
     }
 
 
