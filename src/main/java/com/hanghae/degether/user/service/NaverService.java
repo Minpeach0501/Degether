@@ -109,7 +109,7 @@ public class NaverService {
     public SocialUserInfoDto getUserInfo(String accessToken) throws JsonProcessingException {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Authorization",  accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
         // HTTP 요청 보내기
@@ -126,9 +126,11 @@ public class NaverService {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         System.out.println(responseBody);
+        Long naverid = jsonNode.get("response").get("id").asLong();
         String nickname = jsonNode.get("response").get("nickname").asText();
         String username = jsonNode.get("response").get("email").asText();
         String profileUrl = jsonNode.get("response").get("profile_image").asText();
+
 
 //        log.info("로그인 이용자 정보");
 //        log.info("네이버 고유ID : " + id);
@@ -136,13 +138,13 @@ public class NaverService {
 //        log.info("이메일 : " + username);
 //        log.info("프로필이미지 URL : " + profileUrl);
 
-        return new SocialUserInfoDto( nickname, username, profileUrl);
+        return new SocialUserInfoDto(naverid,nickname, username, profileUrl);
     }
 
     // 3. email로 db 유무 확인후 회원가입 처리
     private User registerKakaoUserIfNeed(SocialUserInfoDto naverUserInfo) {
         // DB 에 중복된 email이 있는지 확인
-        String username = naverUserInfo.getEmail();
+        String username = ("naver" + String.valueOf(naverUserInfo.getId()));
         String nickname = naverUserInfo.getNickname();
         String profileUrl = naverUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)
@@ -173,7 +175,7 @@ public class NaverService {
             token = null;
             throw new IllegalArgumentException("탈퇴한 회원입니다.");
         }
-        response.addHeader("Authorization", "BEARER" + " " + token);
+        response.addHeader("Authorization", token);
         return new LoginResponseDto(true, "성공");
 
     }

@@ -118,7 +118,8 @@ public class GoogleService   {
         JsonNode googleUserInfo = objectMapper.readTree(responseBody);
 
         // 유저정보 작성
-        String username = googleUserInfo.get("email").asText();
+
+        String username = googleUserInfo.get("id").asText();
         String nickname = googleUserInfo.get("name").asText();
         String profileUrl = googleUserInfo.get("picture").asText();
 
@@ -132,7 +133,7 @@ public class GoogleService   {
     // 3. email로 db 유무 확인후 회원가입 처리
     private User registerKakaoUserIfNeed(SocialUserInfoDto googleUserInfo) {
         // DB 에 중복된 email이 있는지 확인
-        String username = googleUserInfo.getEmail();
+        String username = ("google" + String.valueOf(googleUserInfo.getId()));
         String nickname = googleUserInfo.getNickname();
         String profileUrl = googleUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)
@@ -160,7 +161,7 @@ public class GoogleService   {
             token = null;
             throw new IllegalArgumentException("탈퇴한 회원입니다.");
         }
-        response.addHeader("Authorization", "BEARER" + " " + token);
+        response.addHeader("Authorization", token);
         return new LoginResponseDto(true, "성공");
 
     }

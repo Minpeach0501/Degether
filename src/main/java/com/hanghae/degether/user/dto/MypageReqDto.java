@@ -18,4 +18,6 @@ public class MypageReqDto {
     private String github;
     private String figma;
     private String intro;
+    private String phoneNumber;
+    private String email;
 }

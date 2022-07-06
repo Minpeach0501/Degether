@@ -103,21 +103,22 @@ public class KakaoService {
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-        Long id = jsonNode.get("id").asLong();
+        Long kakaoid = jsonNode.get("id").asLong();
         String nickname = jsonNode.get("properties")
                 .get("nickname").asText();
         String username = jsonNode.get("kakao_account")
                 .get("email").asText();
-        String profielUrl = jsonNode.get("properties")
+        String profileUrl = jsonNode.get("properties")
                 .get("profile_image").asText();
 
-        return new SocialUserInfoDto(id, nickname, username, profielUrl);
+        return new SocialUserInfoDto(kakaoid, nickname, username, profileUrl);
     }
     // 3. 카카오ID로 회원가입 처리
     private User registerKakaoUserIfNeed (SocialUserInfoDto kakaoUserInfo) {
         // DB 에 중복된 email이 있는지 확인
-        String username = String.valueOf(kakaoUserInfo.getId());
+        String username = ("kakao" + String.valueOf(kakaoUserInfo.getId()));
         String nickname = kakaoUserInfo.getNickname();
+        String profileUrl = kakaoUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)
                 .orElse(null);
 
@@ -126,9 +127,9 @@ public class KakaoService {
             // password: random UUID
             String password = UUID.randomUUID().toString();
             String encodedPassword = passwordEncoder.encode(password);
-            String profile = "https://ossack.s3.ap-northeast-2.amazonaws.com/basicprofile.png";
+//            String profile = "https://ossack.s3.ap-northeast-2.amazonaws.com/basicprofile.png";
 
-            user = new User(username, nickname, profile, encodedPassword);
+            user = new User(username, nickname, profileUrl, encodedPassword);
             userRepository.save(user);
 
         }
@@ -155,7 +156,7 @@ public class KakaoService {
             token = null;
             throw new IllegalArgumentException("탈퇴한 회원입니다.");
         }
-        response.addHeader("Authorization", "BEARER" + " " + token);
+        response.addHeader("Authorization",  token);
         return new LoginResponseDto(true, "성공");
 
     }

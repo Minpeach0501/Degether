@@ -5,6 +5,7 @@ import com.hanghae.degether.project.model.Zzim;
 import com.hanghae.degether.project.repository.ProjectRepository;
 import com.hanghae.degether.project.repository.UserProjectRepository;
 import com.hanghae.degether.project.repository.ZzimRepository;
+import com.hanghae.degether.project.util.S3Uploader;
 import com.hanghae.degether.user.dto.*;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
@@ -14,9 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -30,17 +33,21 @@ public class MypageService {
 
     private final UserRepository userRepository;
 
+    private  final  S3Uploader s3Uploader;
+
     @Autowired
     public MypageService(ZzimRepository zzimRepository,
                          UserProjectRepository userProjectRepository,
                          ProjectRepository projectRepository,
-                         UserRepository userRepository
+                         UserRepository userRepository,
+                         S3Uploader s3Uploader
     )
     {
         this.zzimRepository =zzimRepository;
         this.userProjectRepository =userProjectRepository;
         this.projectRepository =projectRepository;
         this.userRepository = userRepository;
+        this.s3Uploader = s3Uploader;
 
     }
 
@@ -83,5 +90,38 @@ public class MypageService {
         user.setStatus(false);
         userRepository.save(user);
         return new LoginResponseDto(true, "삭제성공");
+    }
+    @Transactional
+    public List<MyUpdateDto> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto){
+        String username = userDetails.getUsername();
+        String profileUrl = "";
+        s3Uploader.deleteFromS3(profileUrl);
+
+        Optional<User> user = userRepository.findByUsername(username);
+        if(!user.isPresent()) {
+            throw new IllegalArgumentException ("등록되지 않은 사용자입니다.");
+        }
+        if(!file.isEmpty()) {
+            //이미지 업로드
+            profileUrl = s3Uploader.upload(file, reqDto.getProfileUrl());
+        }
+
+
+            String phoneNumber = reqDto.getPhoneNumber();
+            String figma = reqDto.getFigma();
+            String github = reqDto.getGithub();
+            String email = reqDto.getEmail();
+            String nickname = reqDto.getNickname();
+            String intro = reqDto.getIntro();
+            String role = reqDto.getRole();
+            List<Language> language = reqDto.getLanguages();
+
+            List<MyUpdateDto> myUpdateDtos = new ArrayList<>();
+
+
+            myUpdateDtos.add(new MyUpdateDto(profileUrl,role,nickname,language,github,figma,intro,phoneNumber,email));
+
+
+        return  myUpdateDtos;
     }
 }
