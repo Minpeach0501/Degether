@@ -56,6 +56,8 @@ public class Project extends Timestamped {
     private List<Comment> comments;
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<UserProject> userProjects;
+    @ElementCollection
+    private List<String> infoFiles;
 
     public ProjectDto.Response update(
             String projectName,
@@ -98,5 +100,8 @@ public class Project extends Timestamped {
                 .genre(genre.stream().map((Genre::getGenre)).collect(Collectors.toList()))
                 .thumbnail(thumbnail)
                 .build();
+    }
+    public void infoFilesUpdate(List<String> infoFiles){
+        this.infoFiles = infoFiles;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,11 +22,12 @@ public class ProjectController {
     @PostMapping("/project")
     public ResponseDto<?> createProject(
             @Valid @RequestPart ProjectDto.Request projectRequestDto,
-            @RequestPart(value = "thumbnail") MultipartFile multipartFile) {
+            @RequestPart(value = "thumbnail") MultipartFile multipartFile,
+            @RequestPart(value = "infoFile") List<MultipartFile> infoFiles) {
         return ResponseDto.builder()
                 .ok(true)
                 .message("생성 성공")
-                .projectId(projectService.createProject(projectRequestDto, multipartFile))
+                .projectId(projectService.createProject(projectRequestDto, multipartFile, infoFiles))
                 .build();
     }
 
@@ -40,6 +42,17 @@ public class ProjectController {
                 .result(projectService.modifyProject(projectId, projectRequestDto, multipartFile))
                 .build();
     }
+    @PostMapping("/infoFile/{projectId}")
+    public ResponseDto<?> modifyInfoFile(
+            @PathVariable Long projectId,
+            @RequestParam(required = false) String fileUrl,
+            @RequestPart(value = "infoFile") MultipartFile infoFile) {
+        return ResponseDto.builder()
+                .ok(true)
+                .message("요청 성공")
+                .result(projectService.modifyInfoFile(projectId, fileUrl, infoFile))
+                .build();
+    }
 
     // 프로젝트 리스트
     @GetMapping("/projects")
@@ -48,12 +61,14 @@ public class ProjectController {
             @RequestParam(value = "language", required = false) String language,
             @RequestParam(value = "genre", required = false) String genre,
             @RequestParam(value = "step", required = false) String step,
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "sorted", required = false, defaultValue = "createdDate") String sorted,
             @RequestHeader(value = "Authorization",required = false) String token
     ) {
         return ResponseDto.builder()
                 .ok(true)
                 .message("요청 성공")
-                .result(projectService.getProjects(search, language, genre, step, token))
+                .result(projectService.getProjects(search, language, genre, step, token, page, sorted))
                 .build();
     }
 
