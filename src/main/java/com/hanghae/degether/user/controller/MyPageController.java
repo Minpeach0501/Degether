@@ -1,6 +1,7 @@
 package com.hanghae.degether.user.controller;
 
 
+import com.hanghae.degether.doc.dto.ResponseDto;
 import com.hanghae.degether.user.dto.LoginResponseDto;
 import com.hanghae.degether.user.dto.MyPageResDto;
 import com.hanghae.degether.user.dto.MyUpdateDto;
@@ -51,9 +52,9 @@ public class MyPageController {
     }
     //정보 수정
     @PutMapping("/user/userEdit")
-    public List<MyUpdateDto> updateUserInfo(UserDetailsImpl userDetails,
-                                            @RequestPart(value = "file") MultipartFile  file,
-                                            @RequestPart(value = "updateDto") MypageReqDto reqDto){
+    public ResponseDto<?> updateUserInfo(UserDetailsImpl userDetails,
+                                      @RequestPart(value = "file") MultipartFile  file,
+                                      @RequestPart(value = "updateDto") MypageReqDto reqDto){
 
         return mypageService.updateUserInfo(userDetails,file,reqDto);
     }

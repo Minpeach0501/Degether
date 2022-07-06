@@ -1,5 +1,6 @@
 package com.hanghae.degether.user.service;
 
+import com.hanghae.degether.doc.dto.ResponseDto;
 import com.hanghae.degether.project.model.Language;
 import com.hanghae.degether.project.model.Zzim;
 import com.hanghae.degether.project.repository.ProjectRepository;
@@ -29,8 +30,6 @@ public class MypageService {
 
     private final UserProjectRepository userProjectRepository;
 
-    private final ProjectRepository projectRepository;
-
     private final UserRepository userRepository;
 
     private  final  S3Uploader s3Uploader;
@@ -38,14 +37,12 @@ public class MypageService {
     @Autowired
     public MypageService(ZzimRepository zzimRepository,
                          UserProjectRepository userProjectRepository,
-                         ProjectRepository projectRepository,
                          UserRepository userRepository,
                          S3Uploader s3Uploader
     )
     {
         this.zzimRepository =zzimRepository;
         this.userProjectRepository =userProjectRepository;
-        this.projectRepository =projectRepository;
         this.userRepository = userRepository;
         this.s3Uploader = s3Uploader;
 
@@ -77,7 +74,6 @@ public class MypageService {
         // 내가 참여한 모든 프로 젝트들 불러오기
         List<MyProjectResDto> myproject = userProjectRepository.findAllByUserAndIsTeam(user, true);
 
-
         ResultDto resultDto = new ResultDto(profileUrl,role,nickname,languages,github,figma,intro,Zzim,myproject);
 
         return new MyPageResDto(true,"마이페이지 정보를 가져왔습니다.", resultDto);
@@ -92,7 +88,7 @@ public class MypageService {
         return new LoginResponseDto(true, "삭제성공");
     }
     @Transactional
-    public List<MyUpdateDto> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto){
+    public ResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto){
         String username = userDetails.getUsername();
         String profileUrl = "";
         s3Uploader.deleteFromS3(profileUrl);
@@ -106,22 +102,17 @@ public class MypageService {
             profileUrl = s3Uploader.upload(file, reqDto.getProfileUrl());
         }
 
+        String phoneNumber = reqDto.getPhoneNumber();
+        String figma = reqDto.getFigma();
+        String github = reqDto.getGithub();
+        String email = reqDto.getEmail();
+        String nickname = reqDto.getNickname();
+        String intro = reqDto.getIntro();
+        String role = reqDto.getRole();
+        List<Language> language = reqDto.getLanguages();
 
-            String phoneNumber = reqDto.getPhoneNumber();
-            String figma = reqDto.getFigma();
-            String github = reqDto.getGithub();
-            String email = reqDto.getEmail();
-            String nickname = reqDto.getNickname();
-            String intro = reqDto.getIntro();
-            String role = reqDto.getRole();
-            List<Language> language = reqDto.getLanguages();
+        MyUpdateDto myUpdateDto = new MyUpdateDto(profileUrl,role,nickname,language,github,figma,intro,phoneNumber,email);
 
-            List<MyUpdateDto> myUpdateDtos = new ArrayList<>();
-
-
-            myUpdateDtos.add(new MyUpdateDto(profileUrl,role,nickname,language,github,figma,intro,phoneNumber,email));
-
-
-        return  myUpdateDtos;
+        return  new ResponseDto<>(true,"수정 성공", myUpdateDto);
     }
 }
