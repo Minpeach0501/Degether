@@ -33,7 +33,7 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long commentId) {
         User user = CommonUtil.getUser();
-        Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new IllegalArgumentException(ExceptionMessage.NOT_EXIST_Comment));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new IllegalArgumentException(ExceptionMessage.NOT_EXIST_COMMENT));
         if (!comment.getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
         }

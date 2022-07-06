@@ -15,12 +15,17 @@ import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.Store;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,17 +39,25 @@ public class ProjectService {
     private final DocRepository docRepository;
     private final ProjectQueryDslRepository projectQueryDslRepository;
     private final S3Uploader s3Uploader;
-    private final String S3Dir = "projectThumbnail";
+    private final String S3ThumbnailDir = "projectThumbnail";
+    private final String S3InfoFileDir = "projectInfo";
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public Long createProject(ProjectDto.Request projectRequestDto, MultipartFile multipartFile) {
+    public Long createProject(ProjectDto.Request projectRequestDto, MultipartFile multipartFile, List<MultipartFile> infoFiles) {
         User user = CommonUtil.getUser();
         String thumbnailUrl = "";
+        List<String> infoFileUrls = new ArrayList<>();
         if(!multipartFile.isEmpty()) {
             //이미지 업로드
-            thumbnailUrl = s3Uploader.upload(multipartFile, S3Dir);
+            thumbnailUrl = s3Uploader.upload(multipartFile, S3ThumbnailDir);
+        }
+        if (infoFiles.size() != 0) {
+            for (MultipartFile infoFile : infoFiles) {
+                String infoFileUrl = s3Uploader.upload(infoFile, S3InfoFileDir);
+                infoFileUrls.add(infoFileUrl);
+            }
         }
         //save 오류시 업로드된 이미지 삭제
         try {
@@ -59,9 +72,10 @@ public class ProjectService {
                     .figma(projectRequestDto.getFigma())
                     .deadLine(projectRequestDto.getDeadLine())
                     .step(projectRequestDto.getStep())
-                    .languages(projectRequestDto.getLanguage().stream().map((string)-> Language.builder().language(string).build()).collect(Collectors.toList()))
-                    .genres(projectRequestDto.getGenre().stream().map((string)-> Genre.builder().genre(string).build()).collect(Collectors.toList()))
+                    .languages(projectRequestDto.getLanguage().stream().map((string) -> Language.builder().language(string).build()).collect(Collectors.toList()))
+                    .genres(projectRequestDto.getGenre().stream().map((string) -> Genre.builder().genre(string).build()).collect(Collectors.toList()))
                     .user(user)
+                    .infoFiles(infoFileUrls)
                     .build());
             userProjectRepository.save(UserProject.builder()
                     .project(savedProject)
@@ -72,18 +86,27 @@ public class ProjectService {
         } catch (Exception e) {
             log.info("delete Img");
             s3Uploader.deleteFromS3(thumbnailUrl);
+            for (String infoFileUrl : infoFileUrls) {
+                s3Uploader.deleteFromS3(infoFileUrl);
+            }
             throw e;
         }
 
     }
 
     @Transactional(readOnly = true)
-    public List<?> getProjects(String search, String language, String genre, String step, String token) {
+    public ProjectDto.Slice getProjects(String search, String language, String genre, String step, String token, int page, String sorted) {
         User user = CommonUtil.getUserByToken(token, jwtTokenProvider);
         // List<Project> list = projectQueryDslRepository.getProjectsBySearch(search, language, genre, step);
         // List<Project> list = projectRepository.findAllByProjectNameContainsAndLanguages_LanguageAndGenres_GenreAndStep("프로젝트", "spring", "앱", "기획");
-        return projectQueryDslRepository.getProjectsBySearch(search, language, genre, step).stream().map(project -> {
+
+        Sort.Direction direction = Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sorted);
+        Pageable pageable = PageRequest.of(page, 5, sort);
+        Slice<Project> slice = projectQueryDslRepository.getProjectsBySearch(search, language, genre, step, pageable);
+        List<ProjectDto.Response> content = slice.getContent().stream().map(project -> {
             boolean isZzim;
+
             if(user==null) isZzim = false;
             else {
                 isZzim = zzimRepository.existsByProjectAndUser(project,user);
@@ -99,13 +122,21 @@ public class ProjectService {
                     .github(project.getGithub())
                     .figma(project.getFigma())
                     .deadLine(project.getDeadLine())
+                    .dDay(
+                            Duration.between(LocalDate.now().atStartOfDay(),project.getDeadLine().atStartOfDay()).toDays()
+                    )
                     .step(project.getStep())
                     .language(project.getLanguages().stream().map(Language::getLanguage).collect(Collectors.toList()))
                     .genre(project.getGenres().stream().map(Genre::getGenre).collect(Collectors.toList()))
                     .step(project.getStep())
                     .isZzim(isZzim)
+                    .zzimCount(zzimRepository.countByProject(project))
                     .build();
         }).collect(Collectors.toList());
+        return ProjectDto.Slice.builder()
+                .isLast(!slice.hasNext())
+                .list(content)
+                .build();
     }
 
     @Transactional
@@ -139,7 +170,7 @@ public class ProjectService {
             //기존이미지 삭제
             s3Uploader.deleteFromS3(project.getThumbnail());
             //새로운 이미지 업로드
-            thumbnail = s3Uploader.upload(multipartFile, S3Dir);
+            thumbnail = s3Uploader.upload(multipartFile, S3ThumbnailDir);
         }
 
         return project.update(
@@ -156,6 +187,29 @@ public class ProjectService {
                 projectRequestDto.getGenre().stream().map((string)-> Genre.builder().genre(string).build()).collect(Collectors.toList()),
                 thumbnail
         );
+    }
+
+    @Transactional
+    public String modifyInfoFile(Long projectId, String fileUrl, MultipartFile infoFile) {
+        User user = CommonUtil.getUser();
+        Project project = CommonUtil.getProject(projectId, projectRepository);
+        if (!project.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
+        }
+        List<String> infoFiles = project.getInfoFiles();
+        String infoFileUrl = null;
+        //파일 삭제
+        if (fileUrl != null) {
+            //파일 삭제, 수정
+            infoFiles.remove(fileUrl);
+        }
+        if (!infoFile.isEmpty()) {
+            //파일 추가, 수정
+            infoFileUrl = s3Uploader.upload(infoFile,S3InfoFileDir);
+            infoFiles.add(infoFileUrl);
+        }
+        project.infoFilesUpdate(infoFiles);
+        return infoFileUrl;
     }
 
     public boolean existUser(Long projectId) {
@@ -203,6 +257,13 @@ public class ProjectService {
                                 .comment(comment.getComment())
                                 .build()).collect(Collectors.toList())
                 )
+                .infoFiles(project.getInfoFiles().stream().map(s ->
+                        ProjectDto.File.builder()
+                        .fileUrl(s)
+                        .fileName(s3Uploader.getOriginalFileName(s,S3InfoFileDir))
+                        .build())
+                        .collect(Collectors.toList()))
+
                 .build();
     }
 
@@ -232,6 +293,9 @@ public class ProjectService {
                 .beCount(project.getBeCount())
                 .deCount(project.getDeCount())
                 .github(project.getGithub())
+                .dDay(
+                        Duration.between(LocalDate.now().atStartOfDay(),project.getDeadLine().atStartOfDay()).toDays()
+                )
                 .figma(project.getFigma())
                 .user(
                         userProjects.stream().filter((UserProject::isTeam))
@@ -277,6 +341,9 @@ public class ProjectService {
                                     .docStatus(doc.getDocStatus())
                                     .startDate(doc.getStartDate())
                                     .endDate(doc.getEndDate())
+                                    .dDay(
+                                            Duration.between(LocalDate.now().atStartOfDay(),doc.getEndDate().atStartOfDay()).toDays()
+                                    )
                                     .build();
                         }).collect(Collectors.toList())
                 )
@@ -304,15 +371,16 @@ public class ProjectService {
     public void kickUser(Long projectId, Long userId) {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
-        if (!project.getUser().getId().equals(user.getId())) {
+        if (!project.getUser().getId().equals(user.getId()) || userId.equals(user.getId())) {
             throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
         }
         User userSearch = userRepository.findById(userId).orElseThrow(()->
-                new IllegalArgumentException("??")
+                new IllegalArgumentException(ExceptionMessage.NOT_EXIST_USER)
         );
         UserProject userProject = userProjectRepository.findByProjectAndUser(project, userSearch).orElseThrow(()->
             new IllegalArgumentException(ExceptionMessage.NOT_APPLY)
         );
         userProjectRepository.delete(userProject);
     }
+
 }
