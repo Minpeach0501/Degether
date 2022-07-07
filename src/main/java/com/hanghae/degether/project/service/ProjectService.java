@@ -101,7 +101,7 @@ public class ProjectService {
 
         Sort.Direction direction = Sort.Direction.DESC;
         Sort sort = Sort.by(direction, sorted);
-        Pageable pageable = PageRequest.of(page, 5, sort);
+        Pageable pageable = PageRequest.of(page, 18, sort);
         Slice<Project> slice = projectQueryDslRepository.getProjectsBySearch(search, language, genre, step, pageable);
         List<ProjectDto.Response> content = slice.getContent().stream().map(project -> {
             boolean isZzim;

@@ -106,17 +106,22 @@ public class KakaoService {
         Long kakaoid = jsonNode.get("id").asLong();
         String nickname = jsonNode.get("properties")
                 .get("nickname").asText();
-        String username = jsonNode.get("kakao_account")
-                .get("email").asText();
-        String profileUrl = jsonNode.get("properties")
-                .get("profile_image").asText();
+        String username = "";
+        String profileUrl;
+        try {
+            profileUrl = jsonNode.get("properties")
+                    .get("profile_image").asText();
+        }
+        catch (NullPointerException e){
+            profileUrl = "https://ossack.s3.ap-northeast-2.amazonaws.com/basicprofile.png";
+        }
 
         return new SocialUserInfoDto(kakaoid, nickname, username, profileUrl);
     }
     // 3. 카카오ID로 회원가입 처리
     private User registerKakaoUserIfNeed (SocialUserInfoDto kakaoUserInfo) {
         // DB 에 중복된 email이 있는지 확인
-        String username = ("kakao" + String.valueOf(kakaoUserInfo.getId()));
+        String username = "kakao" + String.valueOf(kakaoUserInfo.getId());
         String nickname = kakaoUserInfo.getNickname();
         String profileUrl = kakaoUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)
