@@ -7,8 +7,8 @@ import com.hanghae.degether.user.service.GoogleService;
 import com.hanghae.degether.user.service.KakaoService;
 import com.hanghae.degether.user.service.NaverService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
@@ -37,19 +37,19 @@ public class AuthController {
     }
     //카카오 로그인
     @PostMapping ("/user/kakao/{code}")
-    public LoginResponseDto kakaoLogin(@PathVariable String code, HttpServletResponse response) throws JsonProcessingException {
+    public LoginResponseDto kakaoLogin(@RequestParam  String code, HttpServletResponse response) throws JsonProcessingException {
 // authorizedCode: 카카오 서버로부터 받은 인가 코드
         return kakaoService.kakaoLogin(code,response);
     }
     // 네이버 로그인
-    @PostMapping("/user/naver/{code}/{state}")
-    public  LoginResponseDto naverLogin(@PathVariable String code,@PathVariable String state,HttpServletResponse response ) throws JsonProcessingException {
+    @PostMapping("/user/naver")
+    public  LoginResponseDto naverLogin(@RequestParam  String code,@RequestParam  String state,HttpServletResponse response ) throws JsonProcessingException {
         return naverService.naverLogin(code,state,response);
     }
 
     //구글 서비스 로그인
-    @PostMapping("/user/google/{code}/{state}")
-    public  LoginResponseDto googleLogin(@PathVariable String code,@PathVariable String state,HttpServletResponse response ) throws JsonProcessingException {
+    @PostMapping("/user/google")
+    public  LoginResponseDto googleLogin(@RequestParam String code, @RequestParam String state, HttpServletResponse response ) throws JsonProcessingException {
         return googleService.googleLogin(code,state,response);
     }
 

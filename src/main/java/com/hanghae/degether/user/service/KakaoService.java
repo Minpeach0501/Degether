@@ -15,7 +15,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -39,7 +38,6 @@ public class KakaoService {
     }
 
 
-    @Transactional
     public LoginResponseDto kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
 // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getAccessToken(code);
@@ -49,8 +47,9 @@ public class KakaoService {
 
         User kakaouser = registerKakaoUserIfNeed(kakaoUserInfo);
 
-       return kakaoUsersAuthorizationInput(kakaouser, response);
 
+
+        return kakaoUsersAuthorizationInput(kakaouser, response);
 
     }
 
@@ -103,22 +102,33 @@ public class KakaoService {
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-        Long kakaoid = jsonNode.get("id").asLong();
+        Long id = jsonNode.get("id").asLong();
         String nickname = jsonNode.get("properties")
                 .get("nickname").asText();
-        String username = jsonNode.get("kakao_account")
-                .get("email").asText();
-        String profileUrl = jsonNode.get("properties")
-                .get("profile_image").asText();
+        String username = "";
+        String profileUrl = "";
+        try {
+            username = jsonNode.get("id").asText();
+        }catch (NullPointerException e){
+            username =jsonNode.get("id").asText();
+        }
 
-        return new SocialUserInfoDto(kakaoid, nickname, username, profileUrl);
+        try {
+            profileUrl = jsonNode.get("properties")
+                    .get("profile_image").asText();
+        }
+        catch (NullPointerException e) {
+            profileUrl = "https://ossack.s3.ap-northeast-2.amazonaws.com/basicprofile.png";
+        }
+
+        return new SocialUserInfoDto(username ,nickname, profileUrl);
     }
     // 3. 카카오ID로 회원가입 처리
     private User registerKakaoUserIfNeed (SocialUserInfoDto kakaoUserInfo) {
         // DB 에 중복된 email이 있는지 확인
-        String username = ("kakao" + String.valueOf(kakaoUserInfo.getId()));
+        String username = "kakao"+kakaoUserInfo.getId();
         String nickname = kakaoUserInfo.getNickname();
-        String profileUrl = kakaoUserInfo.getProfileUrl();
+        String profielUrl = kakaoUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)
                 .orElse(null);
 
@@ -127,9 +137,8 @@ public class KakaoService {
             // password: random UUID
             String password = UUID.randomUUID().toString();
             String encodedPassword = passwordEncoder.encode(password);
-//            String profile = "https://ossack.s3.ap-northeast-2.amazonaws.com/basicprofile.png";
 
-            user = new User(username, nickname, profileUrl, encodedPassword);
+            user = new User(username, nickname, profielUrl, encodedPassword);
             userRepository.save(user);
 
         }
@@ -151,13 +160,18 @@ public class KakaoService {
 
         String token = jwtTokenProvider.createToken(kakaouser.getUsername());
 
-
-        if (kakaouser.isStatus() == false) {
-            token = null;
-            throw new IllegalArgumentException("탈퇴한 회원입니다.");
+        try {
+            if (kakaouser.isStatus() == false){
+                token = null;
+                throw  new NullPointerException("탈퇴한 회원입니다.");
+            }
+            response.addHeader("Authorization", token);
+            return new LoginResponseDto(true,"성공");
+        }catch (NullPointerException e) {
+            String message = e.getMessage();
+            return new LoginResponseDto(false,message);
         }
-        response.addHeader("Authorization",  token);
-        return new LoginResponseDto(true, "성공");
+
 
     }
 }

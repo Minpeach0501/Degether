@@ -128,7 +128,7 @@ public class GoogleService   {
         log.debug("이메일 : " + username);
         log.debug("프로필이미지 URL : " + profileUrl);
 
-        return new SocialUserInfoDto(nickname,username,profileUrl);
+        return new SocialUserInfoDto(username,nickname,profileUrl);
     }
     // 3. email로 db 유무 확인후 회원가입 처리
     private User registerKakaoUserIfNeed(SocialUserInfoDto googleUserInfo) {

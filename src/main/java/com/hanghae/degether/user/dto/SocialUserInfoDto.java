@@ -14,9 +14,10 @@ public class SocialUserInfoDto {
     private String email;
     private String profileUrl;
 
-    public SocialUserInfoDto(String nickname, String email, String profileUrl) {
+
+    public SocialUserInfoDto(String id, String nickname, String profileUrl) {
+        this.id = id;
         this.nickname = nickname;
-        this.email = email;
         this.profileUrl = profileUrl;
     }
 }

@@ -3,7 +3,6 @@ package com.hanghae.degether.user.service;
 import com.hanghae.degether.doc.dto.ResponseDto;
 import com.hanghae.degether.project.model.Language;
 import com.hanghae.degether.project.model.Zzim;
-import com.hanghae.degether.project.repository.ProjectRepository;
 import com.hanghae.degether.project.repository.UserProjectRepository;
 import com.hanghae.degether.project.repository.ZzimRepository;
 import com.hanghae.degether.project.util.S3Uploader;
@@ -106,10 +105,26 @@ public class MypageService {
         String figma = reqDto.getFigma();
         String github = reqDto.getGithub();
         String email = reqDto.getEmail();
-        String nickname = reqDto.getNickname();
-        String intro = reqDto.getIntro();
         String role = reqDto.getRole();
         List<Language> language = reqDto.getLanguages();
+        String nickname = reqDto.getNickname();
+        String intro = reqDto.getIntro();
+
+        int nicknameL = nickname.length();
+        int introL = intro.length();
+
+        if (nicknameL >10){
+            throw new RuntimeException("글자수가 초과되었습니다.");
+        }
+        if (nicknameL<2){
+            throw  new RuntimeException("글자수가 부족합니다.");
+        }
+        if (introL >20){
+            throw new RuntimeException("글자수가 초과되었습니다.");
+        }
+
+
+
 
         MyUpdateDto myUpdateDto = new MyUpdateDto(profileUrl,role,nickname,language,github,figma,intro,phoneNumber,email);
 

@@ -126,9 +126,15 @@ public class NaverService {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         System.out.println(responseBody);
-        Long naverid = jsonNode.get("response").get("id").asLong();
+
         String nickname = jsonNode.get("response").get("nickname").asText();
-        String username = jsonNode.get("response").get("email").asText();
+        String username = "";
+        try {
+             username = jsonNode.get("response").get("id").asText();
+        }
+        catch (NullPointerException e){
+            username = "닉네임입력해주세요";
+        }
         String profileUrl = jsonNode.get("response").get("profile_image").asText();
 
 
@@ -138,13 +144,13 @@ public class NaverService {
 //        log.info("이메일 : " + username);
 //        log.info("프로필이미지 URL : " + profileUrl);
 
-        return new SocialUserInfoDto(naverid,nickname, username, profileUrl);
+        return new SocialUserInfoDto(username,nickname, profileUrl);
     }
 
     // 3. email로 db 유무 확인후 회원가입 처리
     private User registerKakaoUserIfNeed(SocialUserInfoDto naverUserInfo) {
         // DB 에 중복된 email이 있는지 확인
-        String username = ("naver" + String.valueOf(naverUserInfo.getId()));
+        String username = "naver"+naverUserInfo.getId();
         String nickname = naverUserInfo.getNickname();
         String profileUrl = naverUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)
