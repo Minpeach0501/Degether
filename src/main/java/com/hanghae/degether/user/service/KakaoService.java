@@ -106,13 +106,9 @@ public class KakaoService {
         Long id = jsonNode.get("id").asLong();
         String nickname = jsonNode.get("properties")
                 .get("nickname").asText();
-        String username = "";
+        String username = jsonNode.get("id").asText();
         String profileUrl = "";
-        try {
-            username = jsonNode.get("id").asText();
-        }catch (NullPointerException e){
-            username =jsonNode.get("id").asText();
-        }
+
 
         try {
             profileUrl = jsonNode.get("properties")
@@ -129,7 +125,7 @@ public class KakaoService {
         // DB 에 중복된 email이 있는지 확인
         String username = "kakao"+kakaoUserInfo.getId();
         String nickname = kakaoUserInfo.getNickname();
-        String profielUrl = kakaoUserInfo.getProfileUrl();
+        String profileUrl = kakaoUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)
                 .orElse(null);
 

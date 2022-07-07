@@ -121,7 +121,13 @@ public class GoogleService   {
 
         String username = googleUserInfo.get("id").asText();
         String nickname = googleUserInfo.get("name").asText();
-        String profileUrl = googleUserInfo.get("picture").asText();
+        String profileUrl = "";
+        try {
+            profileUrl = googleUserInfo.get("picture").asText();
+        }
+        catch (NullPointerException e){
+            profileUrl = "https://ossack.s3.ap-northeast-2.amazonaws.com/basicprofile.png";
+        }
 
         log.debug("로그인 이용자 정보");
         log.debug("닉네임 : " + nickname);
@@ -133,7 +139,7 @@ public class GoogleService   {
     // 3. email로 db 유무 확인후 회원가입 처리
     private User registerKakaoUserIfNeed(SocialUserInfoDto googleUserInfo) {
         // DB 에 중복된 email이 있는지 확인
-        String username = ("google" + String.valueOf(googleUserInfo.getId()));
+        String username = "google"+googleUserInfo.getId();
         String nickname = googleUserInfo.getNickname();
         String profileUrl = googleUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)

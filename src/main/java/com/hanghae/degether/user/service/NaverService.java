@@ -128,14 +128,14 @@ public class NaverService {
         System.out.println(responseBody);
 
         String nickname = jsonNode.get("response").get("nickname").asText();
-        String username = "";
+        String username = jsonNode.get("response").get("id").asText();
+        String profileUrl = "";
         try {
-             username = jsonNode.get("response").get("id").asText();
+             profileUrl = jsonNode.get("response").get("profile_image").asText();
+        }catch (NullPointerException e){
+            profileUrl = "https://ossack.s3.ap-northeast-2.amazonaws.com/basicprofile.png";
         }
-        catch (NullPointerException e){
-            username = "닉네임입력해주세요";
-        }
-        String profileUrl = jsonNode.get("response").get("profile_image").asText();
+
 
 
 //        log.info("로그인 이용자 정보");

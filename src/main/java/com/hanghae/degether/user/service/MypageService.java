@@ -114,13 +114,13 @@ public class MypageService {
         int introL = intro.length();
 
         if (nicknameL >10){
-            throw new RuntimeException("글자수가 초과되었습니다.");
+            throw new IllegalArgumentException("글자수가 초과되었습니다.");
         }
         if (nicknameL<2){
-            throw  new RuntimeException("글자수가 부족합니다.");
+            throw  new IllegalArgumentException("글자수가 부족합니다.");
         }
         if (introL >20){
-            throw new RuntimeException("글자수가 초과되었습니다.");
+            throw new IllegalArgumentException("글자수가 초과되었습니다.");
         }
 
 
