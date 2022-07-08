@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 
 public class SocialUserInfoDto {
-    private Long id;
+    private String id;
     private String nickname;
     private String email;
     private String profileUrl;
@@ -19,10 +19,4 @@ public class SocialUserInfoDto {
         this.profileUrl = profileUrl;
     }
 
-    public SocialUserInfoDto(Long id, String nickname, String email, String profileUrl) {
-        this.id = id;
-        this.nickname = nickname;
-        this.email = email;
-        this.profileUrl = profileUrl;
-    }
 }
