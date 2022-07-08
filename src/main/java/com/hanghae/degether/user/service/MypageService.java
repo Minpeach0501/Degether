@@ -2,7 +2,6 @@ package com.hanghae.degether.user.service;
 
 import com.hanghae.degether.project.model.Language;
 import com.hanghae.degether.project.model.Zzim;
-import com.hanghae.degether.project.repository.ProjectRepository;
 import com.hanghae.degether.project.repository.UserProjectRepository;
 import com.hanghae.degether.project.repository.ZzimRepository;
 import com.hanghae.degether.project.util.S3Uploader;
@@ -20,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -29,44 +29,40 @@ public class MypageService {
 
     private final UserProjectRepository userProjectRepository;
 
-    private final ProjectRepository projectRepository;
-
     private final UserRepository userRepository;
 
-    private  final  S3Uploader s3Uploader;
+    private  final S3Uploader s3Uploader;
 
     @Autowired
     public MypageService(ZzimRepository zzimRepository,
                          UserProjectRepository userProjectRepository,
-                         ProjectRepository projectRepository,
                          UserRepository userRepository,
                          S3Uploader s3Uploader
     )
     {
         this.zzimRepository =zzimRepository;
         this.userProjectRepository =userProjectRepository;
-        this.projectRepository =projectRepository;
         this.userRepository = userRepository;
         this.s3Uploader = s3Uploader;
 
     }
 
     @Transactional
-    public MyPageResDto getuserInfo(MypageReqDto mypageReqDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseDto<?> getuserInfo(MypageReqDto mypageReqDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         String profileUrl = mypageReqDto.getProfileUrl();
         String role = mypageReqDto.getRole();
         String nickname = mypageReqDto.getNickname();
-        List<Language> languages = mypageReqDto.getLanguages();
+        List<String> language =mypageReqDto.getLanguage();
         String github = mypageReqDto.getGithub();
         String figma = mypageReqDto.getFigma();
         String intro = mypageReqDto.getIntro();
 
         User user = userDetails.getUser();
 
-        // 내가  찜한 프로젝트 불러오기
+        // 내가  찜한 프로젝트 불러오기 나누기 1
         List<Zzim> Zzims = zzimRepository.findAllByUser(user);
-        //  찜한 프로젝트에서 필요한 값만 담기
+        //  찜한 프로젝트에서 필요한 값만 담기 나누기 2
         List<ZzimResDto> Zzim = new ArrayList<>();
 
         for (Zzim zzim : Zzims) {
@@ -77,27 +73,28 @@ public class MypageService {
         // 내가 참여한 모든 프로 젝트들 불러오기
         List<MyProjectResDto> myproject = userProjectRepository.findAllByUserAndIsTeam(user, true);
 
+        ResultDto resDto = new ResultDto(profileUrl,role,nickname,language,github,figma,intro,Zzim,myproject);
 
-        ResultDto resultDto = new ResultDto(profileUrl,role,nickname,languages,github,figma,intro,Zzim,myproject);
-
-        return new MyPageResDto(true,"마이페이지 정보를 가져왔습니다.", resultDto);
+        return new ResponseDto<>(true,"마이페이지 정보를 가져왔습니다.", resDto);
     }
 
 
     @Transactional
-    public LoginResponseDto deleteUser(UserDetailsImpl userDetails) {
+    public ResponseDto<?> deleteUser(UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         user.setStatus(false);
         userRepository.save(user);
-        return new LoginResponseDto(true, "삭제성공");
+        return new ResponseDto(true, "삭제성공");
     }
     @Transactional
-    public List<MyUpdateDto> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto){
+    public ResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto){
         String username = userDetails.getUsername();
         String profileUrl = "";
         s3Uploader.deleteFromS3(profileUrl);
 
         Optional<User> user = userRepository.findByUsername(username);
+
+
         if(!user.isPresent()) {
             throw new IllegalArgumentException ("등록되지 않은 사용자입니다.");
         }
@@ -106,22 +103,57 @@ public class MypageService {
             profileUrl = s3Uploader.upload(file, reqDto.getProfileUrl());
         }
 
+        String phoneNumber = reqDto.getPhoneNumber();
+        String figma = reqDto.getFigma();
+        String github = reqDto.getGithub();
+        String email = reqDto.getEmail();
+        String role = reqDto.getRole();
+        List<Language> language = reqDto.getLanguage().stream().map((string)-> Language.builder().language(string).build()).collect(Collectors.toList());
+        String nickname = reqDto.getNickname();
+        String intro = reqDto.getIntro();
 
-            String phoneNumber = reqDto.getPhoneNumber();
-            String figma = reqDto.getFigma();
-            String github = reqDto.getGithub();
-            String email = reqDto.getEmail();
-            String nickname = reqDto.getNickname();
-            String intro = reqDto.getIntro();
-            String role = reqDto.getRole();
-            List<Language> language = reqDto.getLanguages();
+        int nicknameL = nickname.length();
+        int introL = intro.length();
 
-            List<MyUpdateDto> myUpdateDtos = new ArrayList<>();
+        if (nicknameL >10){
+            throw new IllegalArgumentException("글자수가 초과되었습니다.");
+        }
+        if (nicknameL<2){
+            throw  new IllegalArgumentException("글자수가 부족합니다.");
+        }
+        if (introL >20){
+            throw new IllegalArgumentException("글자수가 초과되었습니다.");
+        }
 
 
-            myUpdateDtos.add(new MyUpdateDto(profileUrl,role,nickname,language,github,figma,intro,phoneNumber,email));
+        MyUpdateDto myUpdateDto = new MyUpdateDto(profileUrl,role,nickname,reqDto.getLanguage(),github,figma,intro,phoneNumber,email);
 
 
-        return  myUpdateDtos;
+        user.get().update(profileUrl,role,nickname,language,github,figma,intro,phoneNumber,email);
+
+        // 트랜잭션때문에 안써도 됌
+        //userRepository.save(user.get());
+
+        return  new ResponseDto<>(true,"수정 성공", myUpdateDto);
+
+
     }
+
+    // 프로필 정보 불러오기용
+    public ResponseDto<?> getuserInfo(String username) {
+        Optional<User> user = userRepository.findByUsername(username);
+
+        String profileUrl = user.get().getProfileUrl();
+        String role = user.get().getRole();
+        String nickname = user.get().getNickname();
+        List<String> language = user.get().getLanguage().stream().map(Language::getLanguage).collect(Collectors.toList());
+        String github = user.get().getGithub();
+        String figma = user.get().getFigma();
+        String intro = user.get().getIntro();
+
+        ProfileResDto profileResDto = new ProfileResDto(profileUrl,role,nickname,language,github,figma,intro);
+
+        return new ResponseDto<>(true,"유저 정보를 불러왔습니다.",profileResDto);
+    }
+
 }

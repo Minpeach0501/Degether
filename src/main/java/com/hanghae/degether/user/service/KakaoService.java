@@ -3,7 +3,7 @@ package com.hanghae.degether.user.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hanghae.degether.user.dto.LoginResponseDto;
+import com.hanghae.degether.user.dto.ResponseDto;
 import com.hanghae.degether.user.dto.SocialUserInfoDto;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
@@ -40,7 +40,7 @@ public class KakaoService {
 
 
     @Transactional
-    public LoginResponseDto kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseDto kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
 // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getAccessToken(code);
 
@@ -103,20 +103,27 @@ public class KakaoService {
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-        Long kakaoid = jsonNode.get("id").asLong();
+        Long id = jsonNode.get("id").asLong();
+        String username = jsonNode.get("id").asText();
         String nickname = jsonNode.get("properties")
                 .get("nickname").asText();
-        String username = jsonNode.get("kakao_account")
-                .get("email").asText();
-        String profileUrl = jsonNode.get("properties")
-                .get("profile_image").asText();
+        String profileUrl = "";
 
-        return new SocialUserInfoDto(kakaoid, nickname, username, profileUrl);
+
+        try {
+            profileUrl = jsonNode.get("properties")
+                    .get("profile_image").asText();
+        }
+        catch (NullPointerException e) {
+            profileUrl = "https://ossack.s3.ap-northeast-2.amazonaws.com/basicprofile.png";
+        }
+
+        return new SocialUserInfoDto(username ,nickname, profileUrl);
     }
     // 3. 카카오ID로 회원가입 처리
     private User registerKakaoUserIfNeed (SocialUserInfoDto kakaoUserInfo) {
         // DB 에 중복된 email이 있는지 확인
-        String username = ("kakao" + String.valueOf(kakaoUserInfo.getId()));
+        String username = "kakao"+kakaoUserInfo.getId();
         String nickname = kakaoUserInfo.getNickname();
         String profileUrl = kakaoUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)
@@ -127,7 +134,6 @@ public class KakaoService {
             // password: random UUID
             String password = UUID.randomUUID().toString();
             String encodedPassword = passwordEncoder.encode(password);
-//            String profile = "https://ossack.s3.ap-northeast-2.amazonaws.com/basicprofile.png";
 
             user = new User(username, nickname, profileUrl, encodedPassword);
             userRepository.save(user);
@@ -146,18 +152,23 @@ public class KakaoService {
 //    }
 
     // 5. response Header에 JWT 토큰 추가
-    private LoginResponseDto kakaoUsersAuthorizationInput(User kakaouser, HttpServletResponse response) {
+    private ResponseDto kakaoUsersAuthorizationInput(User kakaouser, HttpServletResponse response) {
         // response header에 token 추가
 
         String token = jwtTokenProvider.createToken(kakaouser.getUsername());
 
-
-        if (kakaouser.isStatus() == false) {
-            token = null;
-            throw new IllegalArgumentException("탈퇴한 회원입니다.");
+        try {
+            if (kakaouser.isStatus() == false){
+                token = null;
+                throw  new NullPointerException("탈퇴한 회원입니다.");
+            }
+            response.addHeader("Authorization", token);
+            return new ResponseDto(true,"성공");
+        }catch (NullPointerException e) {
+            String message = e.getMessage();
+            return new ResponseDto(false,message);
         }
-        response.addHeader("Authorization",  token);
-        return new LoginResponseDto(true, "성공");
+
 
     }
 }

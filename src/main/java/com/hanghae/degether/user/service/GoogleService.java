@@ -4,7 +4,7 @@ package com.hanghae.degether.user.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hanghae.degether.user.dto.LoginResponseDto;
+import com.hanghae.degether.user.dto.ResponseDto;
 import com.hanghae.degether.user.dto.SocialUserInfoDto;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
@@ -47,7 +47,7 @@ public class GoogleService   {
 
     // 구글 로그인
     @Transactional
-    public LoginResponseDto googleLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseDto googleLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
 
         // 인가코드로 엑세스토큰 가져오기
         String accessToken = getAccessToken(code, state);
@@ -121,19 +121,25 @@ public class GoogleService   {
 
         String username = googleUserInfo.get("id").asText();
         String nickname = googleUserInfo.get("name").asText();
-        String profileUrl = googleUserInfo.get("picture").asText();
+        String profileUrl = "";
+        try {
+            profileUrl = googleUserInfo.get("picture").asText();
+        }
+        catch (NullPointerException e){
+            profileUrl = "https://ossack.s3.ap-northeast-2.amazonaws.com/basicprofile.png";
+        }
 
         log.debug("로그인 이용자 정보");
         log.debug("닉네임 : " + nickname);
         log.debug("이메일 : " + username);
         log.debug("프로필이미지 URL : " + profileUrl);
 
-        return new SocialUserInfoDto(nickname,username,profileUrl);
+        return new SocialUserInfoDto(username,nickname,profileUrl);
     }
     // 3. email로 db 유무 확인후 회원가입 처리
     private User registerKakaoUserIfNeed(SocialUserInfoDto googleUserInfo) {
         // DB 에 중복된 email이 있는지 확인
-        String username = ("google" + String.valueOf(googleUserInfo.getId()));
+        String username = "google"+googleUserInfo.getId();
         String nickname = googleUserInfo.getNickname();
         String profileUrl = googleUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)
@@ -152,7 +158,7 @@ public class GoogleService   {
         return user;
     }
 
-    private LoginResponseDto googleUsersAuthorizationInput(User naverUser, HttpServletResponse response) {
+    private ResponseDto googleUsersAuthorizationInput(User naverUser, HttpServletResponse response) {
         String token = jwtTokenProvider.createToken(naverUser.getUsername());
         // exception 발생시켜서 stauts 값으로 탈퇴한 회원들을 판별하기때문에
         // 토큰값 안넘겨주고 dto값 반환
@@ -162,7 +168,7 @@ public class GoogleService   {
             throw new IllegalArgumentException("탈퇴한 회원입니다.");
         }
         response.addHeader("Authorization", token);
-        return new LoginResponseDto(true, "성공");
+        return new ResponseDto(true, "성공");
 
     }
 }

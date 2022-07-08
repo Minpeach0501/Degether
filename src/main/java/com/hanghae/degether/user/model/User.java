@@ -1,11 +1,13 @@
 package com.hanghae.degether.user.model;
 
 
+import com.hanghae.degether.project.model.Language;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity(name = "UserInfo")
 @Getter
@@ -24,6 +26,10 @@ public class User {
 
     @Column(nullable = false)
     private  String password;
+
+    @OneToMany
+    @JoinColumn(name = "USER_ID")
+    private List<Language> language;
 
     @Column
     private  String profileUrl;
@@ -55,5 +61,18 @@ public class User {
         this.nickname = nickname;
         this.profileUrl = profileUrl;
         this.password = password;
+    }
+
+    public void update(String profileUrl, String role, String nickname, List<Language> language, String github, String figma, String intro, String phoneNumber, String email) {
+        this.profileUrl =profileUrl;
+        this.role = role;
+        this.nickname = nickname;
+        this.language = language;
+        this.github = github;
+        this.figma = figma;
+        this.intro = intro;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+
     }
 }

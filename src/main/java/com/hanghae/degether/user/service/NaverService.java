@@ -3,7 +3,7 @@ package com.hanghae.degether.user.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hanghae.degether.user.dto.LoginResponseDto;
+import com.hanghae.degether.user.dto.ResponseDto;
 import com.hanghae.degether.user.dto.SocialUserInfoDto;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
@@ -48,7 +48,7 @@ public class NaverService {
 
 
     @Transactional
-    public LoginResponseDto naverLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseDto naverLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
         //todo 프론트에서 받은 인가코드를 기반으로 인증서버에게 인증 받고,
         // 인증받은 사용자의 정보를 이용하여 SocialUserInfoDto를 생성하여 반환한다.
         String accessToken = getAccessToken(code,state);
@@ -126,10 +126,16 @@ public class NaverService {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         System.out.println(responseBody);
-        Long naverid = jsonNode.get("response").get("id").asLong();
+
         String nickname = jsonNode.get("response").get("nickname").asText();
-        String username = jsonNode.get("response").get("email").asText();
-        String profileUrl = jsonNode.get("response").get("profile_image").asText();
+        String username = jsonNode.get("response").get("id").asText();
+        String profileUrl = "";
+        try {
+             profileUrl = jsonNode.get("response").get("profile_image").asText();
+        }catch (NullPointerException e){
+            profileUrl = "https://ossack.s3.ap-northeast-2.amazonaws.com/basicprofile.png";
+        }
+
 
 
 //        log.info("로그인 이용자 정보");
@@ -138,13 +144,13 @@ public class NaverService {
 //        log.info("이메일 : " + username);
 //        log.info("프로필이미지 URL : " + profileUrl);
 
-        return new SocialUserInfoDto(naverid,nickname, username, profileUrl);
+        return new SocialUserInfoDto(username,nickname, profileUrl);
     }
 
     // 3. email로 db 유무 확인후 회원가입 처리
     private User registerKakaoUserIfNeed(SocialUserInfoDto naverUserInfo) {
         // DB 에 중복된 email이 있는지 확인
-        String username = ("naver" + String.valueOf(naverUserInfo.getId()));
+        String username = "naver"+naverUserInfo.getId();
         String nickname = naverUserInfo.getNickname();
         String profileUrl = naverUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)
@@ -166,7 +172,7 @@ public class NaverService {
 
 
     // 4. response Header에 JWT 토큰 추가
-    private LoginResponseDto naverUsersAuthorizationInput(User naverUser, HttpServletResponse response) {
+    private ResponseDto naverUsersAuthorizationInput(User naverUser, HttpServletResponse response) {
         String token = jwtTokenProvider.createToken(naverUser.getUsername());
         // exception 발생시켜서 stauts 값으로 탈퇴한 회원들을 판별하기때문에
         // 토큰값 안넘겨주고 dto값 반환
@@ -176,7 +182,7 @@ public class NaverService {
             throw new IllegalArgumentException("탈퇴한 회원입니다.");
         }
         response.addHeader("Authorization", token);
-        return new LoginResponseDto(true, "성공");
+        return new ResponseDto(true, "성공");
 
     }
 }

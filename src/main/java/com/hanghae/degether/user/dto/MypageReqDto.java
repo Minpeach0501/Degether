@@ -1,6 +1,5 @@
 package com.hanghae.degether.user.dto;
 
-import com.hanghae.degether.project.model.Language;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +13,7 @@ public class MypageReqDto {
     private String profileUrl;
     private String role;
     private String nickname;
-    private List<Language> languages;
+    private List<String> language;
     private String github;
     private String figma;
     private String intro;
