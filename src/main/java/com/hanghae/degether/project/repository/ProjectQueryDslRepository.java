@@ -13,6 +13,7 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,7 @@ public class ProjectQueryDslRepository {
                 .leftJoin(project.languages, language1)
                 .leftJoin(project.genres, genre1)
                 .where(
+                        project.deadLine.goe(LocalDate.now()),
                         searchContains(search),
                         stepEq(step),
                         languageContains(language),

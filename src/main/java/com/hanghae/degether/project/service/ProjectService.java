@@ -26,6 +26,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -48,11 +49,11 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         String thumbnailUrl = "";
         List<String> infoFileUrls = new ArrayList<>();
-        if(!multipartFile.isEmpty()) {
+        if(multipartFile != null) {
             //이미지 업로드
             thumbnailUrl = s3Uploader.upload(multipartFile, S3ThumbnailDir);
         }
-        if (infoFiles.size() != 0) {
+        if (infoFiles != null) {
             for (MultipartFile infoFile : infoFiles) {
                 String infoFileUrl = s3Uploader.upload(infoFile, S3InfoFileDir);
                 infoFileUrls.add(infoFileUrl);
@@ -115,9 +116,8 @@ public class ProjectService {
                     .thumbnail(project.getThumbnail())
                     .projectName(project.getProjectName())
                     .projectDescription(project.getProjectDescription())
-                    .feCount(project.getFeCount())
-                    .beCount(project.getBeCount())
-                    .deCount(project.getDeCount())
+                    .currentCount((int) project.getUserProjects().stream().filter((UserProject::isTeam)).count())
+                    .totalCount(project.getBeCount() + project.getFeCount() + project.getDeCount())
                     .github(project.getGithub())
                     .figma(project.getFigma())
                     .deadLine(project.getDeadLine())
@@ -164,7 +164,7 @@ public class ProjectService {
             throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
         }
         String thumbnail = project.getThumbnail();
-        if (!multipartFile.isEmpty()) {
+        if (multipartFile != null) {
             //프로젝트 수정시 새로운 multipartfile이 오면 이미지 수정
             //기존이미지 삭제
             s3Uploader.deleteFromS3(s3Uploader.getFileName(project.getThumbnail()));
@@ -203,7 +203,7 @@ public class ProjectService {
             infoFiles.remove(fileUrl);
             s3Uploader.deleteFromS3(s3Uploader.getFileName(fileUrl));
         }
-        if (!infoFile.isEmpty()) {
+        if (infoFile != null) {
             //파일 추가, 수정
             infoFileUrl = s3Uploader.upload(infoFile,S3InfoFileDir);
             infoFiles.add(infoFileUrl);
@@ -225,8 +225,8 @@ public class ProjectService {
         if (!project.getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
         }
-        if (!project.getThumbnail().isEmpty() && !"".equals(project.getThumbnail())) {
-            //이미지 삭제
+        if (project.getThumbnail() != null && !"".equals(project.getThumbnail())) {
+            // 이미지 삭제
             s3Uploader.deleteFromS3(s3Uploader.getFileName(project.getThumbnail()));
         }
         for (String infoFileUrl : project.getInfoFiles()) {
@@ -238,12 +238,15 @@ public class ProjectService {
 
 
     public ProjectDto.Response getProject(Long projectId) {
-        User user = CommonUtil.getUser();
+        // User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         return ProjectDto.Response.builder()
                 .thumbnail(project.getThumbnail())
                 .projectName(project.getProjectName())
                 .projectDescription(project.getProjectDescription())
+                .feCurrentCount((int) project.getUserProjects().stream().filter(userProject -> Objects.equals("front", userProject.getUser().getRole())).count())
+                .beCurrentCount((int) project.getUserProjects().stream().filter(userProject -> Objects.equals("back", userProject.getUser().getRole())).count())
+                .deCurrentCount((int) project.getUserProjects().stream().filter(userProject -> Objects.equals("designer", userProject.getUser().getRole())).count())
                 .feCount(project.getFeCount())
                 .beCount(project.getBeCount())
                 .deCount(project.getDeCount())
@@ -289,7 +292,6 @@ public class ProjectService {
         if (!userProjectRepository.existsByProjectAndUserAndIsTeam(project, user, true)) {
             throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
         }
-        List<UserProject> userProjects = userProjectRepository.findAllByProject(project);
         return ProjectDto.Response.builder()
                 .projectName(project.getProjectName())
                 .feCount(project.getFeCount())
@@ -301,7 +303,7 @@ public class ProjectService {
                 )
                 .figma(project.getFigma())
                 .user(
-                        userProjects.stream().filter((UserProject::isTeam))
+                        project.getUserProjects().stream().filter((UserProject::isTeam))
                                 .map((userProjectList) -> {
                                     User userStream = userProjectList.getUser();
                                     return UserDto.builder()
@@ -313,7 +315,7 @@ public class ProjectService {
                                 }).collect(Collectors.toList())
                 )
                 .applyUser(
-                        userProjects.stream().filter((userProject -> !userProject.isTeam()))
+                        project.getUserProjects().stream().filter((userProject -> !userProject.isTeam()))
                                 .map((userProjectList) -> {
                                     User userStream = userProjectList.getUser();
                                     return UserDto.builder()

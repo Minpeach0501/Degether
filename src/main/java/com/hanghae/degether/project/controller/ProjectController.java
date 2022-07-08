@@ -22,8 +22,8 @@ public class ProjectController {
     @PostMapping("/project")
     public ResponseDto<?> createProject(
             @Valid @RequestPart ProjectDto.Request projectRequestDto,
-            @RequestPart(value = "thumbnail") MultipartFile multipartFile,
-            @RequestPart(value = "infoFile") List<MultipartFile> infoFiles) {
+            @RequestPart(value = "thumbnail", required = false) MultipartFile multipartFile,
+            @RequestPart(value = "infoFiles", required = false) List<MultipartFile> infoFiles) {
         return ResponseDto.builder()
                 .ok(true)
                 .message("생성 성공")
@@ -35,7 +35,7 @@ public class ProjectController {
     public ResponseDto<?> modifyProject(
             @PathVariable Long projectId,
             @Valid @RequestPart ProjectDto.Request projectRequestDto,
-            @RequestPart(value = "thumbnail") MultipartFile multipartFile) {
+            @RequestPart(value = "thumbnail", required = false) MultipartFile multipartFile) {
         return ResponseDto.builder()
                 .ok(true)
                 .message("수정 성공")
@@ -46,7 +46,7 @@ public class ProjectController {
     public ResponseDto<?> modifyInfoFile(
             @PathVariable Long projectId,
             @RequestParam(required = false) String fileUrl,
-            @RequestPart MultipartFile infoFile) {
+            @RequestPart(required = false) MultipartFile infoFile) {
         return ResponseDto.builder()
                 .ok(true)
                 .message("요청 성공")

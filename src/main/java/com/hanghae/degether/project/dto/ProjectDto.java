@@ -1,6 +1,7 @@
 package com.hanghae.degether.project.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.hanghae.degether.project.model.Genre;
 import com.hanghae.degether.project.model.Language;
 import lombok.*;
@@ -58,13 +59,19 @@ public class ProjectDto {
         private String thumbnail;
         private String projectName;
         private String projectDescription;
-        private int feCount;
-        private int beCount;
-        private int deCount;
+        private Integer feCount;
+        private Integer beCount;
+        private Integer deCount;
+        private Integer feCurrentCount;
+        private Integer beCurrentCount;
+        private Integer deCurrentCount;
+        private Integer currentCount;
+        private Integer totalCount;
         private String github;
         private String figma;
         private LocalDate deadLine;
-        private long dDay;
+        @JsonProperty("dDay")
+        private Long dDay;
         private String step;
         private List<String> language;
         private List<String> genre;
@@ -75,7 +82,7 @@ public class ProjectDto {
         private List<DocDto> notice;
         private List<DocDto> todo;
         private Boolean isZzim;
-        private long zzimCount;
+        private Long zzimCount;
     }
     @Getter
     @Setter
