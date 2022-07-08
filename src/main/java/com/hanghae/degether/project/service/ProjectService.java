@@ -111,13 +111,23 @@ public class ProjectService {
             else {
                 isZzim = zzimRepository.existsByProjectAndUser(project,user);
             }
+            int devCount = project.getBeCount() + project.getFeCount();
+            int deCount = project.getDeCount();
+            for (UserProject userProject : project.getUserProjects()) {
+                String role = userProject.getUser().getRole();
+                if ("back".equals(role) || "front".equals(role)) {
+                    devCount--;
+                } else if ("designer".equals(role)) {
+                    deCount--;
+                }
+            }
             return ProjectDto.Response.builder()
                     .projectId(project.getId())
                     .thumbnail(project.getThumbnail())
                     .projectName(project.getProjectName())
                     .projectDescription(project.getProjectDescription())
-                    .currentCount((int) project.getUserProjects().stream().filter((UserProject::isTeam)).count())
-                    .totalCount(project.getBeCount() + project.getFeCount() + project.getDeCount())
+                    .devCount(devCount)
+                    .deCount(deCount)
                     .github(project.getGithub())
                     .figma(project.getFigma())
                     .deadLine(project.getDeadLine())

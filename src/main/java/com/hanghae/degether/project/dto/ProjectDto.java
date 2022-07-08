@@ -61,12 +61,11 @@ public class ProjectDto {
         private String projectDescription;
         private Integer feCount;
         private Integer beCount;
+        private Integer devCount;
         private Integer deCount;
         private Integer feCurrentCount;
         private Integer beCurrentCount;
         private Integer deCurrentCount;
-        private Integer currentCount;
-        private Integer totalCount;
         private String github;
         private String figma;
         private LocalDate deadLine;
