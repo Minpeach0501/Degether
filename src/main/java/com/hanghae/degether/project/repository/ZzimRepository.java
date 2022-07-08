@@ -6,6 +6,7 @@ import com.hanghae.degether.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ZzimRepository extends JpaRepository<Zzim, Long> {
 
@@ -19,4 +20,6 @@ public interface ZzimRepository extends JpaRepository<Zzim, Long> {
     void deleteByProject(Project project);
 
     List<Zzim> findAllByUser(User user);
+
+    List<Zzim> findAllByUser(Optional<User> user);
 }

@@ -1,6 +1,5 @@
 package com.hanghae.degether.user.dto;
 
-import com.hanghae.degether.project.model.Language;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +11,7 @@ public class ResultDto {
     private String profileUrl;
     private String role;
     private String nickname ;
-    private List<Language> language;
+    private List<String> language;
     private String github;
     private String figma;
     private String intro;
@@ -21,7 +20,7 @@ public class ResultDto {
 
     private List<MyProjectResDto> myProject;
 
-    public ResultDto(String profileUrl, String role, String nickname, List<Language> languages, String github, String figma, String intro, List<ZzimResDto> zzim, List<MyProjectResDto> myproject) {
+    public ResultDto(String profileUrl, String role, String nickname, List<String> languages, String github, String figma, String intro, List<ZzimResDto> zzim, List<MyProjectResDto> myproject) {
         this.profileUrl =profileUrl;
         this.role= role;
         this.nickname = nickname;

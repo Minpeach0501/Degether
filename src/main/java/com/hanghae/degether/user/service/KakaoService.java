@@ -104,9 +104,9 @@ public class KakaoService {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         Long id = jsonNode.get("id").asLong();
+        String username = jsonNode.get("id").asText();
         String nickname = jsonNode.get("properties")
                 .get("nickname").asText();
-        String username = jsonNode.get("id").asText();
         String profileUrl = "";
 
 
@@ -134,6 +134,7 @@ public class KakaoService {
             // password: random UUID
             String password = UUID.randomUUID().toString();
             String encodedPassword = passwordEncoder.encode(password);
+//            String profile = "https://ossack.s3.ap-northeast-2.amazonaws.com/basicprofile.png";
 
             user = new User(username, nickname, profileUrl, encodedPassword);
             userRepository.save(user);
@@ -152,7 +153,7 @@ public class KakaoService {
 //    }
 
     // 5. response Header에 JWT 토큰 추가
-    private LoginResponseDto kakaoUsersAuthorizationInput(User kakaouser, HttpServletResponse response) {
+    private ResponseDto kakaoUsersAuthorizationInput(User kakaouser, HttpServletResponse response) {
         // response header에 token 추가
 
         String token = jwtTokenProvider.createToken(kakaouser.getUsername());
@@ -163,10 +164,10 @@ public class KakaoService {
                 throw  new NullPointerException("탈퇴한 회원입니다.");
             }
             response.addHeader("Authorization", token);
-            return new LoginResponseDto(true,"성공");
+            return new ResponseDto(true,"성공");
         }catch (NullPointerException e) {
             String message = e.getMessage();
-            return new LoginResponseDto(false,message);
+            return new ResponseDto(false,message);
         }
 
 

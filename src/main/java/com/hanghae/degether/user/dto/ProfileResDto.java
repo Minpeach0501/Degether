@@ -1,6 +1,5 @@
 package com.hanghae.degether.user.dto;
 
-import com.hanghae.degether.project.model.Language;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +9,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MyUpdateDto {
+public class ProfileResDto {
+
 
     private String profileUrl;
     private String role;
@@ -19,10 +19,8 @@ public class MyUpdateDto {
     private String github;
     private String figma;
     private String intro;
-    private String phoneNumber;
-    private String email;
 
-    public MyUpdateDto(String profileUrl, String role, String nickname, List<String> language, String github, String figma, String intro, String phoneNumber, String email) {
+    public ProfileResDto(String profileUrl, String role, String nickname, List<String> language, String github, String figma, String intro) {
         this.profileUrl = profileUrl;
         this.role = role;
         this.nickname = nickname;
@@ -30,7 +28,5 @@ public class MyUpdateDto {
         this.github = github;
         this.figma = figma;
         this.intro = intro;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
     }
 }

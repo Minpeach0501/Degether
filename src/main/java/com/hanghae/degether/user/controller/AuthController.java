@@ -7,6 +7,7 @@ import com.hanghae.degether.user.service.GoogleService;
 import com.hanghae.degether.user.service.KakaoService;
 import com.hanghae.degether.user.service.NaverService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +37,7 @@ public class AuthController {
         this.googleService =googleService;
     }
     //카카오 로그인
-    @PostMapping ("/user/kakao/{code}")
+    @PostMapping ("/user/kakao")
     public LoginResponseDto kakaoLogin(@RequestParam  String code, HttpServletResponse response) throws JsonProcessingException {
 // authorizedCode: 카카오 서버로부터 받은 인가 코드
         return kakaoService.kakaoLogin(code,response);
