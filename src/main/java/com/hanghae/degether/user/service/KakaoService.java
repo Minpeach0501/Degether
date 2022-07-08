@@ -3,8 +3,9 @@ package com.hanghae.degether.user.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hanghae.degether.user.dto.UserResponseDto;
+import com.hanghae.degether.user.dto.LoginResDto;
 import com.hanghae.degether.user.dto.SocialUserInfoDto;
+import com.hanghae.degether.user.dto.UserResponseDto;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
@@ -54,7 +55,9 @@ public class KakaoService {
 
         Optional<User> user = userRepository.findByUsername(kakaouser.getUsername());
 
-       return new UserResponseDto<>(true, "로그인성공",user);
+        LoginResDto loginResDto = new LoginResDto(user);
+
+       return new UserResponseDto<>(true, "로그인성공",loginResDto);
 
     }
 
