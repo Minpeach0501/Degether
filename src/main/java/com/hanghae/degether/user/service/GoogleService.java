@@ -4,7 +4,7 @@ package com.hanghae.degether.user.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hanghae.degether.user.dto.ResponseDto;
+import com.hanghae.degether.user.dto.UserResponseDto;
 import com.hanghae.degether.user.dto.SocialUserInfoDto;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
@@ -47,7 +47,7 @@ public class GoogleService   {
 
     // 구글 로그인
     @Transactional
-    public ResponseDto googleLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
+    public UserResponseDto googleLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
 
         // 인가코드로 엑세스토큰 가져오기
         String accessToken = getAccessToken(code, state);
@@ -158,7 +158,7 @@ public class GoogleService   {
         return user;
     }
 
-    private ResponseDto googleUsersAuthorizationInput(User naverUser, HttpServletResponse response) {
+    private UserResponseDto googleUsersAuthorizationInput(User naverUser, HttpServletResponse response) {
         String token = jwtTokenProvider.createToken(naverUser.getUsername());
         // exception 발생시켜서 stauts 값으로 탈퇴한 회원들을 판별하기때문에
         // 토큰값 안넘겨주고 dto값 반환
@@ -168,7 +168,7 @@ public class GoogleService   {
             throw new IllegalArgumentException("탈퇴한 회원입니다.");
         }
         response.addHeader("Authorization", token);
-        return new ResponseDto(true, "성공");
+        return new UserResponseDto(true, "성공");
 
     }
 }

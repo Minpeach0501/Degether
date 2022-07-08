@@ -9,26 +9,26 @@ import lombok.Setter;
 @Setter
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseDto<T> {
+public class UserResponseDto<A> {
     private boolean ok;
     private String message;
-    private T result;
+    private A result;
     //private T results;
 
-    public ResponseDto(boolean ok, String message) {
+    public UserResponseDto(boolean ok, String message) {
         this.ok = ok;
         this.message = message;
     }
 
-//    public ResponseDto(boolean ok, String message, T list) {
+//    public UserResponseDto(boolean ok, String message, T list) {
 //        this.ok = ok;
 //        this.message = message;
 //        this.results = list;
 //    }
 
-    public ResponseDto(boolean ok, String message, T t) {
+    public UserResponseDto(boolean ok, String message, A result) {
         this.ok = ok;
         this.message = message;
-        this.result = t;
+        this.result = result;
     }
 }

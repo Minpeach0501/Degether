@@ -1,9 +1,7 @@
 package com.hanghae.degether.user.service;
 
-import com.hanghae.degether.doc.dto.ResponseDto;
 import com.hanghae.degether.project.model.Language;
 import com.hanghae.degether.project.model.Zzim;
-import com.hanghae.degether.project.repository.ProjectRepository;
 import com.hanghae.degether.project.repository.UserProjectRepository;
 import com.hanghae.degether.project.repository.ZzimRepository;
 import com.hanghae.degether.project.util.S3Uploader;
@@ -21,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -49,7 +48,7 @@ public class MypageService {
     }
 
     @Transactional
-    public ResponseDto<?> getuserInfo(MypageReqDto mypageReqDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public UserResponseDto<?> getuserInfo(MypageReqDto mypageReqDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         String profileUrl = mypageReqDto.getProfileUrl();
         String role = mypageReqDto.getRole();
@@ -76,19 +75,19 @@ public class MypageService {
 
         ResultDto resDto = new ResultDto(profileUrl,role,nickname,language,github,figma,intro,Zzim,myproject);
 
-        return new ResponseDto<>(true,"마이페이지 정보를 가져왔습니다.", resDto);
+        return new UserResponseDto<>(true,"마이페이지 정보를 가져왔습니다.", resDto);
     }
 
 
     @Transactional
-    public ResponseDto<?> deleteUser(UserDetailsImpl userDetails) {
+    public UserResponseDto deleteUser(UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         user.setStatus(false);
         userRepository.save(user);
-        return new ResponseDto(true, "삭제성공");
+        return new UserResponseDto(true, "삭제성공");
     }
     @Transactional
-    public ResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto){
+    public UserResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto){
         String username = userDetails.getUsername();
         String profileUrl = "";
         s3Uploader.deleteFromS3(profileUrl);
@@ -135,13 +134,13 @@ public class MypageService {
         // 트랜잭션때문에 안써도 됌
         //userRepository.save(user.get());
 
-        return  new ResponseDto<>(true,"수정 성공", myUpdateDto);
+        return  new UserResponseDto<>(true,"수정 성공", myUpdateDto);
 
 
     }
 
-    // 프로필 정보 불러오기용
-    public ResponseDto<?> getuserInfo(String username) {
+    // 프로젝트 메인페이지에서 팀원 프로필 정보 불러오기용
+    public UserResponseDto<?> OneUserInfo(String username) {
         Optional<User> user = userRepository.findByUsername(username);
 
         String profileUrl = user.get().getProfileUrl();
@@ -154,7 +153,7 @@ public class MypageService {
 
         ProfileResDto profileResDto = new ProfileResDto(profileUrl,role,nickname,language,github,figma,intro);
 
-        return new ResponseDto<>(true,"유저 정보를 불러왔습니다.",profileResDto);
+        return new UserResponseDto<>(true,"유저 정보를 불러왔습니다.",profileResDto);
     }
 
 }

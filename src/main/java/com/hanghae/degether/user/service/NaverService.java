@@ -3,7 +3,7 @@ package com.hanghae.degether.user.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hanghae.degether.user.dto.ResponseDto;
+import com.hanghae.degether.user.dto.UserResponseDto;
 import com.hanghae.degether.user.dto.SocialUserInfoDto;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
@@ -48,7 +48,7 @@ public class NaverService {
 
 
     @Transactional
-    public ResponseDto naverLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
+    public UserResponseDto naverLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
         //todo 프론트에서 받은 인가코드를 기반으로 인증서버에게 인증 받고,
         // 인증받은 사용자의 정보를 이용하여 SocialUserInfoDto를 생성하여 반환한다.
         String accessToken = getAccessToken(code,state);
@@ -127,8 +127,8 @@ public class NaverService {
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         System.out.println(responseBody);
 
-        String nickname = jsonNode.get("response").get("nickname").asText();
-        String username = jsonNode.get("response").get("id").asText();
+        String NaverUsername = jsonNode.get("response").get("id").asText();
+        String NaverNickname = jsonNode.get("response").get("nickname").asText();
         String profileUrl = "";
         try {
              profileUrl = jsonNode.get("response").get("profile_image").asText();
@@ -144,12 +144,13 @@ public class NaverService {
 //        log.info("이메일 : " + username);
 //        log.info("프로필이미지 URL : " + profileUrl);
 
-        return new SocialUserInfoDto(username,nickname, profileUrl);
+        return new SocialUserInfoDto(NaverUsername,NaverNickname, profileUrl);
     }
 
     // 3. email로 db 유무 확인후 회원가입 처리
     private User registerKakaoUserIfNeed(SocialUserInfoDto naverUserInfo) {
-        // DB 에 중복된 email이 있는지 확인
+        // DB 에 중복된 username이 있는지 확인
+        //email은 선택동의라 선택하지않으면 username이  null값으로 들어가버림
         String username = "naver"+naverUserInfo.getId();
         String nickname = naverUserInfo.getNickname();
         String profileUrl = naverUserInfo.getProfileUrl();
@@ -172,7 +173,7 @@ public class NaverService {
 
 
     // 4. response Header에 JWT 토큰 추가
-    private ResponseDto naverUsersAuthorizationInput(User naverUser, HttpServletResponse response) {
+    private UserResponseDto naverUsersAuthorizationInput(User naverUser, HttpServletResponse response) {
         String token = jwtTokenProvider.createToken(naverUser.getUsername());
         // exception 발생시켜서 stauts 값으로 탈퇴한 회원들을 판별하기때문에
         // 토큰값 안넘겨주고 dto값 반환
@@ -182,7 +183,7 @@ public class NaverService {
             throw new IllegalArgumentException("탈퇴한 회원입니다.");
         }
         response.addHeader("Authorization", token);
-        return new ResponseDto(true, "성공");
+        return new UserResponseDto(true, "성공");
 
     }
 }

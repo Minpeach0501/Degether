@@ -20,7 +20,7 @@ public class ResponseDto<T> {
         this.message = message;
     }
 
-//    public ResponseDto(boolean ok, String message, T list) {
+//    public UserResponseDto(boolean ok, String message, T list) {
 //        this.ok = ok;
 //        this.message = message;
 //        this.results = list;
