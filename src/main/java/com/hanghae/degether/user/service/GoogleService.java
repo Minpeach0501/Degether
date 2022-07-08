@@ -23,6 +23,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -54,11 +55,13 @@ public class GoogleService   {
 
         SocialUserInfoDto googleUserInfo = getUserInfo(accessToken);
         // 엑세스토큰으로 유저정보 가져오기
-        User naverUser = registerKakaoUserIfNeed(googleUserInfo);
+        User googleUser = registerKakaoUserIfNeed(googleUserInfo);
 
+        googleUsersAuthorizationInput(googleUser, response);
 
-        return googleUsersAuthorizationInput(naverUser, response);
+        Optional<User> user = userRepository.findByUsername(googleUser.getUsername());
 
+        return new UserResponseDto<>(true, "로그인성공", user);
     }
 
     // 인가코드로 엑세스토큰 가져오기

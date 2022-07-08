@@ -23,6 +23,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -57,12 +58,11 @@ public class NaverService {
 
         User naverUser = registerKakaoUserIfNeed(naverUserInfo);
 
+        naverUsersAuthorizationInput(naverUser, response);
 
-        return naverUsersAuthorizationInput(naverUser, response);
+        Optional<User> user = userRepository.findByUsername(naverUser.getUsername());
 
-
-//인증받은 사용자의 정보를 이용하여 LoginResponse 를 생성하여 반환한다.
-
+        return  new UserResponseDto<>(true,"성공", user);
 
     }
 

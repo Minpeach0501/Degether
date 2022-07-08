@@ -21,6 +21,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -46,11 +47,14 @@ public class KakaoService {
 
 // 2. "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
         SocialUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
-
+// 3.유저가 등록된 유저가 아니면  회원가입
         User kakaouser = registerKakaoUserIfNeed(kakaoUserInfo);
 
-       return kakaoUsersAuthorizationInput(kakaouser, response);
+       kakaoUsersAuthorizationInput(kakaouser, response);
 
+        Optional<User> user = userRepository.findByUsername(kakaouser.getUsername());
+
+       return new UserResponseDto<>(true, "로그인성공",user);
 
     }
 
