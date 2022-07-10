@@ -4,13 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hanghae.degether.user.dto.LoginResDto;
-import com.hanghae.degether.user.dto.UserResponseDto;
 import com.hanghae.degether.user.dto.SocialUserInfoDto;
+import com.hanghae.degether.user.dto.UserResponseDto;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -36,6 +37,12 @@ public class NaverService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtTokenProvider jwtTokenProvider;
+
+    @Value("${naver.client.id}")
+    private String naver_client_id;
+
+    @Value("${naver.key}")
+    private String secret_key;
 
     @Autowired
     public NaverService(UserRepository userRepository,
@@ -78,8 +85,8 @@ public class NaverService {
         // HTTP Body 생성 (네이버는 secret key가 필요하다)
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", "7AYfB5Qp7evMA4RqbOMh");
-        body.add("client_secret", "q8HuZCWivT");
+        body.add("client_id", naver_client_id);
+        body.add("client_secret", secret_key);
         body.add("redirect_uri", "http://localhost:3000/auth/naver/callback");
         body.add("code", code);
         body.add("state", state);
@@ -112,7 +119,7 @@ public class NaverService {
     public SocialUserInfoDto getUserInfo(String accessToken) throws JsonProcessingException {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization",  accessToken);
+        headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
         // HTTP 요청 보내기

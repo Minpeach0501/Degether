@@ -27,7 +27,7 @@ public class User {
     @Column(nullable = false)
     private  String password;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
     private List<Language> language;
 
