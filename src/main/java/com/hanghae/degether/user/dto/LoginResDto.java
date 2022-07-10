@@ -30,7 +30,11 @@ public class LoginResDto {
         this.profileUrl = user.get().getProfileUrl();
         this.role = user.get().getRole();
         this.nickname = user.get().getNickname();
-        this.language =user.get().getLanguage().stream().map(Language::getLanguage).collect(Collectors.toList());
+        if(user.get().getLanguage() != null){
+            this.language =user.get().getLanguage().stream().map(Language::getLanguage).collect(Collectors.toList());
+        } else {
+            this.language = null;
+        }
         this.github = user.get().getGithub();
         this.figma = user.get().getFigma();
         this.intro = user.get().getIntro();
