@@ -10,6 +10,7 @@ import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -31,6 +32,9 @@ public class KakaoService {
     private final UserRepository userRepository;
 
     private final JwtTokenProvider jwtTokenProvider;
+
+    @Value("${kakao.client.id}")
+    public String client_id;
 
 
     @Autowired
@@ -54,7 +58,7 @@ public class KakaoService {
        kakaoUsersAuthorizationInput(kakaouser, response);
 
         Optional<User> user = userRepository.findByUsername(kakaouser.getUsername());
-
+        System.out.println(user.get().getId());
         LoginResDto loginResDto = new LoginResDto(user);
 
        return new UserResponseDto<>(true, "로그인성공",loginResDto);
@@ -67,9 +71,10 @@ public class KakaoService {
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
 // HTTP Body 생성
+
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", "d184a94d70ebafe24481f7c3c707e788");
+        body.add("client_id", client_id);
         body.add("redirect_uri", "http://localhost:3000/auth/kakao/callback");
         body.add("code", code);
 
