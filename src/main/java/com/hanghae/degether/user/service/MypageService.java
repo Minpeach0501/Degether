@@ -126,7 +126,7 @@ public class MypageService {
         }
 
 
-        MyUpdateDto myUpdateDto = new MyUpdateDto(profileUrl,role,nickname,reqDto.getLanguage(),github,figma,intro,phoneNumber,email);
+        LoginResDto loginResDto = new LoginResDto(profileUrl,role,nickname,reqDto.getLanguage(),github,figma,intro,phoneNumber,email);
 
 
         user.get().update(profileUrl,role,nickname,language,github,figma,intro,phoneNumber,email);
@@ -134,7 +134,7 @@ public class MypageService {
         // 트랜잭션때문에 안써도 됌
         //userRepository.save(user.get());
 
-        return  new UserResponseDto<>(true,"수정 성공", myUpdateDto);
+        return  new UserResponseDto<>(true,"수정 성공", loginResDto);
 
 
     }

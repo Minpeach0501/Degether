@@ -56,7 +56,7 @@ public class User {
     private boolean status = true ;
 
 
-    public User(String username, String nickname, String profileUrl, String password) {
+    public User(String username, String nickname, String profileUrl, String password){
         this.username = username;
         this.nickname = nickname;
         this.profileUrl = profileUrl;

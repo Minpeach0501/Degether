@@ -41,4 +41,16 @@ public class LoginResDto {
         this.phoneNumber = user.get().getPhoneNumber();
         this.email = user.get().getEmail();
     }
+    //MyUpdateDto 를 만들어서 할필요가 없기에 생성자를 추가해 dto 파일 하나를 줄임
+    public LoginResDto(String profileUrl, String role, String nickname, List<String> language, String github, String figma, String intro, String phoneNumber, String email) {
+        this.profileUrl = profileUrl;
+        this.role = role;
+        this.nickname = nickname;
+        this.language = language;
+        this.github = github;
+        this.figma = figma;
+        this.intro = intro;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+    }
 }

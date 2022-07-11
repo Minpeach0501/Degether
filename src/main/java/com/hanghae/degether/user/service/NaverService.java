@@ -44,6 +44,7 @@ public class NaverService {
     @Value("${naver.key}")
     private String secret_key;
 
+
     @Autowired
     public NaverService(UserRepository userRepository,
                         PasswordEncoder passwordEncoder,
@@ -64,7 +65,7 @@ public class NaverService {
         //프론트에서 받은 인가코드를 기반으로 인증서버에게 인증 받고,
         SocialUserInfoDto naverUserInfo = getUserInfo(accessToken);
 
-        User naverUser = registerKakaoUserIfNeed(naverUserInfo);
+        User naverUser = registernaverUserIfNeed(naverUserInfo);
 
         naverUsersAuthorizationInput(naverUser, response);
 
@@ -158,7 +159,7 @@ public class NaverService {
     }
 
     // 3. email로 db 유무 확인후 회원가입 처리
-    private User registerKakaoUserIfNeed(SocialUserInfoDto naverUserInfo) {
+    private User registernaverUserIfNeed(SocialUserInfoDto naverUserInfo) {
         // DB 에 중복된 username이 있는지 확인
         //email은 선택동의라 선택하지않으면 username이  null값으로 들어가버림
         String username = "naver"+naverUserInfo.getId();

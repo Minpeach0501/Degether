@@ -58,7 +58,7 @@ public class KakaoService {
        kakaoUsersAuthorizationInput(kakaouser, response);
 
         Optional<User> user = userRepository.findByUsername(kakaouser.getUsername());
-        System.out.println(user.get().getId());
+
         LoginResDto loginResDto = new LoginResDto(user);
 
        return new UserResponseDto<>(true, "로그인성공",loginResDto);
@@ -71,10 +71,9 @@ public class KakaoService {
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
 // HTTP Body 생성
-
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", client_id);
+        body.add("client_id", "d184a94d70ebafe24481f7c3c707e788");
         body.add("redirect_uri", "http://localhost:3000/auth/kakao/callback");
         body.add("code", code);
 
