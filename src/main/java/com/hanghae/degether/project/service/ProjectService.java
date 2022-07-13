@@ -266,6 +266,7 @@ public class ProjectService {
                 .deadLine(project.getDeadLine())
                 .step(project.getStep())
                 .language(project.getLanguages().stream().map(Language::getLanguage).collect(Collectors.toList()))
+                .languageString(project.getLanguages().stream().map(Language::getLanguage).collect(Collectors.joining(", ")))
                 .genre(project.getGenres().stream().map(Genre::getGenre).collect(Collectors.toList()))
                 .comment(
                         project.getComments().stream().map(comment -> CommentDto.Response.builder()
