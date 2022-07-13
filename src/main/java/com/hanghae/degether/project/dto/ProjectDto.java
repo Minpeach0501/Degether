@@ -73,6 +73,7 @@ public class ProjectDto {
         private Long dDay;
         private String step;
         private List<String> language;
+        private String languageString;
         private List<String> genre;
         private List<ProjectDto.File> infoFiles;
         private List<CommentDto.Response> comment;

@@ -136,6 +136,7 @@ public class ProjectService {
                     )
                     .step(project.getStep())
                     .language(project.getLanguages().stream().map(Language::getLanguage).collect(Collectors.toList()))
+                    .languageString(project.getLanguages().stream().map(Language::getLanguage).collect(Collectors.joining(", ")))
                     .genre(project.getGenres().stream().map(Genre::getGenre).collect(Collectors.toList()))
                     .step(project.getStep())
                     .isZzim(isZzim)
