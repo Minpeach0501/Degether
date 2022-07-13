@@ -143,8 +143,35 @@ public class ProjectService {
                     .zzimCount(zzimRepository.countByProject(project))
                     .build();
         }).collect(Collectors.toList());
+        List<ProjectDto.Response> myProject = null;
+        //참여중 프로젝트
+        if(user!=null){
+            myProject = userProjectRepository.findAllByIsTeamAndUser(true,user).stream().map(
+                    userProject -> {
+                        //Todo: 쿼리 개선 필요
+                        Project project = userProject.getProject();
+                        int devCount = 0;
+                        int deCount = 0;
+                        for (UserProject userProject2 : project.getUserProjects()) {
+                            String role = userProject2.getUser().getRole();
+                            if ("back".equals(role) || "front".equals(role)) {
+                                devCount++;
+                            } else if ("designer".equals(role)) {
+                                deCount++;
+                            }
+                        }
+                        return ProjectDto.Response.builder()
+                                .projectId(project.getId())
+                                .projectName(project.getProjectName())
+                                .devCount(devCount)
+                                .deCount(deCount)
+                                .thumbnail(project.getThumbnail())
+                                .build();
+                    }).collect(Collectors.toList());
+        }
         return ProjectDto.Slice.builder()
                 .isLast(!slice.hasNext())
+                .myProject(myProject)
                 .list(content)
                 .build();
     }

@@ -6,6 +6,7 @@ import com.hanghae.degether.user.dto.MyProjectResDto;
 import com.hanghae.degether.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,4 +25,6 @@ public interface UserProjectRepository extends JpaRepository<UserProject, Long> 
     List<MyProjectResDto> findAllByUserAndIsTeam(User user, boolean isTeam);
 
     List<MyProjectResDto> findAllByUserAndIsTeam(Optional<User> user, boolean isTeam);
+
+    List<UserProject> findAllByIsTeamAndUser(boolean isTeam, User user);
 }

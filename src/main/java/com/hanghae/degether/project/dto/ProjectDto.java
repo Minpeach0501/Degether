@@ -93,6 +93,7 @@ public class ProjectDto {
     public static class Slice{
         private Boolean isLast;
         private List<ProjectDto.Response> list;
+        private List<ProjectDto.Response> myProject;
     }
     @Getter
     @Setter
