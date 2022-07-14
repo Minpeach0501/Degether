@@ -30,7 +30,7 @@ public class CommonUtil {
         }
     }
     public static User getUserByToken(String token, JwtTokenProvider jwtTokenProvider){
-        if(token == null) return null;
+        if(token == null || "null".equals(token)) return null;
         UserDetailsImpl userDetails = (UserDetailsImpl) jwtTokenProvider.getAuthentication(token).getPrincipal();
         return userDetails.getUser();
     }
