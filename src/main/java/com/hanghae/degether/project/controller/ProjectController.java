@@ -65,6 +65,7 @@ public class ProjectController {
             @RequestParam(value = "sorted", required = false, defaultValue = "createdDate") String sorted,
             @RequestHeader(value = "Authorization",required = false) String token
     ) {
+        System.out.println("getProjects Token : " + token);
         return ResponseDto.builder()
                 .ok(true)
                 .message("요청 성공")
