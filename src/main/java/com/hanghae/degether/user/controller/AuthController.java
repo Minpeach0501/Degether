@@ -37,9 +37,9 @@ public class AuthController {
     }
     //카카오 로그인
     @PostMapping ("/user/kakao")
-    public UserResponseDto kakaoLogin(@RequestParam  String code, HttpServletResponse response) throws JsonProcessingException {
+    public UserResponseDto kakaoLogin(@RequestParam String redirectUrl, @RequestParam  String code, HttpServletResponse response) throws JsonProcessingException {
 // authorizedCode: 카카오 서버로부터 받은 인가 코드
-        return kakaoService.kakaoLogin(code,response);
+        return kakaoService.kakaoLogin(code,response,redirectUrl);
     }
     // 네이버 로그인
     @PostMapping("/user/naver")

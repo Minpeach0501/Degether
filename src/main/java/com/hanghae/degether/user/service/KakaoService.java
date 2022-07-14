@@ -35,7 +35,8 @@ public class KakaoService {
 
     @Value("${kakao.client.id}")
     public String client_id;
-
+    @Value("${loginURL}")
+    public String loginURL;
 
     @Autowired
     public KakaoService(UserRepository userRepository, PasswordEncoder passwordEncoder,JwtTokenProvider jwtTokenProvider) {
@@ -46,9 +47,9 @@ public class KakaoService {
 
 
     @Transactional
-    public UserResponseDto kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+    public UserResponseDto kakaoLogin(String code, HttpServletResponse response, String redirectUrl) throws JsonProcessingException {
 // 1. "인가 코드"로 "액세스 토큰" 요청
-        String accessToken = getAccessToken(code);
+        String accessToken = getAccessToken(code, redirectUrl);
 
 // 2. "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
         SocialUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
@@ -65,7 +66,7 @@ public class KakaoService {
 
     }
 
-    private String getAccessToken(String code) throws JsonProcessingException {
+    private String getAccessToken(String code, String redirectUrl) throws JsonProcessingException {
 // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -74,7 +75,7 @@ public class KakaoService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", client_id);
-        body.add("redirect_uri", "http://localhost:3000/auth/kakao/callback");
+        body.add("redirect_uri", redirectUrl);
         body.add("code", code);
 
 // HTTP 요청 보내기
