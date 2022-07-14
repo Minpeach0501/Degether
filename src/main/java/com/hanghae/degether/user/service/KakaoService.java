@@ -35,8 +35,6 @@ public class KakaoService {
 
     @Value("${kakao.client.id}")
     public String client_id;
-    @Value("${loginURL}")
-    public String loginURL;
 
     @Autowired
     public KakaoService(UserRepository userRepository, PasswordEncoder passwordEncoder,JwtTokenProvider jwtTokenProvider) {
