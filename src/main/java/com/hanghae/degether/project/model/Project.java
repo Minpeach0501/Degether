@@ -21,7 +21,7 @@ public class Project extends Timestamped {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
     private Long id;
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String thumbnail;
     @Column
     private String projectName;
@@ -57,6 +57,7 @@ public class Project extends Timestamped {
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<UserProject> userProjects;
     @ElementCollection
+    @Column(columnDefinition = "TEXT")
     private List<String> infoFiles;
 
     public ProjectDto.Response update(
