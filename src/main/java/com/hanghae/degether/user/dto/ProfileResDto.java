@@ -1,5 +1,6 @@
 package com.hanghae.degether.user.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 public class ProfileResDto {
 
@@ -20,6 +22,7 @@ public class ProfileResDto {
     private String figma;
     private String intro;
 
+    @Builder
     public ProfileResDto(String profileUrl, String role, String nickname, List<String> language, String github, String figma, String intro) {
         this.profileUrl = profileUrl;
         this.role = role;

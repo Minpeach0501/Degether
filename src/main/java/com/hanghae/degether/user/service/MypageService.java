@@ -10,6 +10,7 @@ import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.UserDetailsImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.IllegalInstantException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
@@ -34,10 +35,11 @@ public class MypageService {
     private  final S3Uploader s3Uploader;
 
     @Autowired
-    public MypageService(ZzimRepository zzimRepository,
-                         UserProjectRepository userProjectRepository,
-                         UserRepository userRepository,
-                         S3Uploader s3Uploader
+    public MypageService(
+            ZzimRepository zzimRepository,
+            UserProjectRepository userProjectRepository,
+            UserRepository userRepository,
+            S3Uploader s3Uploader
     )
     {
         this.zzimRepository =zzimRepository;
@@ -50,32 +52,35 @@ public class MypageService {
     @Transactional
     public UserResponseDto<?> getuserInfo(MypageReqDto mypageReqDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        String profileUrl = mypageReqDto.getProfileUrl();
-        String role = mypageReqDto.getRole();
-        String nickname = mypageReqDto.getNickname();
-        List<String> language =mypageReqDto.getLanguage();
-        String github = mypageReqDto.getGithub();
-        String figma = mypageReqDto.getFigma();
-        String intro = mypageReqDto.getIntro();
-
         User user = userDetails.getUser();
 
-        // 내가  찜한 프로젝트 불러오기 나누기 1
+
         List<Zzim> Zzims = zzimRepository.findAllByUser(user);
-        //  찜한 프로젝트에서 필요한 값만 담기 나누기 2
+
         List<ZzimResDto> Zzim = new ArrayList<>();
 
         for (Zzim zzim : Zzims) {
             ZzimResDto zzimResDto = new ZzimResDto(zzim);
             Zzim.add(zzimResDto);
         }
-
+        
         // 내가 참여한 모든 프로 젝트들 불러오기
         List<MyProjectResDto> myproject = userProjectRepository.findAllByUserAndIsTeam(user, true);
 
-        ResultDto resDto = new ResultDto(profileUrl,role,nickname,language,github,figma,intro,Zzim,myproject);
+        ResultDto resultDto = ResultDto.builder()
+                .profileUrl(mypageReqDto.getProfileUrl())
+                .role(mypageReqDto.getRole())
+                .nickname(mypageReqDto.getNickname())
+                .language(mypageReqDto.getLanguage())
+                .github(mypageReqDto.getGithub())
+                .figma(mypageReqDto.getFigma())
+                .intro(mypageReqDto.getIntro())
+                .zzim(Zzim)
+                .myProject(myproject)
+                .build();
 
-        return new UserResponseDto<>(true,"마이페이지 정보를 가져왔습니다.", resDto);
+
+        return new UserResponseDto<>(true,"마이페이지 정보를 가져왔습니다.", resultDto);
     }
 
 
@@ -86,6 +91,7 @@ public class MypageService {
         userRepository.save(user);
         return new UserResponseDto(true, "삭제성공");
     }
+
     @Transactional
     public UserResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto){
         String username = userDetails.getUsername();
@@ -136,23 +142,25 @@ public class MypageService {
 
         return  new UserResponseDto<>(true,"수정 성공", loginResDto);
 
-
     }
 
     // 프로젝트 메인페이지에서 팀원 프로필 정보 불러오기용
     public UserResponseDto<?> OneUserInfo(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new IllegalInstantException("존재하지않는 사용자입니다.")
+        );
 
-        String profileUrl = user.get().getProfileUrl();
-        String role = user.get().getRole();
-        String nickname = user.get().getNickname();
-        List<String> language = user.get().getLanguage().stream().map(Language::getLanguage).collect(Collectors.toList());
-        String github = user.get().getGithub();
-        String figma = user.get().getFigma();
-        String intro = user.get().getIntro();
+        List<String> language = user.getLanguage().stream().map(Language::getLanguage).collect(Collectors.toList());
 
-        ProfileResDto profileResDto = new ProfileResDto(profileUrl,role,nickname,language,github,figma,intro);
-
+        ProfileResDto profileResDto = ProfileResDto.builder()
+                .profileUrl(user.getProfileUrl())
+                .role(user.getRole())
+                .nickname(user.getNickname())
+                .language(language)
+                .github(user.getGithub())
+                .figma(user.getFigma())
+                .intro(user.getIntro())
+                .build();
         return new UserResponseDto<>(true,"유저 정보를 불러왔습니다.",profileResDto);
     }
 

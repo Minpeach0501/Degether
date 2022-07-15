@@ -1,11 +1,7 @@
 package com.hanghae.degether.project.exception;
 
 import com.hanghae.degether.project.dto.ResponseDto;
-import com.nimbusds.oauth2.sdk.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.crossstore.ChangeSetPersister;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

@@ -1,6 +1,5 @@
 package com.hanghae.degether.project.aop;
 
-import com.hanghae.degether.project.repository.ProjectRepository;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.security.UserDetailsImpl;
 import org.aspectj.lang.ProceedingJoinPoint;

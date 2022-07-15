@@ -1,7 +1,6 @@
 package com.hanghae.degether.project.repository;
 
 import com.hanghae.degether.project.model.Project;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.hanghae.degether.project.model.QGenre.genre1;
 import static com.hanghae.degether.project.model.QLanguage.language1;

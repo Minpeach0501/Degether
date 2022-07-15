@@ -1,11 +1,13 @@
 package com.hanghae.degether.user.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
+@Builder
 @NoArgsConstructor
 public class ResultDto {
     private String profileUrl;
@@ -20,6 +22,7 @@ public class ResultDto {
 
     private List<MyProjectResDto> myProject;
 
+    @Builder
     public ResultDto(String profileUrl, String role, String nickname, List<String> languages, String github, String figma, String intro, List<ZzimResDto> zzim, List<MyProjectResDto> myproject) {
         this.profileUrl =profileUrl;
         this.role= role;

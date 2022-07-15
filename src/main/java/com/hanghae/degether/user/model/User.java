@@ -2,9 +2,7 @@ package com.hanghae.degether.user.model;
 
 
 import com.hanghae.degether.project.model.Language;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -12,7 +10,9 @@ import java.util.List;
 @Entity(name = "UserInfo")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,13 +56,14 @@ public class User {
     private boolean status = true ;
 
 
+    @Builder
     public User(String username, String nickname, String profileUrl, String password){
         this.username = username;
         this.nickname = nickname;
         this.profileUrl = profileUrl;
         this.password = password;
     }
-
+    @Builder
     public void update(String profileUrl, String role, String nickname, List<Language> language, String github, String figma, String intro, String phoneNumber, String email) {
         this.profileUrl =profileUrl;
         this.role = role;

@@ -9,7 +9,7 @@ import com.hanghae.degether.user.dto.UserResponseDto;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class KakaoService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -36,12 +37,7 @@ public class KakaoService {
     @Value("${kakao.client.id}")
     public String client_id;
 
-    @Autowired
-    public KakaoService(UserRepository userRepository, PasswordEncoder passwordEncoder,JwtTokenProvider jwtTokenProvider) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtTokenProvider=jwtTokenProvider;
-    }
+
 
 
     @Transactional
@@ -72,7 +68,7 @@ public class KakaoService {
 // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", client_id);
+        body.add("client_id", "kakao.client.id");
         body.add("redirect_uri", redirectUrl);
         body.add("code", code);
 

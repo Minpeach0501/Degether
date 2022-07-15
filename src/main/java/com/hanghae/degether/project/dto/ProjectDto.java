@@ -2,8 +2,6 @@ package com.hanghae.degether.project.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.hanghae.degether.project.model.Genre;
-import com.hanghae.degether.project.model.Language;
 import lombok.*;
 
 import javax.validation.constraints.NotEmpty;

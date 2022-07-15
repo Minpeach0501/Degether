@@ -76,8 +76,8 @@ public class GoogleService   {
 
         // 바디에 필요한 정보 담기
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("client_id", "98635515398-lvj5cfe0tofba8it8182fsvd9ei6l0tk.apps.googleusercontent.com");
-        body.add("client_secret", "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");
+        body.add("client_id", "");
+        body.add("client_secret", "");
         body.add("code", code);
         body.add("redirect_uri", "http://localhost:3000/auth/google/callback");
         body.add("grant_type", "authorization_code");

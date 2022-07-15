@@ -1,7 +1,6 @@
 package com.hanghae.degether.doc.model;
 
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hanghae.degether.doc.dto.DocRequestDto;
 import com.hanghae.degether.doc.dto.StatusDto;
 import com.hanghae.degether.project.model.Project;
@@ -10,7 +9,6 @@ import com.hanghae.degether.user.model.User;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;

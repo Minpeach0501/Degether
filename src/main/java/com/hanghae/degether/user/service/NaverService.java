@@ -46,9 +46,10 @@ public class NaverService {
 
 
     @Autowired
-    public NaverService(UserRepository userRepository,
-                        PasswordEncoder passwordEncoder,
-                        JwtTokenProvider jwtTokenProvider
+    public NaverService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JwtTokenProvider jwtTokenProvider
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder =passwordEncoder;
@@ -180,7 +181,6 @@ public class NaverService {
         }
         return user;
     }
-
 
 
     // 4. response Header에 JWT 토큰 추가

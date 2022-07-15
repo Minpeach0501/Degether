@@ -17,7 +17,7 @@ public class LoginResDto {
     private String  profileUrl;
     private String role;
     private String  nickname;
-    private List<String> language= null;
+    private List<String> language;
     private String  github;
     private String  figma;
     private String  intro;

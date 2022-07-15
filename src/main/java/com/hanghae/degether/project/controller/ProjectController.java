@@ -3,9 +3,7 @@ package com.hanghae.degether.project.controller;
 import com.hanghae.degether.project.dto.ProjectDto;
 import com.hanghae.degether.project.dto.ResponseDto;
 import com.hanghae.degether.project.service.ProjectService;
-import com.hanghae.degether.user.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
