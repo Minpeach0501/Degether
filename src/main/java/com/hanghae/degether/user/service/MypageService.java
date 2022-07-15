@@ -31,7 +31,7 @@ public class MypageService {
 
     private final UserRepository userRepository;
 
-    private  final S3Uploader s3Uploader;
+    private final S3Uploader s3Uploader;
 
     @Autowired
     public MypageService(
@@ -39,10 +39,9 @@ public class MypageService {
             UserProjectRepository userProjectRepository,
             UserRepository userRepository,
             S3Uploader s3Uploader
-    )
-    {
-        this.zzimRepository =zzimRepository;
-        this.userProjectRepository =userProjectRepository;
+    ) {
+        this.zzimRepository = zzimRepository;
+        this.userProjectRepository = userProjectRepository;
         this.userRepository = userRepository;
         this.s3Uploader = s3Uploader;
 
@@ -62,7 +61,7 @@ public class MypageService {
             ZzimResDto zzimResDto = new ZzimResDto(zzim);
             Zzim.add(zzimResDto);
         }
-        
+
         // 내가 참여한 모든 프로 젝트들 불러오기 projection 사용
         List<MyProjectResDto> myproject = userProjectRepository.findAllByUserAndIsTeam(user, true);
 
@@ -78,7 +77,7 @@ public class MypageService {
                 .myProject(myproject)
                 .build();
 
-        return new UserResponseDto<>(true,"마이페이지 정보를 가져왔습니다.", resultDto);
+        return new UserResponseDto<>(true, "마이페이지 정보를 가져왔습니다.", resultDto);
     }
 
 
@@ -91,34 +90,34 @@ public class MypageService {
     }
 
     @Transactional
-    public UserResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto){
+    public UserResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto) {
         String username = userDetails.getUsername();
         String profileUrl = "";
         s3Uploader.deleteFromS3(profileUrl);
 
-        User user =userRepository.findByUsername(username).orElseThrow(
-                ()-> new IllegalInstantException("등록되지 않은 사용자입니다.")
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new IllegalInstantException("등록되지 않은 사용자입니다.")
         );
 
-        if(!file.isEmpty()) {
+        if (!file.isEmpty()) {
             //이미지 업로드
             profileUrl = s3Uploader.upload(file, reqDto.getProfileUrl());
         }
 
-        List<Language> language = reqDto.getLanguage().stream().map((string)-> Language.builder().language(string).build()).collect(Collectors.toList());
+        List<Language> language = reqDto.getLanguage().stream().map((string) -> Language.builder().language(string).build()).collect(Collectors.toList());
         String nickname = reqDto.getNickname();
         String intro = reqDto.getIntro();
 
         int nicknameL = nickname.length();
         int introL = intro.length();
 
-        if (nicknameL >10){
+        if (nicknameL > 10) {
             throw new IllegalArgumentException("글자수가 초과되었습니다.");
         }
-        if (nicknameL<2){
-            throw  new IllegalArgumentException("글자수가 부족합니다.");
+        if (nicknameL < 2) {
+            throw new IllegalArgumentException("글자수가 부족합니다.");
         }
-        if (introL >20){
+        if (introL > 20) {
             throw new IllegalArgumentException("글자수가 초과되었습니다.");
         }
 
@@ -136,18 +135,18 @@ public class MypageService {
                 .build();
 
         user.update(resDto.getProfileUrl(),
-                    resDto.getRole(),
-                    resDto.getNickname(),
-                    language,
-                    resDto.getGithub(),
-                    resDto.getFigma(),
-                    resDto.getIntro(),
-                    resDto.getPhoneNumber(),
-                    resDto.getEmail());
+                resDto.getRole(),
+                resDto.getNickname(),
+                language,
+                resDto.getGithub(),
+                resDto.getFigma(),
+                resDto.getIntro(),
+                resDto.getPhoneNumber(),
+                resDto.getEmail());
         // 트랜잭션때문에 안써도 됌
         //userRepository.save(user.get());
 
-        return  new UserResponseDto<>(true,"수정 성공", resDto);
+        return new UserResponseDto<>(true, "수정 성공", resDto);
 
     }
 
@@ -168,7 +167,7 @@ public class MypageService {
                 .figma(user.getFigma())
                 .intro(user.getIntro())
                 .build();
-        return new UserResponseDto<>(true,"유저 정보를 불러왔습니다.",profileResDto);
+        return new UserResponseDto<>(true, "유저 정보를 불러왔습니다.", profileResDto);
     }
 
 }
