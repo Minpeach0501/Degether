@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,7 +63,7 @@ public class MypageService {
             Zzim.add(zzimResDto);
         }
         
-        // 내가 참여한 모든 프로 젝트들 불러오기
+        // 내가 참여한 모든 프로 젝트들 불러오기 projection 사용
         List<MyProjectResDto> myproject = userProjectRepository.findAllByUserAndIsTeam(user, true);
 
         ResultDto resultDto = ResultDto.builder()
@@ -78,7 +77,6 @@ public class MypageService {
                 .zzim(Zzim)
                 .myProject(myproject)
                 .build();
-
 
         return new UserResponseDto<>(true,"마이페이지 정보를 가져왔습니다.", resultDto);
     }
@@ -98,22 +96,15 @@ public class MypageService {
         String profileUrl = "";
         s3Uploader.deleteFromS3(profileUrl);
 
-        Optional<User> user = userRepository.findByUsername(username);
+        User user =userRepository.findByUsername(username).orElseThrow(
+                ()-> new IllegalInstantException("등록되지 않은 사용자입니다.")
+        );
 
-
-        if(!user.isPresent()) {
-            throw new IllegalArgumentException ("등록되지 않은 사용자입니다.");
-        }
         if(!file.isEmpty()) {
             //이미지 업로드
             profileUrl = s3Uploader.upload(file, reqDto.getProfileUrl());
         }
 
-        String phoneNumber = reqDto.getPhoneNumber();
-        String figma = reqDto.getFigma();
-        String github = reqDto.getGithub();
-        String email = reqDto.getEmail();
-        String role = reqDto.getRole();
         List<Language> language = reqDto.getLanguage().stream().map((string)-> Language.builder().language(string).build()).collect(Collectors.toList());
         String nickname = reqDto.getNickname();
         String intro = reqDto.getIntro();
@@ -132,15 +123,31 @@ public class MypageService {
         }
 
 
-        LoginResDto loginResDto = new LoginResDto(profileUrl,role,nickname,reqDto.getLanguage(),github,figma,intro,phoneNumber,email);
+        LoginResDto resDto = LoginResDto.builder()
+                .profileUrl(reqDto.getProfileUrl())
+                .role(reqDto.getRole())
+                .nickname(reqDto.getNickname())
+                .language(reqDto.getLanguage())
+                .github(reqDto.getGithub())
+                .figma(reqDto.getFigma())
+                .intro(reqDto.getIntro())
+                .phoneNumber(reqDto.getPhoneNumber())
+                .email(reqDto.getEmail())
+                .build();
 
-
-        user.get().update(profileUrl,role,nickname,language,github,figma,intro,phoneNumber,email);
-
+        user.update(resDto.getProfileUrl(),
+                    resDto.getRole(),
+                    resDto.getNickname(),
+                    language,
+                    resDto.getGithub(),
+                    resDto.getFigma(),
+                    resDto.getIntro(),
+                    resDto.getPhoneNumber(),
+                    resDto.getEmail());
         // 트랜잭션때문에 안써도 됌
         //userRepository.save(user.get());
 
-        return  new UserResponseDto<>(true,"수정 성공", loginResDto);
+        return  new UserResponseDto<>(true,"수정 성공", resDto);
 
     }
 
