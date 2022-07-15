@@ -33,7 +33,7 @@ public class ProjectController {
     public ResponseDto<?> modifyProject(
             @PathVariable Long projectId,
             @Valid @RequestPart ProjectDto.Request projectRequestDto,
-            @RequestPart(value = "thumbnail") MultipartFile multipartFile) {
+            @RequestPart(value = "thumbnail", required = false) MultipartFile multipartFile) {
         return ResponseDto.builder()
                 .ok(true)
                 .message("수정 성공")
