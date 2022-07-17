@@ -49,25 +49,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // 토큰 인증이므로 세션 사용x
         http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.headers().frameOptions().sameOrigin();
-//        http.authorizeRequests().antMatchers("/ws-stomp");
-//        http.authorizeRequests().antMatchers("/pub/**");
-//        http.authorizeRequests().antMatchers("/sub/**");
+        //        http.authorizeRequests().antMatchers("/ws-stomp");
+        //        http.authorizeRequests().antMatchers("/pub/**");
+        //        http.authorizeRequests().antMatchers("/sub/**");
         // 회원 관리 처리 API (POST /user/**) 에 대해 CSRF 무시
 
         http.authorizeRequests()
-//                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                //                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 // 회원 관리 처리 API 전부를 login 없이 허용
                 .antMatchers("/user/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/post/**").permitAll()
                 .antMatchers("/**").permitAll()
                 .anyRequest().permitAll()
-//                .anyRequest().authenticated()
+                //                .anyRequest().authenticated()
                 .and()
                 .logout()
                 .logoutUrl("/user/logout")
-//                .deleteCookies("token")
-//                .antMatchers("/kakao/callback").permitAll()
-//                .antMatchers("/**").permitAll()
+                //                .deleteCookies("token")
+                //                .antMatchers("/kakao/callback").permitAll()
+                //                .antMatchers("/**").permitAll()
                 // 그 외 어떤 요청이든 '인증'
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
@@ -76,13 +76,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://localhost:3000");
-        configuration.addAllowedOrigin("http://solpine.shop.s3-website.ap-northeast-2.amazonaws.com");
         configuration.addAllowedOrigin("http://degather.shop.s3-website.ap-northeast-2.amazonaws.com");
+        configuration.addAllowedOrigin("https://degather.one");
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.addExposedHeader("Authorization");
         configuration.setAllowCredentials(true);
-//        configuration.validateAllowCredentials();
+        //        configuration.validateAllowCredentials();
         configuration.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
