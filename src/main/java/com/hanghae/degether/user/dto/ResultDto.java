@@ -17,13 +17,15 @@ public class ResultDto {
     private String github;
     private String figma;
     private String intro;
+    private String email;
+    private String phoneNumber;
 
     private List<ZzimResDto> zzim;
 
     private List<MyProjectResDto> myProject;
 
     @Builder
-    public ResultDto(String profileUrl, String role, String nickname, List<String> languages, String github, String figma, String intro, List<ZzimResDto> zzim, List<MyProjectResDto> myproject) {
+    public ResultDto(String profileUrl, String role, String nickname, List<String> languages, String github, String figma, String intro,String email, String phoneNumber, List<ZzimResDto> zzim, List<MyProjectResDto> myproject) {
         this.profileUrl =profileUrl;
         this.role= role;
         this.nickname = nickname;
@@ -31,6 +33,8 @@ public class ResultDto {
         this.github = github;
         this.figma = figma;
         this.intro = intro;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
         this.zzim = zzim;
         this.myProject = myproject;
     }

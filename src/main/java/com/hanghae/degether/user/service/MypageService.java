@@ -73,6 +73,8 @@ public class MypageService {
                 .github(mypageReqDto.getGithub())
                 .figma(mypageReqDto.getFigma())
                 .intro(mypageReqDto.getIntro())
+                .email(mypageReqDto.getEmail())
+                .phoneNumber(mypageReqDto.getPhoneNumber())
                 .zzim(Zzim)
                 .myProject(myproject)
                 .build();
