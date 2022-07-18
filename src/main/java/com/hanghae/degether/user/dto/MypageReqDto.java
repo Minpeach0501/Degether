@@ -28,7 +28,7 @@ public class MypageReqDto {
     private String figma;
 
     @NotEmpty(message = "한줄소개를 입력해 주세요.")
-    @Size(min = 2, max = 10, message = "2글자 이상, 10글자 이하로 입력해 주세요.")
+    @Size(max = 20, message = "20글자 이하로 입력해 주세요.")
     private String intro;
 
     @NotEmpty(message = "전화번호를 입력해 주세요.")
@@ -38,7 +38,6 @@ public class MypageReqDto {
     private String phoneNumber;
 
     @NotEmpty(message = "이메일을 입력해 주세요.")
-    @NotNull(message = "이메일을 입력해 주세요.")
-    @Email
+    @Pattern(regexp = "^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\\.[a-zA-Z]{2,3}$")
     private String email;
 }

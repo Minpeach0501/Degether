@@ -53,8 +53,9 @@ public class MypageService {
 
         User user2 = userDetails.getUser();
         User user = userRepository.findById(user2.getId()).orElseThrow(
-                ()-> new IllegalInstantException("존재하지않는 유저입니다.")
+                ()-> new IllegalInstantException("존재하지 않는 사용자입니다.")
         );
+
 
         List<Zzim> Zzims = zzimRepository.findAllByUser(user);
 
