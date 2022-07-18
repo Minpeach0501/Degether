@@ -1,6 +1,7 @@
 package com.hanghae.degether.user.service;
 
 import com.hanghae.degether.project.model.Language;
+import com.hanghae.degether.project.model.UserProject;
 import com.hanghae.degether.project.model.Zzim;
 import com.hanghae.degether.project.repository.UserProjectRepository;
 import com.hanghae.degether.project.repository.ZzimRepository;
@@ -61,9 +62,18 @@ public class MypageService {
             ZzimResDto zzimResDto = new ZzimResDto(zzim);
             Zzim.add(zzimResDto);
         }
+        List<MyProjectResDto> myProjectResDtos = new ArrayList<>();
 
         // 내가 참여한 모든 프로 젝트들 불러오기 projection 사용
-        List<MyProjectResDto> myproject = userProjectRepository.findAllByUserAndIsTeam(user, true);
+        List<UserProject> myproject = userProjectRepository.findAllByUserAndIsTeam(user, true);
+
+        for (UserProject userProject : myproject) {
+            MyProjectResDto myProjectResDto1 = new MyProjectResDto(userProject);
+            myProjectResDtos.add(myProjectResDto1);
+        }
+
+
+
 
         ResultDto resultDto = ResultDto.builder()
                 .profileUrl(mypageReqDto.getProfileUrl())
@@ -76,7 +86,7 @@ public class MypageService {
                 .email(mypageReqDto.getEmail())
                 .phoneNumber(mypageReqDto.getPhoneNumber())
                 .zzim(Zzim)
-                .myProject(myproject)
+                .myProject(myProjectResDtos)
                 .build();
 
         return new UserResponseDto<>(true, "마이페이지 정보를 가져왔습니다.", resultDto);
@@ -128,6 +138,8 @@ public class MypageService {
 
 
         LoginResDto resDto = LoginResDto.builder()
+                .userId(user.getId())
+                .username(username)
                 .profileUrl(profileUrl)
                 .role(reqDto.getRole())
                 .nickname(reqDto.getNickname())

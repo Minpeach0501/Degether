@@ -3,9 +3,13 @@ package com.hanghae.degether.user.dto;
 import com.hanghae.degether.project.model.Genre;
 import com.hanghae.degether.project.model.Language;
 import com.hanghae.degether.project.model.Zzim;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@Setter
 public class ZzimResDto {
    private Long projectId;
     private String projectName;
