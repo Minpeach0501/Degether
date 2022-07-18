@@ -6,7 +6,8 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.hanghae.degether.project.exception.ExceptionMessage;
+import com.hanghae.degether.exception.CustomException;
+import com.hanghae.degether.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,7 @@ public class S3Uploader {
     // 이미지 업로드
     public String upload(MultipartFile file, String dirName) {
         if (file.getSize() > maxUploadSize) {
-            throw new IllegalArgumentException(ExceptionMessage.OVER_UPLOAD_SIZE);
+            throw new CustomException(ErrorCode.OVER_UPLOAD_SIZE);
         }
 
         // 1. S3에 업로드할 파일 이름 생성
