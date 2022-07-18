@@ -38,4 +38,6 @@ public class ResultDto {
         this.zzim = zzim;
         this.myProject = myproject;
     }
+
+
 }
