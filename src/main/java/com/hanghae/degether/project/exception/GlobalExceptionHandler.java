@@ -2,6 +2,7 @@ package com.hanghae.degether.project.exception;
 
 import com.hanghae.degether.project.dto.ResponseDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,9 +18,21 @@ public class GlobalExceptionHandler {
                 .ok(false)
                 .message(e.getMessage())
                 .build();
-    }    @ExceptionHandler(MethodArgumentNotValidException.class)
+    }
+
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<?> customException(CustomException e){
+        log.error("CustomException",e);
+        return ResponseEntity.status(e.getCode())
+                .body(e.getMessage());
+        // return ResponseDto.builder()
+        //         .ok(false)
+        //         .message(e.getMessage())
+        //         .build();
+    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseDto<?> methodArgumentNotValidException(MethodArgumentNotValidException e){
-        log.error("IllegalArgumentException",e);
+        log.error("MethodArgumentNotValidException",e);
         return ResponseDto.builder()
                 .ok(false)
                 .message(e.getBindingResult().getAllErrors().get(0).getDefaultMessage())
