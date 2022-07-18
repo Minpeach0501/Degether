@@ -176,6 +176,5 @@ public class KakaoService {
             return new UserResponseDto(false,message);
         }
 
-
     }
 }

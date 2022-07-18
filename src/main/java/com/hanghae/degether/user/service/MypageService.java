@@ -92,18 +92,20 @@ public class MypageService {
     @Transactional
     public UserResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto) {
         String username = userDetails.getUsername();
-        String profileUrl = "";
-        s3Uploader.deleteFromS3(profileUrl);
 
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new IllegalInstantException("등록되지 않은 사용자입니다.")
         );
 
-        if (!file.isEmpty()) {
+        String profileUrl = user.getProfileUrl();
+
+        if (file!=null) {
             //이미지 업로드
+            s3Uploader.deleteFromS3(user.getProfileUrl());
             profileUrl = s3Uploader.upload(file, reqDto.getProfileUrl());
         }
 
+        // 프론트쪽으로 정보를 줄때에는 language라는 엔티티대신 스트링값을 줘야한다.
         List<Language> language = reqDto.getLanguage().stream().map((string) -> Language.builder().language(string).build()).collect(Collectors.toList());
         String nickname = reqDto.getNickname();
         String intro = reqDto.getIntro();
@@ -111,15 +113,16 @@ public class MypageService {
         int nicknameL = nickname.length();
         int introL = intro.length();
 
-        if (nicknameL > 10) {
-            throw new IllegalArgumentException("글자수가 초과되었습니다.");
-        }
-        if (nicknameL < 2) {
-            throw new IllegalArgumentException("글자수가 부족합니다.");
-        }
-        if (introL > 20) {
-            throw new IllegalArgumentException("글자수가 초과되었습니다.");
-        }
+//        유효성검사는 validation으로 교체
+//        if (nicknameL > 10) {
+//            throw new IllegalArgumentException("글자수가 초과되었습니다.");
+//        }
+//        if (nicknameL < 2) {
+//            throw new IllegalArgumentException("글자수가 부족합니다.");
+//        }
+//        if (introL > 20) {
+//            throw new IllegalArgumentException("글자수가 초과되었습니다.");
+//        }
 
 
         LoginResDto resDto = LoginResDto.builder()
@@ -143,6 +146,7 @@ public class MypageService {
                 resDto.getIntro(),
                 resDto.getPhoneNumber(),
                 resDto.getEmail());
+
         // 트랜잭션때문에 안써도 됌
         //userRepository.save(user.get());
 
@@ -167,6 +171,7 @@ public class MypageService {
                 .figma(user.getFigma())
                 .intro(user.getIntro())
                 .build();
+
         return new UserResponseDto<>(true, "유저 정보를 불러왔습니다.", profileResDto);
     }
 
