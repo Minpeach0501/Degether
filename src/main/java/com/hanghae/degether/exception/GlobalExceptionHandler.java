@@ -1,4 +1,4 @@
-package com.hanghae.degether.project.exception;
+package com.hanghae.degether.exception;
 
 import com.hanghae.degether.project.dto.ResponseDto;
 import lombok.extern.slf4j.Slf4j;

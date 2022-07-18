@@ -1,4 +1,4 @@
-package com.hanghae.degether.project.exception;
+package com.hanghae.degether.exception;
 
 import lombok.Getter;
 

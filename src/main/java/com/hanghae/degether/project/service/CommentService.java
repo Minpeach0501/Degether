@@ -1,8 +1,8 @@
 package com.hanghae.degether.project.service;
 
 import com.hanghae.degether.project.dto.CommentDto;
-import com.hanghae.degether.project.exception.CustomException;
-import com.hanghae.degether.project.exception.ErrorCode;
+import com.hanghae.degether.exception.CustomException;
+import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.project.model.Comment;
 import com.hanghae.degether.project.repository.CommentRepository;
 import com.hanghae.degether.project.repository.ProjectRepository;

@@ -1,7 +1,7 @@
 package com.hanghae.degether.project.util;
 
-import com.hanghae.degether.project.exception.CustomException;
-import com.hanghae.degether.project.exception.ErrorCode;
+import com.hanghae.degether.exception.CustomException;
+import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.project.repository.ProjectRepository;
 import com.hanghae.degether.project.model.Project;
 import com.hanghae.degether.user.model.User;
@@ -28,8 +28,12 @@ public class CommonUtil {
     }
     public static User getUserByToken(String token, JwtTokenProvider jwtTokenProvider){
         if(token == null || "null".equals(token)) return null;
-        UserDetailsImpl userDetails = (UserDetailsImpl) jwtTokenProvider.getAuthentication(token).getPrincipal();
-        return userDetails.getUser();
+        try {
+            UserDetailsImpl userDetails = (UserDetailsImpl) jwtTokenProvider.getAuthentication(token).getPrincipal();
+            return userDetails.getUser();
+        }catch (Exception e){
+            throw new CustomException(ErrorCode.UNAUTHORIZED_TOKEN);
+        }
     }
 
     // Util

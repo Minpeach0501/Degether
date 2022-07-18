@@ -1,4 +1,4 @@
-package com.hanghae.degether.project.exception;
+package com.hanghae.degether.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,8 @@ public enum ErrorCode {
     UNAUTHORIZED(415,"권한이 없습니다."),
     DUPLICATED_APPLY(416,"이미 지원한 프로젝트 입니다."),
     NOT_APPLY(417,"해당 유저는 지원한 상태가 아닙니다."),
-    DUPLICATED_JOIN(418,"이미 가입된 유저 입니다.")
+    DUPLICATED_JOIN(418,"이미 가입된 유저 입니다."),
+    UNAUTHORIZED_TOKEN(419,"유효하지 않은 토큰 입니다.")
     ;
     private final int code;
     private final String message;
