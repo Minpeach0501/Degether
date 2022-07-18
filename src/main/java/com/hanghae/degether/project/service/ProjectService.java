@@ -5,7 +5,8 @@ import com.hanghae.degether.project.dto.CommentDto;
 import com.hanghae.degether.project.dto.DocDto;
 import com.hanghae.degether.project.dto.ProjectDto;
 import com.hanghae.degether.project.dto.UserDto;
-import com.hanghae.degether.project.exception.ExceptionMessage;
+import com.hanghae.degether.project.exception.CustomException;
+import com.hanghae.degether.project.exception.ErrorCode;
 import com.hanghae.degether.project.model.*;
 import com.hanghae.degether.project.repository.ProjectQueryDslRepository;
 import com.hanghae.degether.project.repository.ProjectRepository;
@@ -203,7 +204,7 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!project.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         String thumbnail = project.getThumbnail();
         if (multipartFile != null) {
@@ -235,7 +236,7 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!project.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         List<String> infoFiles = project.getInfoFiles();
         String infoFileUrl = null;
@@ -265,7 +266,7 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!project.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         if (project.getThumbnail() != null && !"".equals(project.getThumbnail())) {
             // 이미지 삭제
@@ -320,7 +321,7 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (userProjectRepository.existsByProjectAndUser(project, user)) {
-            throw new IllegalArgumentException(ExceptionMessage.DUPLICATED_APPLY);
+            throw new CustomException(ErrorCode.DUPLICATED_APPLY);
         }
         userProjectRepository.save(UserProject.builder()
                 .user(user)
@@ -333,7 +334,7 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!userProjectRepository.existsByProjectAndUserAndIsTeam(project, user, true)) {
-            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         return ProjectDto.Response.builder()
                 .projectName(project.getProjectName())
@@ -402,16 +403,16 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!project.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         User userSearch = userRepository.findById(userId).orElseThrow(()->
                 new IllegalArgumentException("??")
         );
         UserProject userProject = userProjectRepository.findByProjectAndUser(project, userSearch).orElseThrow(()->
-                new IllegalArgumentException(ExceptionMessage.NOT_APPLY)
+                new CustomException(ErrorCode.NOT_APPLY)
         );
         if (userProject.isTeam()) {
-            throw new IllegalArgumentException(ExceptionMessage.DUPLICATED_JOIN);
+            throw new CustomException(ErrorCode.DUPLICATED_JOIN);
         }
         userProject.changeIsTeam(true);
     }
@@ -420,13 +421,13 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!project.getUser().getId().equals(user.getId()) || userId.equals(user.getId())) {
-            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         User userSearch = userRepository.findById(userId).orElseThrow(()->
-                new IllegalArgumentException(ExceptionMessage.NOT_EXIST_USER)
+                new CustomException(ErrorCode.NOT_EXIST_USER)
         );
         UserProject userProject = userProjectRepository.findByProjectAndUser(project, userSearch).orElseThrow(()->
-            new IllegalArgumentException(ExceptionMessage.NOT_APPLY)
+            new CustomException(ErrorCode.NOT_APPLY)
         );
         userProjectRepository.delete(userProject);
     }

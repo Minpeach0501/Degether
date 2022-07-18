@@ -1,7 +1,8 @@
 package com.hanghae.degether.project.util;
 
+import com.hanghae.degether.project.exception.CustomException;
+import com.hanghae.degether.project.exception.ErrorCode;
 import com.hanghae.degether.project.repository.ProjectRepository;
-import com.hanghae.degether.project.exception.ExceptionMessage;
 import com.hanghae.degether.project.model.Project;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.security.JwtTokenProvider;
@@ -18,11 +19,11 @@ public class CommonUtil {
         try {
             UserDetailsImpl userDetails= (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if (userDetails == null) {
-                throw new IllegalArgumentException(ExceptionMessage.REQUIRED_LOGIN);
+                throw new CustomException(ErrorCode.REQUIRED_LOGIN);
             }
             return userDetails.getUser();
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException(ExceptionMessage.REQUIRED_LOGIN);
+            throw new CustomException(ErrorCode.REQUIRED_LOGIN);
         }
     }
     public static User getUserByToken(String token, JwtTokenProvider jwtTokenProvider){
@@ -33,6 +34,9 @@ public class CommonUtil {
 
     // Util
     public static Project getProject(Long projectId, ProjectRepository projectRepository) {
-        return projectRepository.findById(projectId).orElseThrow(()-> new IllegalArgumentException(ExceptionMessage.NOT_EXIST_PROJECT));
+        return projectRepository.findById(projectId).orElseThrow(()->
+                // new IllegalArgumentException(ExceptionMessage.NOT_EXIST_PROJECT)
+                new CustomException(ErrorCode.NOT_EXIST_PROJECT)
+        );
     }
 }
