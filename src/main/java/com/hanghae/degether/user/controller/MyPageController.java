@@ -48,9 +48,10 @@ public class MyPageController {
     //정보 수정
     @PutMapping("/user/userEdit")
     public UserResponseDto<?> updateUserInfo(
-            UserDetailsImpl userDetails,
-            @RequestPart(value = "file") MultipartFile  file,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestPart(value = "file" ,required = false) MultipartFile  file,
             @RequestPart(value = "updateDto") MypageReqDto reqDto
+
     ){
 
         return mypageService.updateUserInfo(userDetails,file,reqDto);

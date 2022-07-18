@@ -27,7 +27,7 @@ public class User {
     @Column(nullable = false)
     private  String password;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "USER_ID")
     private List<Language> language;
 
@@ -68,7 +68,8 @@ public class User {
         this.profileUrl =profileUrl;
         this.role = role;
         this.nickname = nickname;
-        this.language = language;
+        this.language.clear();
+        this.language.addAll(language);
         this.github = github;
         this.figma = figma;
         this.intro = intro;
@@ -76,4 +77,6 @@ public class User {
         this.email = email;
 
     }
+
+
 }

@@ -2,8 +2,7 @@ package com.hanghae.degether.user.dto;
 
 import com.hanghae.degether.project.model.Language;
 import com.hanghae.degether.user.model.User;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +10,9 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoginResDto {
     private Long userId;
     private String username ;
@@ -24,6 +26,8 @@ public class LoginResDto {
     private String phoneNumber;
     private String email ;
 
+
+    @Builder
     public LoginResDto(Optional<User> user) {
         this.userId = user.get().getId();
         this.username = user.get().getUsername();
@@ -41,6 +45,7 @@ public class LoginResDto {
         this.phoneNumber = user.get().getPhoneNumber();
         this.email = user.get().getEmail();
     }
+    @Builder
     //MyUpdateDto 를 만들어서 할필요가 없기에 생성자를 추가해 dto 파일 하나를 줄임
     public LoginResDto(String profileUrl, String role, String nickname, List<String> language, String github, String figma, String intro, String phoneNumber, String email) {
         this.profileUrl = profileUrl;

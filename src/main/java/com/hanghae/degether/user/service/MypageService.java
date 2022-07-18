@@ -1,6 +1,7 @@
 package com.hanghae.degether.user.service;
 
 import com.hanghae.degether.project.model.Language;
+import com.hanghae.degether.project.model.UserProject;
 import com.hanghae.degether.project.model.Zzim;
 import com.hanghae.degether.project.repository.UserProjectRepository;
 import com.hanghae.degether.project.repository.ZzimRepository;
@@ -19,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +32,7 @@ public class MypageService {
 
     private final UserRepository userRepository;
 
-    private  final S3Uploader s3Uploader;
+    private final S3Uploader s3Uploader;
 
     @Autowired
     public MypageService(
@@ -40,10 +40,9 @@ public class MypageService {
             UserProjectRepository userProjectRepository,
             UserRepository userRepository,
             S3Uploader s3Uploader
-    )
-    {
-        this.zzimRepository =zzimRepository;
-        this.userProjectRepository =userProjectRepository;
+    ) {
+        this.zzimRepository = zzimRepository;
+        this.userProjectRepository = userProjectRepository;
         this.userRepository = userRepository;
         this.s3Uploader = s3Uploader;
 
@@ -63,9 +62,18 @@ public class MypageService {
             ZzimResDto zzimResDto = new ZzimResDto(zzim);
             Zzim.add(zzimResDto);
         }
-        
-        // 내가 참여한 모든 프로 젝트들 불러오기
-        List<MyProjectResDto> myproject = userProjectRepository.findAllByUserAndIsTeam(user, true);
+        List<MyProjectResDto> myProjectResDtos = new ArrayList<>();
+
+        // 내가 참여한 모든 프로 젝트들 불러오기 projection 사용
+        List<UserProject> myproject = userProjectRepository.findAllByUserAndIsTeam(user, true);
+
+        for (UserProject userProject : myproject) {
+            MyProjectResDto myProjectResDto1 = new MyProjectResDto(userProject);
+            myProjectResDtos.add(myProjectResDto1);
+        }
+
+
+
 
         ResultDto resultDto = ResultDto.builder()
                 .profileUrl(mypageReqDto.getProfileUrl())
@@ -75,12 +83,13 @@ public class MypageService {
                 .github(mypageReqDto.getGithub())
                 .figma(mypageReqDto.getFigma())
                 .intro(mypageReqDto.getIntro())
+                .email(mypageReqDto.getEmail())
+                .phoneNumber(mypageReqDto.getPhoneNumber())
                 .zzim(Zzim)
-                .myProject(myproject)
+                .myProject(myProjectResDtos)
                 .build();
 
-
-        return new UserResponseDto<>(true,"마이페이지 정보를 가져왔습니다.", resultDto);
+        return new UserResponseDto<>(true, "마이페이지 정보를 가져왔습니다.", resultDto);
     }
 
 
@@ -93,54 +102,69 @@ public class MypageService {
     }
 
     @Transactional
-    public UserResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto){
+    public UserResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto) {
         String username = userDetails.getUsername();
-        String profileUrl = "";
-        s3Uploader.deleteFromS3(profileUrl);
 
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new IllegalInstantException("등록되지 않은 사용자입니다.")
+        );
 
+        String profileUrl = user.getProfileUrl();
 
-        if(!user.isPresent()) {
-            throw new IllegalArgumentException ("등록되지 않은 사용자입니다.");
-        }
-        if(!file.isEmpty()) {
+        if (file!=null) {
             //이미지 업로드
+            s3Uploader.deleteFromS3(s3Uploader.getFileName(user.getProfileUrl()));
             profileUrl = s3Uploader.upload(file, reqDto.getProfileUrl());
         }
 
-        String phoneNumber = reqDto.getPhoneNumber();
-        String figma = reqDto.getFigma();
-        String github = reqDto.getGithub();
-        String email = reqDto.getEmail();
-        String role = reqDto.getRole();
-        List<Language> language = reqDto.getLanguage().stream().map((string)-> Language.builder().language(string).build()).collect(Collectors.toList());
+        // 프론트쪽으로 정보를 줄때에는 language라는 엔티티대신 스트링값을 줘야한다.
+        List<Language> language = reqDto.getLanguage().stream().map((string) -> Language.builder().language(string).build()).collect(Collectors.toList());
         String nickname = reqDto.getNickname();
         String intro = reqDto.getIntro();
 
-        int nicknameL = nickname.length();
-        int introL = intro.length();
+//        int nicknameL = nickname.length();
+//        int introL = intro.length();
 
-        if (nicknameL >10){
-            throw new IllegalArgumentException("글자수가 초과되었습니다.");
-        }
-        if (nicknameL<2){
-            throw  new IllegalArgumentException("글자수가 부족합니다.");
-        }
-        if (introL >20){
-            throw new IllegalArgumentException("글자수가 초과되었습니다.");
-        }
-
-
-        LoginResDto loginResDto = new LoginResDto(profileUrl,role,nickname,reqDto.getLanguage(),github,figma,intro,phoneNumber,email);
+//        유효성검사는 validation으로 교체
+//        if (nicknameL > 10) {
+//            throw new IllegalArgumentException("글자수가 초과되었습니다.");
+//        }
+//        if (nicknameL < 2) {
+//            throw new IllegalArgumentException("글자수가 부족합니다.");
+//        }
+//        if (introL > 20) {
+//            throw new IllegalArgumentException("글자수가 초과되었습니다.");
+//        }
 
 
-        user.get().update(profileUrl,role,nickname,language,github,figma,intro,phoneNumber,email);
+        LoginResDto resDto = LoginResDto.builder()
+                .userId(user.getId())
+                .username(username)
+                .profileUrl(profileUrl)
+                .role(reqDto.getRole())
+                .nickname(reqDto.getNickname())
+                .language(reqDto.getLanguage())
+                .github(reqDto.getGithub())
+                .figma(reqDto.getFigma())
+                .intro(reqDto.getIntro())
+                .phoneNumber(reqDto.getPhoneNumber())
+                .email(reqDto.getEmail())
+                .build();
+
+        user.update(resDto.getProfileUrl(),
+                resDto.getRole(),
+                resDto.getNickname(),
+                language,
+                resDto.getGithub(),
+                resDto.getFigma(),
+                resDto.getIntro(),
+                resDto.getPhoneNumber(),
+                resDto.getEmail());
 
         // 트랜잭션때문에 안써도 됌
         //userRepository.save(user.get());
 
-        return  new UserResponseDto<>(true,"수정 성공", loginResDto);
+        return new UserResponseDto<>(true, "수정 성공", resDto);
 
     }
 
@@ -160,8 +184,11 @@ public class MypageService {
                 .github(user.getGithub())
                 .figma(user.getFigma())
                 .intro(user.getIntro())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
                 .build();
-        return new UserResponseDto<>(true,"유저 정보를 불러왔습니다.",profileResDto);
+
+        return new UserResponseDto<>(true, "유저 정보를 불러왔습니다.", profileResDto);
     }
 
 }

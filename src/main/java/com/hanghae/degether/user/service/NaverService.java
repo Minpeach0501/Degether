@@ -9,8 +9,8 @@ import com.hanghae.degether.user.dto.UserResponseDto;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +30,7 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class NaverService {
 
     private final UserRepository userRepository;
@@ -43,18 +44,6 @@ public class NaverService {
 
     @Value("${naver.key}")
     private String secret_key;
-
-
-    @Autowired
-    public NaverService(
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            JwtTokenProvider jwtTokenProvider
-    ) {
-        this.userRepository = userRepository;
-        this.passwordEncoder =passwordEncoder;
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
 
 
 
