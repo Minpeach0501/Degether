@@ -51,8 +51,10 @@ public class MypageService {
     @Transactional
     public UserResponseDto<?> getuserInfo(MypageReqDto mypageReqDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        User user = userDetails.getUser();
-
+        User user2 = userDetails.getUser();
+        User user = userRepository.findById(user2.getId()).orElseThrow(
+                ()-> new IllegalInstantException("존재하지않는 유저입니다.")
+        );
 
         List<Zzim> Zzims = zzimRepository.findAllByUser(user);
 
@@ -64,7 +66,6 @@ public class MypageService {
         }
         List<MyProjectResDto> myProjectResDtos = new ArrayList<>();
 
-        // 내가 참여한 모든 프로 젝트들 불러오기 projection 사용
         List<UserProject> myproject = userProjectRepository.findTop3ByUserAndIsTeam(user, true);
 
         for (UserProject userProject : myproject) {
@@ -167,6 +168,7 @@ public class MypageService {
 
     }
 
+    @Transactional
     // 프로젝트 메인페이지에서 팀원 프로필 정보 불러오기용
     public UserResponseDto<?> OneUserInfo(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
