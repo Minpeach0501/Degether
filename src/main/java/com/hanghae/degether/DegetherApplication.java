@@ -10,6 +10,7 @@ public class DegetherApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(DegetherApplication.class, args);
+        
     }
 
 }
