@@ -17,19 +17,19 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class MyProjectResDto{
 
-    Long Id;
+    private Long Id;
 
-    String projectName;
+    private String projectName;
 
-    String description;
+    private String description;
 
-    String Thumbnail;
+    private String Thumbnail;
 
-    List<String> language;
+    private List<String> language;
 
-    List<String> genre;
+    private List<String> genre;
 
-    String Step;
+    private String Step;
 
 
 
