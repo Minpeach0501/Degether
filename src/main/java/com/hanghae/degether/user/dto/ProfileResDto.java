@@ -21,9 +21,11 @@ public class ProfileResDto {
     private String github;
     private String figma;
     private String intro;
+    private String email;
+    private String phoneNumber;
 
     @Builder
-    public ProfileResDto(String profileUrl, String role, String nickname, List<String> language, String github, String figma, String intro) {
+    public ProfileResDto(String profileUrl, String role, String nickname, List<String> language, String github, String figma, String intro, String email, String phoneNumber) {
         this.profileUrl = profileUrl;
         this.role = role;
         this.nickname = nickname;
@@ -31,5 +33,7 @@ public class ProfileResDto {
         this.github = github;
         this.figma = figma;
         this.intro = intro;
+        this.email =email;
+        this.phoneNumber = phoneNumber;
     }
 }

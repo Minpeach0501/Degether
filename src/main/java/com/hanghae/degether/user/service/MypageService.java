@@ -172,6 +172,8 @@ public class MypageService {
                 .github(user.getGithub())
                 .figma(user.getFigma())
                 .intro(user.getIntro())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
                 .build();
 
         return new UserResponseDto<>(true, "유저 정보를 불러왔습니다.", profileResDto);
