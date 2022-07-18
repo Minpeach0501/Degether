@@ -21,7 +21,7 @@ public interface UserProjectRepository extends JpaRepository<UserProject, Long> 
     Optional<UserProject> findByProjectAndUser(Project project, User user);
 
 
-    List<UserProject> findAllByUserAndIsTeam(User user, boolean isTeam);
+    List<UserProject> findTop3ByUserAndIsTeam(User user, boolean isTeam);
 
     List<MyProjectResDto> findAllByUserAndIsTeam(Optional<User> user, boolean isTeam);
 

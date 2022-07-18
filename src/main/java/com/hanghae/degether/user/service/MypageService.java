@@ -65,21 +65,20 @@ public class MypageService {
         List<MyProjectResDto> myProjectResDtos = new ArrayList<>();
 
         // 내가 참여한 모든 프로 젝트들 불러오기 projection 사용
-        List<UserProject> myproject = userProjectRepository.findAllByUserAndIsTeam(user, true);
+        List<UserProject> myproject = userProjectRepository.findTop3ByUserAndIsTeam(user, true);
 
         for (UserProject userProject : myproject) {
             MyProjectResDto myProjectResDto1 = new MyProjectResDto(userProject);
             myProjectResDtos.add(myProjectResDto1);
         }
 
-
-
+        List<String> language = user.getLanguage().stream().map(Language::getLanguage).collect(Collectors.toList());
 
         ResultDto resultDto = ResultDto.builder()
                 .profileUrl(user.getProfileUrl())
                 .role(user.getRole())
                 .nickname(user.getNickname())
-                .language(user.getLanguage().stream().map(Language::getLanguage).collect(Collectors.toList()))
+                .language(language)
                 .github(user.getGithub())
                 .figma(user.getFigma())
                 .intro(user.getIntro())
