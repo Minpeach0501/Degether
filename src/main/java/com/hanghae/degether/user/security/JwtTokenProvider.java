@@ -43,7 +43,9 @@ public class JwtTokenProvider {
     // 토큰 생성
     public String createToken(String userPk) {
         Claims claims = Jwts.claims().setSubject(userPk);
+
         Date now = new Date();
+
         String token= Jwts.builder()
                 .setClaims(claims)//정보저장
                 .setIssuedAt(now)//토큰 발행 시간 정보

@@ -101,7 +101,7 @@ public class MypageService {
 
         if (file!=null) {
             //이미지 업로드
-            s3Uploader.deleteFromS3(user.getProfileUrl());
+            s3Uploader.deleteFromS3(s3Uploader.getFileName(user.getProfileUrl()));
             profileUrl = s3Uploader.upload(file, reqDto.getProfileUrl());
         }
 
@@ -110,8 +110,8 @@ public class MypageService {
         String nickname = reqDto.getNickname();
         String intro = reqDto.getIntro();
 
-        int nicknameL = nickname.length();
-        int introL = intro.length();
+//        int nicknameL = nickname.length();
+//        int introL = intro.length();
 
 //        유효성검사는 validation으로 교체
 //        if (nicknameL > 10) {
@@ -126,7 +126,7 @@ public class MypageService {
 
 
         LoginResDto resDto = LoginResDto.builder()
-                .profileUrl(reqDto.getProfileUrl())
+                .profileUrl(profileUrl)
                 .role(reqDto.getRole())
                 .nickname(reqDto.getNickname())
                 .language(reqDto.getLanguage())
