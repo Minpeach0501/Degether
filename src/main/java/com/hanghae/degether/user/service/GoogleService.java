@@ -4,6 +4,8 @@ package com.hanghae.degether.user.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hanghae.degether.exception.CustomException;
+import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.user.dto.LoginResDto;
 import com.hanghae.degether.user.dto.UserResponseDto;
 import com.hanghae.degether.user.dto.SocialUserInfoDto;
@@ -171,7 +173,7 @@ public class GoogleService   {
 
         if (naverUser.isStatus() == false) {
             token = null;
-            throw new IllegalArgumentException("탈퇴한 회원입니다.");
+            throw new CustomException(ErrorCode.DELETED_USER);
         }
         response.addHeader("Authorization", token);
         return new UserResponseDto(true, "성공");

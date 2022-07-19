@@ -1,11 +1,9 @@
 package com.hanghae.degether.user.security;
 
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,16 +19,18 @@ import java.util.Date;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class JwtTokenProvider {
 
-    @Value("K7kjHSF345h345S86F3A2erGB98iWIad")
+    @Value("jwt.secret")
     private String secretKey;
+
     public static final String AUTH_HEADER = "Authorization";
     public final HttpServletResponse response;
 
     // 토큰 유효시간
     // 프론트엔드와 약속해야 함
-    private Long tokenValidTime = 24*60*60*1000L;
+    private Long tokenValidTime = 24 * 60 * 60 * 1000L; // 24시간
 
     private final UserDetailsService userDetailsService;
 
@@ -46,7 +46,7 @@ public class JwtTokenProvider {
 
         Date now = new Date();
 
-        String token= Jwts.builder()
+        String token = Jwts.builder()
                 .setClaims(claims)//정보저장
                 .setIssuedAt(now)//토큰 발행 시간 정보
                 .setExpiration(new Date(now.getTime() + tokenValidTime))
@@ -73,16 +73,12 @@ public class JwtTokenProvider {
     //"X-AUTH-TOKEN":"TOKEN 깞"
     public String resolveToken(HttpServletRequest request) {
         return request.getHeader("Authorization");
-
     }
 
     // 토큰의 유효성 + 만료일자 확인
     public boolean validateToken(String jwtToken) {
-        try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
             return !claims.getBody().getExpiration().before(new Date());
-        } catch (Exception e) {
-            return false;
-        }
     }
+
 }

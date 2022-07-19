@@ -32,11 +32,11 @@ public class MypageReqDto {
     private String intro;
 
     @NotEmpty(message = "전화번호를 입력해 주세요.")
-    @Pattern
-            (regexp = "^01(?:0|1|[6-9])[.-]?(\\d{3}|\\d{4})[.-]?(\\d{4})$",
+    @Pattern(regexp = "^01(?:0|1|[6-9])[.-]?(\\d{3}|\\d{4})[.-]?(\\d{4})$",
             message = "전화번호 양식에 맞지않습니다.")
     private String phoneNumber;
 
+    //@Email 이 있으나 프론트와 약속을 하였기에 맞췄다.
     @NotEmpty(message = "이메일을 입력해 주세요.")
     @Pattern(regexp = "^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\\.[a-zA-Z]{2,3}$")
     private String email;

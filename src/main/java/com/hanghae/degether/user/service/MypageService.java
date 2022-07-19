@@ -1,5 +1,7 @@
 package com.hanghae.degether.user.service;
 
+import com.hanghae.degether.exception.CustomException;
+import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.project.model.Language;
 import com.hanghae.degether.project.model.UserProject;
 import com.hanghae.degether.project.model.Zzim;
@@ -11,7 +13,6 @@ import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.UserDetailsImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.IllegalInstantException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
@@ -53,7 +54,7 @@ public class MypageService {
 
         User user2 = userDetails.getUser();
         User user = userRepository.findById(user2.getId()).orElseThrow(
-                ()-> new IllegalInstantException("존재하지 않는 사용자입니다.")
+                ()-> new CustomException(ErrorCode.NOT_EXIST_USER)
         );
 
 
@@ -107,7 +108,7 @@ public class MypageService {
         String username = userDetails.getUsername();
 
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new IllegalInstantException("등록되지 않은 사용자입니다.")
+                () -> new CustomException(ErrorCode.NOT_EXIST_USER)
         );
 
         String profileUrl = user.getProfileUrl();
@@ -173,7 +174,7 @@ public class MypageService {
     // 프로젝트 메인페이지에서 팀원 프로필 정보 불러오기용
     public UserResponseDto<?> OneUserInfo(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new IllegalInstantException("존재하지않는 사용자입니다.")
+                () -> new CustomException(ErrorCode.NOT_EXIST_USER)
         );
 
         List<String> language = user.getLanguage().stream().map(Language::getLanguage).collect(Collectors.toList());

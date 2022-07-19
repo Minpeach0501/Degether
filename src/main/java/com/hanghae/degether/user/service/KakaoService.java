@@ -3,6 +3,8 @@ package com.hanghae.degether.user.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hanghae.degether.exception.CustomException;
+import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.user.dto.LoginResDto;
 import com.hanghae.degether.user.dto.SocialUserInfoDto;
 import com.hanghae.degether.user.dto.UserResponseDto;
@@ -50,7 +52,7 @@ public class KakaoService {
 // 3.유저가 등록된 유저가 아니면  회원가입
         User kakaouser = registerKakaoUserIfNeed(kakaoUserInfo);
 
-       kakaoUsersAuthorizationInput(kakaouser, response);
+        kakaoUsersAuthorizationInput(kakaouser, response);
 
         Optional<User> user = userRepository.findByUsername(kakaouser.getUsername());
 
@@ -161,13 +163,12 @@ public class KakaoService {
     // 5. response Header에 JWT 토큰 추가
     private UserResponseDto kakaoUsersAuthorizationInput(User kakaouser, HttpServletResponse response) {
         // response header에 token 추가
-
         String token = jwtTokenProvider.createToken(kakaouser.getUsername());
 
         try {
             if (kakaouser.isStatus() == false){
                 token = null;
-                throw  new NullPointerException("탈퇴한 회원입니다.");
+                throw  new CustomException(ErrorCode.DELETED_USER);
             }
             response.addHeader("Authorization", token);
             return new UserResponseDto(true,"성공");
