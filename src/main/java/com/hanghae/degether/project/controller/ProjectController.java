@@ -71,6 +71,15 @@ public class ProjectController {
                 .build();
     }
 
+    @GetMapping("/myprojects")
+    public ResponseDto<?> getMyProjects() {
+        return ResponseDto.builder()
+                .ok(true)
+                .message("요청 성공")
+                .result(projectService.getMyProjects())
+                .build();
+    }
+
     // 찜하기, 찜삭제
     @PostMapping("/projectZzim/{projectId}")
     public ResponseDto<?> projectZzim(@PathVariable Long projectId) {

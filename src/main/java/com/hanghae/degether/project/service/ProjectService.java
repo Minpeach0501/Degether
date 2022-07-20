@@ -1,11 +1,9 @@
 package com.hanghae.degether.project.service;
 
 import com.hanghae.degether.doc.repository.DocRepository;
-import com.hanghae.degether.project.dto.CommentDto;
-import com.hanghae.degether.project.dto.DocDto;
-import com.hanghae.degether.project.dto.ProjectDto;
-import com.hanghae.degether.project.dto.UserDto;
-import com.hanghae.degether.project.exception.ExceptionMessage;
+import com.hanghae.degether.project.dto.*;
+import com.hanghae.degether.exception.CustomException;
+import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.project.model.*;
 import com.hanghae.degether.project.repository.ProjectQueryDslRepository;
 import com.hanghae.degether.project.repository.ProjectRepository;
@@ -147,39 +145,39 @@ public class ProjectService {
                     .zzimCount(zzimRepository.countByProject(project))
                     .build();
         }).collect(Collectors.toList());
-        List<ProjectDto.Response> myProject = null;
-        //참여중 프로젝트
-        if(user!=null){
-            myProject = userProjectRepository.findAllByIsTeamAndUser(true,user).stream().map(
-                    userProject -> {
-                        //Todo: 쿼리 개선 필요
-                        Project project = userProject.getProject();
-                        int devCount = 0;
-                        int deCount = 0;
-                        for (UserProject userProject2 : project.getUserProjects()) {
-                            String role = userProject2.getUser().getRole();
-                            if ("back".equals(role) || "front".equals(role)) {
-                                devCount++;
-                            } else if ("designer".equals(role)) {
-                                deCount++;
-                            }
-                        }
-                        return ProjectDto.Response.builder()
-                                .projectId(project.getId())
-                                .projectName(project.getProjectName())
-                                .devCount(devCount)
-                                .deCount(deCount)
-                                .thumbnail(project.getThumbnail())
-                                .build();
-                    }).collect(Collectors.toList());
-        }
         return ProjectDto.Slice.builder()
                 .isLast(!slice.hasNext())
-                .myProject(myProject)
                 .list(content)
                 .build();
     }
 
+    public List<ProjectDto.Response> getMyProjects() {
+        User user = CommonUtil.getUser();
+
+        return userProjectRepository.findAllByIsTeamAndUser(true,user).stream().map(
+                userProject -> {
+                    //Todo: 쿼리 개선 필요
+                    Project project = userProject.getProject();
+                    int devCount = 0;
+                    int deCount = 0;
+                    for (UserProject userProject2 : project.getUserProjects()) {
+                        String role = userProject2.getUser().getRole();
+                        if ("back".equals(role) || "front".equals(role)) {
+                            devCount++;
+                        } else if ("designer".equals(role)) {
+                            deCount++;
+                        }
+                    }
+                    return ProjectDto.Response.builder()
+                            .projectId(project.getId())
+                            .projectName(project.getProjectName())
+                            .devCount(devCount)
+                            .deCount(deCount)
+                            .thumbnail(project.getThumbnail())
+                            .build();
+                }).collect(Collectors.toList());
+
+    }
     @Transactional
     public void projectZzim(Long projectId) {
         User user = CommonUtil.getUser();
@@ -203,7 +201,7 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!project.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         String thumbnail = project.getThumbnail();
         if (multipartFile != null) {
@@ -235,7 +233,7 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!project.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         List<String> infoFiles = project.getInfoFiles();
         String infoFileUrl = null;
@@ -265,7 +263,7 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!project.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         if (project.getThumbnail() != null && !"".equals(project.getThumbnail())) {
             // 이미지 삭제
@@ -320,7 +318,7 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (userProjectRepository.existsByProjectAndUser(project, user)) {
-            throw new IllegalArgumentException(ExceptionMessage.DUPLICATED_APPLY);
+            throw new CustomException(ErrorCode.DUPLICATED_APPLY);
         }
         userProjectRepository.save(UserProject.builder()
                 .user(user)
@@ -333,7 +331,7 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!userProjectRepository.existsByProjectAndUserAndIsTeam(project, user, true)) {
-            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         return ProjectDto.Response.builder()
                 .projectName(project.getProjectName())
@@ -370,30 +368,26 @@ public class ProjectService {
                                 }).collect(Collectors.toList())
                 )
                 .notice(
-                        docRepository.findAllByProjectAndNoticeOrderByCreatedDateDesc(project, true).stream().map((doc)->{
-                            return DocDto.builder()
-                                    .docId(doc.getId())
-                                    .title(doc.getTitle())
-                                    .nickname(doc.getUser().getNickname())
-                                    .createdDate(doc.getCreatedDate())
-                                    .build();
-                        }).collect(Collectors.toList())
+                        docRepository.findAllByProjectAndNoticeOrderByCreatedDateDesc(project, true).stream().map((doc)-> DocDto.builder()
+                                .docId(doc.getId())
+                                .title(doc.getTitle())
+                                .nickname(doc.getUser().getNickname())
+                                .createdDate(doc.getCreatedDate())
+                                .build()).collect(Collectors.toList())
                 )
                 .todo(
-                        docRepository.findAllByProjectAndOnGoingOrderByCreatedDateDesc(project, true).stream().map((doc)->{
-                            return DocDto.builder()
-                                    .docId(doc.getId())
-                                    .title(doc.getTitle())
-                                    .inCharge(doc.getInCharge().getNickname())
-                                    .createdDate(doc.getCreatedDate())
-                                    .docStatus(doc.getDocStatus())
-                                    .startDate(doc.getStartDate())
-                                    .endDate(doc.getEndDate())
-                                    .dDay(
-                                            Duration.between(LocalDate.now().atStartOfDay(),doc.getEndDate().atStartOfDay()).toDays()
-                                    )
-                                    .build();
-                        }).collect(Collectors.toList())
+                        docRepository.findAllByProjectAndOnGoingOrderByCreatedDateDesc(project, true).stream().map((doc)-> DocDto.builder()
+                                .docId(doc.getId())
+                                .title(doc.getTitle())
+                                .inCharge(doc.getInCharge().getNickname())
+                                .createdDate(doc.getCreatedDate())
+                                .docStatus(doc.getDocStatus())
+                                .startDate(doc.getStartDate())
+                                .endDate(doc.getEndDate())
+                                .dDay(
+                                        Duration.between(LocalDate.now().atStartOfDay(),doc.getEndDate().atStartOfDay()).toDays()
+                                )
+                                .build()).collect(Collectors.toList())
                 )
                 .build();
     }
@@ -402,16 +396,16 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!project.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         User userSearch = userRepository.findById(userId).orElseThrow(()->
                 new IllegalArgumentException("??")
         );
         UserProject userProject = userProjectRepository.findByProjectAndUser(project, userSearch).orElseThrow(()->
-                new IllegalArgumentException(ExceptionMessage.NOT_APPLY)
+                new CustomException(ErrorCode.NOT_APPLY)
         );
         if (userProject.isTeam()) {
-            throw new IllegalArgumentException(ExceptionMessage.DUPLICATED_JOIN);
+            throw new CustomException(ErrorCode.DUPLICATED_JOIN);
         }
         userProject.changeIsTeam(true);
     }
@@ -420,13 +414,13 @@ public class ProjectService {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!project.getUser().getId().equals(user.getId()) || userId.equals(user.getId())) {
-            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         User userSearch = userRepository.findById(userId).orElseThrow(()->
-                new IllegalArgumentException(ExceptionMessage.NOT_EXIST_USER)
+                new CustomException(ErrorCode.NOT_EXIST_USER)
         );
         UserProject userProject = userProjectRepository.findByProjectAndUser(project, userSearch).orElseThrow(()->
-            new IllegalArgumentException(ExceptionMessage.NOT_APPLY)
+            new CustomException(ErrorCode.NOT_APPLY)
         );
         userProjectRepository.delete(userProject);
     }

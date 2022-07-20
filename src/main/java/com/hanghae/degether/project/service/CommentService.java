@@ -1,12 +1,13 @@
 package com.hanghae.degether.project.service;
 
 import com.hanghae.degether.project.dto.CommentDto;
+import com.hanghae.degether.exception.CustomException;
+import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.project.model.Comment;
 import com.hanghae.degether.project.repository.CommentRepository;
 import com.hanghae.degether.project.repository.ProjectRepository;
 import com.hanghae.degether.project.repository.UserProjectRepository;
 import com.hanghae.degether.project.util.CommonUtil;
-import com.hanghae.degether.project.exception.ExceptionMessage;
 import com.hanghae.degether.project.model.Project;
 import com.hanghae.degether.user.model.User;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +34,9 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long commentId) {
         User user = CommonUtil.getUser();
-        Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new IllegalArgumentException(ExceptionMessage.NOT_EXIST_COMMENT));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_COMMENT));
         if (!comment.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException(ExceptionMessage.UNAUTHORIZED);
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         commentRepository.delete(comment);
     }

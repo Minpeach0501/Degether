@@ -24,6 +24,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    private final JwtExceptionFilter jwtExceptionFilter;
+
     @Bean
     public BCryptPasswordEncoder encodePassword() {
         return new BCryptPasswordEncoder();
@@ -45,6 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
         http.cors().configurationSource(corsConfigurationSource());
         // 토큰 인증이므로 세션 사용x
         http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -70,7 +73,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //                .antMatchers("/**").permitAll()
                 // 그 외 어떤 요청이든 '인증'
                 .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                // JwtAuthenticationFilter 앞단에 JwtExceptionFilter를 위치시키겠다는 설정
+                .addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class);
     }
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
