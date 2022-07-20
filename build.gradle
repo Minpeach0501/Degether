@@ -34,6 +34,10 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    //REDIS
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation "org.springframework.session:spring-session-data-redis"
+    implementation 'it.ozimov:embedded-redis:0.7.2'
 
     //querydsl
     implementation "com.querydsl:querydsl-jpa:5.0.0"

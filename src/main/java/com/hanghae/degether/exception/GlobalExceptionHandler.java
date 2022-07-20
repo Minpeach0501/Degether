@@ -39,4 +39,14 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
+//    @ExceptionHandler(NullPointerException.class)
+//    public ResponseDto<?> NullPointerException(NullPointerException e){
+//        log.error("NullPointerException",e);
+//        return ResponseDto.builder()
+//                .ok(false)
+//                .message(e.getMessage())
+//                .build();
+//    }
+
+
 }
