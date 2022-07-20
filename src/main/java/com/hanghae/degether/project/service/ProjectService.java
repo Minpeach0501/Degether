@@ -1,10 +1,7 @@
 package com.hanghae.degether.project.service;
 
 import com.hanghae.degether.doc.repository.DocRepository;
-import com.hanghae.degether.project.dto.CommentDto;
-import com.hanghae.degether.project.dto.DocDto;
-import com.hanghae.degether.project.dto.ProjectDto;
-import com.hanghae.degether.project.dto.UserDto;
+import com.hanghae.degether.project.dto.*;
 import com.hanghae.degether.exception.CustomException;
 import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.project.model.*;
@@ -148,39 +145,39 @@ public class ProjectService {
                     .zzimCount(zzimRepository.countByProject(project))
                     .build();
         }).collect(Collectors.toList());
-        List<ProjectDto.Response> myProject = null;
-        //참여중 프로젝트
-        if(user!=null){
-            myProject = userProjectRepository.findAllByIsTeamAndUser(true,user).stream().map(
-                    userProject -> {
-                        //Todo: 쿼리 개선 필요
-                        Project project = userProject.getProject();
-                        int devCount = 0;
-                        int deCount = 0;
-                        for (UserProject userProject2 : project.getUserProjects()) {
-                            String role = userProject2.getUser().getRole();
-                            if ("back".equals(role) || "front".equals(role)) {
-                                devCount++;
-                            } else if ("designer".equals(role)) {
-                                deCount++;
-                            }
-                        }
-                        return ProjectDto.Response.builder()
-                                .projectId(project.getId())
-                                .projectName(project.getProjectName())
-                                .devCount(devCount)
-                                .deCount(deCount)
-                                .thumbnail(project.getThumbnail())
-                                .build();
-                    }).collect(Collectors.toList());
-        }
         return ProjectDto.Slice.builder()
                 .isLast(!slice.hasNext())
-                .myProject(myProject)
                 .list(content)
                 .build();
     }
 
+    public List<ProjectDto.Response> getMyProjects() {
+        User user = CommonUtil.getUser();
+
+        return userProjectRepository.findAllByIsTeamAndUser(true,user).stream().map(
+                userProject -> {
+                    //Todo: 쿼리 개선 필요
+                    Project project = userProject.getProject();
+                    int devCount = 0;
+                    int deCount = 0;
+                    for (UserProject userProject2 : project.getUserProjects()) {
+                        String role = userProject2.getUser().getRole();
+                        if ("back".equals(role) || "front".equals(role)) {
+                            devCount++;
+                        } else if ("designer".equals(role)) {
+                            deCount++;
+                        }
+                    }
+                    return ProjectDto.Response.builder()
+                            .projectId(project.getId())
+                            .projectName(project.getProjectName())
+                            .devCount(devCount)
+                            .deCount(deCount)
+                            .thumbnail(project.getThumbnail())
+                            .build();
+                }).collect(Collectors.toList());
+
+    }
     @Transactional
     public void projectZzim(Long projectId) {
         User user = CommonUtil.getUser();
@@ -371,30 +368,26 @@ public class ProjectService {
                                 }).collect(Collectors.toList())
                 )
                 .notice(
-                        docRepository.findAllByProjectAndNoticeOrderByCreatedDateDesc(project, true).stream().map((doc)->{
-                            return DocDto.builder()
-                                    .docId(doc.getId())
-                                    .title(doc.getTitle())
-                                    .nickname(doc.getUser().getNickname())
-                                    .createdDate(doc.getCreatedDate())
-                                    .build();
-                        }).collect(Collectors.toList())
+                        docRepository.findAllByProjectAndNoticeOrderByCreatedDateDesc(project, true).stream().map((doc)-> DocDto.builder()
+                                .docId(doc.getId())
+                                .title(doc.getTitle())
+                                .nickname(doc.getUser().getNickname())
+                                .createdDate(doc.getCreatedDate())
+                                .build()).collect(Collectors.toList())
                 )
                 .todo(
-                        docRepository.findAllByProjectAndOnGoingOrderByCreatedDateDesc(project, true).stream().map((doc)->{
-                            return DocDto.builder()
-                                    .docId(doc.getId())
-                                    .title(doc.getTitle())
-                                    .inCharge(doc.getInCharge().getNickname())
-                                    .createdDate(doc.getCreatedDate())
-                                    .docStatus(doc.getDocStatus())
-                                    .startDate(doc.getStartDate())
-                                    .endDate(doc.getEndDate())
-                                    .dDay(
-                                            Duration.between(LocalDate.now().atStartOfDay(),doc.getEndDate().atStartOfDay()).toDays()
-                                    )
-                                    .build();
-                        }).collect(Collectors.toList())
+                        docRepository.findAllByProjectAndOnGoingOrderByCreatedDateDesc(project, true).stream().map((doc)-> DocDto.builder()
+                                .docId(doc.getId())
+                                .title(doc.getTitle())
+                                .inCharge(doc.getInCharge().getNickname())
+                                .createdDate(doc.getCreatedDate())
+                                .docStatus(doc.getDocStatus())
+                                .startDate(doc.getStartDate())
+                                .endDate(doc.getEndDate())
+                                .dDay(
+                                        Duration.between(LocalDate.now().atStartOfDay(),doc.getEndDate().atStartOfDay()).toDays()
+                                )
+                                .build()).collect(Collectors.toList())
                 )
                 .build();
     }
