@@ -74,7 +74,7 @@ public class ProjectQueryDslRepository {
                 switch (order.getProperty()){
                     case "createdDate":
                         return new OrderSpecifier<>(direction, project.createdDate);
-                    case "content":
+                    case "deadLine":
                         return new OrderSpecifier<>(direction, project.deadLine);
                 }
             }

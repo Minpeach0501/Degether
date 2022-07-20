@@ -101,8 +101,10 @@ public class ProjectService {
         User user = CommonUtil.getUserByToken(token, jwtTokenProvider);
         // List<Project> list = projectQueryDslRepository.getProjectsBySearch(search, language, genre, step);
         // List<Project> list = projectRepository.findAllByProjectNameContainsAndLanguages_LanguageAndGenres_GenreAndStep("프로젝트", "spring", "앱", "기획");
-
         Sort.Direction direction = Sort.Direction.DESC;
+        if("deadLine".equals(sorted)) {
+            direction = Sort.Direction.ASC;
+        }
         Sort sort = Sort.by(direction, sorted);
         Pageable pageable = PageRequest.of(page, 18, sort);
         Slice<Project> slice = projectQueryDslRepository.getProjectsBySearch(search, language, genre, step, pageable);
