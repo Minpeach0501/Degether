@@ -44,7 +44,7 @@ public class ProjectController {
     public ResponseDto<?> modifyInfoFile(
             @PathVariable Long projectId,
             @RequestParam(required = false) String fileUrl,
-            @RequestPart MultipartFile infoFile) {
+            @RequestPart(required = false) MultipartFile infoFile) {
         return ResponseDto.builder()
                 .ok(true)
                 .message("요청 성공")
