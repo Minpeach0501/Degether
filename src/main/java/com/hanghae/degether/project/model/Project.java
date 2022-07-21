@@ -103,6 +103,7 @@ public class Project extends Timestamped {
                 .build();
     }
     public void infoFilesUpdate(List<String> infoFiles){
-        this.infoFiles = infoFiles;
+        this.infoFiles.clear();
+        this.infoFiles.addAll(infoFiles);
     }
 }
