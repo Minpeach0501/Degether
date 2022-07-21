@@ -1,5 +1,6 @@
 package com.hanghae.degether.project.model;
 
+import com.hanghae.degether.openvidu.model.MeetingNote;
 import com.hanghae.degether.project.dto.ProjectDto;
 import com.hanghae.degether.user.model.User;
 import lombok.AllArgsConstructor;
@@ -56,6 +57,8 @@ public class Project extends Timestamped {
     private List<Comment> comments;
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<UserProject> userProjects;
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<MeetingNote> meetingNotes;
     @ElementCollection
     @Column(columnDefinition = "TEXT")
     private List<String> infoFiles;
