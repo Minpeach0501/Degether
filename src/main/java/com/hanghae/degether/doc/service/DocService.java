@@ -11,9 +11,12 @@ import com.hanghae.degether.doc.repository.DocRepository;
 import com.hanghae.degether.doc.repository.FolderRepository;
 import com.hanghae.degether.project.model.Project;
 import com.hanghae.degether.project.repository.ProjectRepository;
+import com.hanghae.degether.project.repository.UserProjectRepository;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
+import com.hanghae.degether.user.security.JwtTokenProvider;
 import com.hanghae.degether.user.security.UserDetailsImpl;
+import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,12 +33,17 @@ public class DocService {
     private final UserRepository userRepository;
     private final FolderRepository folderRepository;
 
+    private final UserProjectRepository userProjectRepository;
+    private final JwtTokenProvider tokenProvider;
+
     @Autowired
-    public DocService(DocRepository docRepository, ProjectRepository projectRepository, UserRepository userRepository, FolderRepository folderRepository){
+    public DocService(DocRepository docRepository, ProjectRepository projectRepository, UserRepository userRepository, FolderRepository folderRepository, JwtTokenProvider tokenProvider, UserProjectRepository userProjectRepository){
         this.docRepository = docRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
         this.folderRepository = folderRepository;
+        this.tokenProvider = tokenProvider;
+        this.userProjectRepository = userProjectRepository;
     }
 
     @Transactional
@@ -112,5 +120,13 @@ public class DocService {
         Folder folder = folderRepository.findById(folderId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 폴더입니다."));
         doc.update(folder);
         return  new ResponseDto<>(true,"이동 성공.");
+    }
+
+    public ResponseDto<?> openvidu(String token, Long projectId) {
+        User user = userRepository.findByUsername(tokenProvider.getUserPk(token)).orElseThrow(
+                ()->new IllegalArgumentException("유저X"));
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                ()->new IllegalArgumentException("프로젝트X"));
+        return userProjectRepository.existsByProjectAndUserAndIsTeam(project, user, true) ? new ResponseDto<>(true,"생성가능") : new ResponseDto<>(false,"생성불가");
     }
 }

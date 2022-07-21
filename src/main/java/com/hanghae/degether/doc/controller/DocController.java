@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 public class DocController {
     private final DocService docService;
@@ -70,5 +72,12 @@ public class DocController {
     public ResponseDto<?> updateFolder(@PathVariable Long docId,
                                        @PathVariable Long folderId){
         return docService.updateFolder(docId, folderId);
+    }
+
+    //오픈비듀 세션 권한확인
+    @GetMapping("/api/openvidu/{projectId}")
+    public ResponseDto<?> openvidu(HttpServletRequest request,@PathVariable Long projectId ){
+        String token = request.getHeader("token");
+        return docService.openvidu(token, projectId);
     }
 }
