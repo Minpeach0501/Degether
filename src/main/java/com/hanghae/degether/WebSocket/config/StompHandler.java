@@ -26,7 +26,7 @@ public class StompHandler implements ChannelInterceptor {
         // websocket 연결시 헤더의 jwt token 검증
         if (StompCommand.CONNECT == accessor.getCommand()) {
             log.info("CONNECT : {}", sessionId);
-            jwtTokenProvider.validateToken(accessor.getFirstNativeHeader("token"));
+            // jwtTokenProvider.validateToken(accessor.getFirstNativeHeader("token"));
             // 구독 요청시 유저의 카운트수를 저장하고 최대인원수를 관리하며 , 세션정보를 저장한다.
         }
 
