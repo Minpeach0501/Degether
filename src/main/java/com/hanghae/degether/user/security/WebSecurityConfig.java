@@ -85,6 +85,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.addAllowedOrigin("http://degather.shop.s3-website.ap-northeast-2.amazonaws.com");
         configuration.addAllowedOrigin("https://degether.one");
         configuration.addAllowedOrigin("https://degether.shop");
+        configuration.addAllowedOrigin("https://vidutest.shop");
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.addExposedHeader("Authorization");
