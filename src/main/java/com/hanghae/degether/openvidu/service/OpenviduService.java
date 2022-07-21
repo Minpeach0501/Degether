@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -66,21 +67,27 @@ public class OpenviduService {
                 }
                 return ResponseDto.builder().message("이미 녹음중 입니다").build();
             }catch (OpenViduJavaClientException | OpenViduHttpException exception){
-                System.out.println(exception);
+                // System.out.println(exception.getMessage());
                 return ResponseDto.builder()
                         .ok(false)
                         .message("화상채팅 서버 오류 입니다.")
                         .build();
             }
         }
+
         //녹음 시작
         try{
-            RecordingProperties properties = new RecordingProperties.Builder()
-                    .outputMode(Recording.OutputMode.COMPOSED)
-                    .hasAudio(true)
-                    .hasVideo(false)
-                    .build();
-            Recording recording = openVidu.startRecording(sessionId, properties);
+            Recording recording = openVidu.getRecording(sessionId);
+            if(recording!=null && "started".equals(recording.getStatus())){
+                //녹음중임
+            }else{
+                RecordingProperties properties = new RecordingProperties.Builder()
+                        .outputMode(Recording.OutputMode.COMPOSED)
+                        .hasAudio(true)
+                        .hasVideo(false)
+                        .build();
+                recording = openVidu.startRecording(sessionId, properties);
+            }
             sessionRecordingMap.put(sessionId, recording.getId());
             return ResponseDto.builder()
                     .ok(true)
@@ -90,7 +97,7 @@ public class OpenviduService {
 
         }catch (OpenViduJavaClientException | OpenViduHttpException exception){
             sessionRecordingMap.remove(sessionId);
-            System.out.println(exception);
+            System.out.println(exception.getMessage());
             return ResponseDto.builder()
                     .ok(false)
                     .message("화상채팅 서버 오류 입니다.")
@@ -153,5 +160,9 @@ public class OpenviduService {
                     .build()).collect(Collectors.toList());
             savedMeetingNote.updateUtterances(utterances);
         }
+    }
+    public ResponseDto<?> listRecording() throws OpenViduJavaClientException, OpenViduHttpException {
+
+        return ResponseDto.builder().result(openVidu.listRecordings()).build();
     }
 }
