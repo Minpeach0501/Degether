@@ -1,8 +1,12 @@
 package com.hanghae.degether.openvidu.repository;
 
-import com.hanghae.degether.openvidu.model.MeetingNote;
+import com.hanghae.degether.openvidu.model.Meetingnote;
+import com.hanghae.degether.project.model.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MeetingNoteRepository extends JpaRepository<MeetingNote, Long> {
+import java.util.List;
 
+public interface MeetingNoteRepository extends JpaRepository<Meetingnote, Long> {
+
+    List<Meetingnote> findAllByProject(Project project);
 }

@@ -1,6 +1,5 @@
 package com.hanghae.degether.openvidu.model;
 
-import com.hanghae.degether.project.model.Project;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,6 +25,6 @@ public class Utterance {
     @Column
     private int spk;
     @ManyToOne
-    @JoinColumn(name = "meetingNote_id")
-    private MeetingNote meetingNote;
+    @JoinColumn(name = "meetingnote_id")
+    private Meetingnote meetingnote;
 }

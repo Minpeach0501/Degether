@@ -2,10 +2,8 @@ package com.hanghae.degether.openvidu.service;
 
 import com.hanghae.degether.exception.CustomException;
 import com.hanghae.degether.exception.ErrorCode;
-import com.hanghae.degether.openvidu.dto.MultipartInputStreamFileResource;
-import com.hanghae.degether.openvidu.dto.VitoConfigDto;
-import com.hanghae.degether.openvidu.dto.VitoResponseDto;
-import io.openvidu.java.client.OpenVidu;
+import com.hanghae.degether.openvidu.dto.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -13,10 +11,10 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 @Service
+@RequiredArgsConstructor
 public class SttService {
     private String STT_TOKEN;
 

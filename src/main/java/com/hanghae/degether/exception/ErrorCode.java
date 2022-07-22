@@ -24,6 +24,8 @@ public enum ErrorCode {
     NAVER_TOKEN(425,"네이버 오류입니다."),
     VITO_H0002(426,"STT 토큰 오류 입니다." ),
     VITO_H0010(427,"STT 서비스 오류 입니다."),
+    NOT_EXIST_MEETING_NOTE(428,"존재하지 않는 프로젝트 입니다."),
+    OPENVIDU_ERROR(429,"화상채팅 서버 오류 입니다.")
     ;
     private final int code;
     private final String message;
