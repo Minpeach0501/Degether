@@ -6,10 +6,7 @@ import com.hanghae.degether.openvidu.dto.MultipartInputStreamFileResource;
 import com.hanghae.degether.openvidu.dto.VitoConfigDto;
 import com.hanghae.degether.openvidu.dto.VitoResponseDto;
 import io.openvidu.java.client.OpenVidu;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -81,7 +78,8 @@ public class SttService {
         headers.add("Authorization", STT_TOKEN);
         String url = "https://openapi.vito.ai/v1/transcribe/"+sttId;
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
-        VitoResponseDto vitoResponseDto = restTemplate.postForObject(url, requestEntity, VitoResponseDto.class);
+        ResponseEntity<VitoResponseDto> vitoResponseDtoResponseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity , VitoResponseDto.class);
+        VitoResponseDto vitoResponseDto = vitoResponseDtoResponseEntity.getBody();
         if ("H0002".equals(vitoResponseDto.getCode())) {
             //유효하지 않은 토큰
             if(resend){

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @RestController
 @RequiredArgsConstructor
 public class OpenviduController {
@@ -26,5 +28,9 @@ public class OpenviduController {
     @GetMapping("/openvidu/api/recordings")
     public ResponseDto<?> listRecording() throws OpenViduJavaClientException, OpenViduHttpException {
         return openviduService.listRecording();
+    }
+    @GetMapping("/openvidu/api/test")
+    public ResponseDto<?> testRecording() throws OpenViduJavaClientException, OpenViduHttpException, IOException {
+        return openviduService.testRecording();
     }
 }

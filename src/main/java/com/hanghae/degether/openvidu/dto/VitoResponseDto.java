@@ -24,7 +24,7 @@ public class VitoResponseDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public class Results{
+    public static class Results{
         private List<Utterance> utterances;
     }
 
@@ -32,7 +32,7 @@ public class VitoResponseDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public class Utterance{
+    public static class Utterance{
         private Long start_at;
         private Long duration;
         private String msg;

@@ -125,7 +125,7 @@ public class OpenviduService {
                     .project(project)
                     .build();
             MeetingNote savedMeetingNote = meetingNoteRepository.save(meetingNote);
-            getSttUtterance(sessionId, savedMeetingNote);
+            getSttUtterance(sttId, savedMeetingNote);
             return ResponseDto.builder()
                     .ok(true)
                     .message("회의록 저장 성공")
@@ -163,6 +163,12 @@ public class OpenviduService {
     }
     public ResponseDto<?> listRecording() throws OpenViduJavaClientException, OpenViduHttpException {
 
+        return ResponseDto.builder().result(openVidu.listRecordings()).build();
+    }
+    public ResponseDto<?> testRecording() throws OpenViduJavaClientException, OpenViduHttpException, IOException {
+
+        String sttId = sttService.getSttId("https://vidutest.shop/openvidu/recordings/ses_LPtXhnb6h8/ses_LPtXhnb6h8.webm", true);
+        VitoResponseDto vitoResponseDto = sttService.getSttUtterance(sttId, true);
         return ResponseDto.builder().result(openVidu.listRecordings()).build();
     }
 }
