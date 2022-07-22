@@ -116,7 +116,7 @@ public class MypageService {
         if (file!=null) {
             //이미지 업로드
             s3Uploader.deleteFromS3(s3Uploader.getFileName(user.getProfileUrl()));
-            profileUrl = s3Uploader.upload(file, reqDto.getProfileUrl());
+            profileUrl = s3Uploader.upload(file, "userProfile");
         }
 
         // 프론트쪽으로 정보를 줄때에는 language라는 엔티티대신 스트링값을 줘야한다.
