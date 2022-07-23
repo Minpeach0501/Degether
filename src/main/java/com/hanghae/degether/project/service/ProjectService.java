@@ -119,9 +119,9 @@ public class ProjectService {
             int deCount = project.getDeCount();
             for (UserProject userProject : project.getUserProjects()) {
                 String role = userProject.getUser().getRole();
-                if ("back".equals(role) || "front".equals(role)) {
+                if ("백엔드 개발자".equals(role) || "프론트엔드 개발자".equals(role)) {
                     devCount--;
-                } else if ("designer".equals(role)) {
+                } else if ("디자이너".equals(role)) {
                     deCount--;
                 }
             }
@@ -164,9 +164,9 @@ public class ProjectService {
                     int deCount = 0;
                     for (UserProject userProject2 : project.getUserProjects()) {
                         String role = userProject2.getUser().getRole();
-                        if ("back".equals(role) || "front".equals(role)) {
+                        if ("백엔드 개발자".equals(role) || "프론트엔드 개발자".equals(role)) {
                             devCount++;
-                        } else if ("designer".equals(role)) {
+                        } else if ("디자이너".equals(role)) {
                             deCount++;
                         }
                     }
