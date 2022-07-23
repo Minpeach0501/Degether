@@ -71,8 +71,11 @@ public class ChatService {
         }
         log.info("ENTER : {}", messageDto.getMessage());
 //        ChatRoom chatRoom = roomRepository.findByUsername(username);
-
-        ChatRoom chatRoom = new ChatRoom();
+        ChatRoom chatRoom = roomRepository.findByRoomId(messageDto.getRoomId());
+        if (chatRoom == null) {
+            chatRoom = ChatRoom.create(messageDto.getRoomId());
+            roomRepository.save(chatRoom);
+        }
 
         //캐시 저장
         chatMessageRepository.save(messageDto);
@@ -91,9 +94,5 @@ public class ChatService {
         log.info("getMessages roomId : {}", roomId);
         return chatMessageRepository.findAllMessage(roomId);
     }
-
-
-
-
 }
 

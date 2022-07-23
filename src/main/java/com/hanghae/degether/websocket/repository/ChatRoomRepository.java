@@ -70,8 +70,6 @@ public class ChatRoomRepository {
         roomRepository.save(chatRoom);
     }
 
-
-
     public static ChannelTopic getTopic(String roomId) {
         return topics.get(roomId);
     }
