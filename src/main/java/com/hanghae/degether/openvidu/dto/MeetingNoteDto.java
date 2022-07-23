@@ -15,6 +15,7 @@ public class MeetingNoteDto {
     public static class Response{
         private Long id;
         private Long createdAt;
+        private String title;
         private Long duration;
         private String url;
         private Boolean status;

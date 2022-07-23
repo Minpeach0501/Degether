@@ -23,6 +23,8 @@ public class Meetingnote {
     @Column
     private Long createdAt;
     @Column
+    private String title;
+    @Column
     private Long duration;
     @Column
     private String url;

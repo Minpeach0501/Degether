@@ -24,6 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -123,9 +126,11 @@ public class OpenviduService {
             Recording recording = openVidu.stopRecording(sessionRecordingMap.get(sessionId));
             sessionRecordingMap.remove(sessionId);
             String sttId = sttService.getSttId(recording.getUrl(), true);
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             Meetingnote meetingNote = Meetingnote.builder()
                     .sttId(sttId)
                     .createdAt(recording.getCreatedAt())
+                    .title(format.format(new Date(recording.getCreatedAt())))
                     .duration((long) recording.getDuration())
                     .url(recording.getUrl())
                     .status(false)
@@ -178,6 +183,7 @@ public class OpenviduService {
                 MeetingNoteDto.Response.builder()
                         .id(meetingNote.getId())
                         .createdAt(meetingNote.getCreatedAt())
+                        .title(meetingNote.getTitle())
                         .duration(meetingNote.getDuration())
                         .url(meetingNote.getUrl())
                         .status(meetingNote.getStatus())
