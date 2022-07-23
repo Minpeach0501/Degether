@@ -125,21 +125,6 @@ public class MypageService {
         String nickname = reqDto.getNickname();
         String intro = reqDto.getIntro();
 
-//        int nicknameL = nickname.length();
-//        int introL = intro.length();
-
-//        유효성검사는 validation으로 교체
-//        if (nicknameL > 10) {
-//            throw new IllegalArgumentException("글자수가 초과되었습니다.");
-//        }
-//        if (nicknameL < 2) {
-//            throw new IllegalArgumentException("글자수가 부족합니다.");
-//        }
-//        if (introL > 20) {
-//            throw new IllegalArgumentException("글자수가 초과되었습니다.");
-//        }
-
-
         LoginResDto resDto = LoginResDto.builder()
                 .userId(user.getId())
                 .username(username)

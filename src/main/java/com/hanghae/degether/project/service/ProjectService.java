@@ -17,8 +17,6 @@ import com.hanghae.degether.project.util.S3Uploader;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
-import com.hanghae.degether.websocket.dto.UserInfoDto;
-import com.hanghae.degether.websocket.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -50,7 +48,7 @@ public class ProjectService {
     private final String S3InfoFileDir = "projectInfo";
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
-    private final ChatRoomRepository chatRoomRepository;
+
 
     @Transactional
     public Long createProject(ProjectDto.Request projectRequestDto, MultipartFile multipartFile, List<MultipartFile> infoFiles) {
@@ -91,8 +89,8 @@ public class ProjectService {
                     .user(user)
                     .build());
 
-            UserInfoDto userInfoDto = new UserInfoDto(user);
-            chatRoomRepository.createChatRoom(savedProject,userInfoDto);
+//            UserInfoDto userInfoDto = new UserInfoDto(user);
+//            chatRoomRepository.createChatRoom(savedProject,userInfoDto);
 
             return savedProject.getId();
         } catch (Exception e) {
