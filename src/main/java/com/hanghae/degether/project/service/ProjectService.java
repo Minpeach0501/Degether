@@ -345,6 +345,7 @@ public class ProjectService {
                         Duration.between(LocalDate.now().atStartOfDay(),project.getDeadLine().atStartOfDay()).toDays()
                 )
                 .figma(project.getFigma())
+                .leaderId(project.getUser().getId())
                 .user(
                         project.getUserProjects().stream().filter((UserProject::isTeam))
                                 .map((userProjectList) -> {
