@@ -41,6 +41,7 @@ public class ChatRoomRepository {
     private void init() {
         opsHashChatRoom = redisTemplate.opsForHash();
         topics = new HashMap<>();
+        topics.put("57", new ChannelTopic("chatroom"));
     }
 
 
@@ -62,17 +63,6 @@ public class ChatRoomRepository {
     public void createChatRoom(Project project, UserInfoDto userDto) {
 
         ChatRoom chatRoom = ChatRoom.create(project, userDto);
-
-        // redis 저장
-        opsHashChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);
-
-        // DB 저장
-        roomRepository.save(chatRoom);
-    }
-    @Transactional
-    public void createChatRoom2(String roomId) {
-
-        ChatRoom chatRoom = ChatRoom.create(roomId);
 
         // redis 저장
         opsHashChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);
