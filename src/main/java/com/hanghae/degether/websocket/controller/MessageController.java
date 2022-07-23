@@ -25,7 +25,7 @@ public class MessageController {
 
     // 메세지 보내기
     @MessageMapping({"/chat/message"})
-    public void message(ChatMessageDto message, @Header("token") String token) {
+    public void message(ChatMessageDto message, @Header("Authorization") String token) {
         log.info("요청 메서드 [message] /chat/message");
             chatService.save(message, token);
     }

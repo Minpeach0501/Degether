@@ -69,17 +69,8 @@ public class ChatRoomRepository {
         // DB 저장
         roomRepository.save(chatRoom);
     }
-    @Transactional
-    public void createChatRoom2(String roomId) {
 
-        ChatRoom chatRoom = ChatRoom.create(roomId);
 
-        // redis 저장
-        opsHashChatRoom.put(CHAT_ROOMS, chatRoom.getRoomId(), chatRoom);
-
-        // DB 저장
-        roomRepository.save(chatRoom);
-    }
 
     public static ChannelTopic getTopic(String roomId) {
         return topics.get(roomId);
