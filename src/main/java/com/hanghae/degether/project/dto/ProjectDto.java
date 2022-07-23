@@ -81,6 +81,7 @@ public class ProjectDto {
         private List<DocDto> todo;
         private Boolean isZzim;
         private Long zzimCount;
+        private Long leaderId;
     }
     @Getter
     @Setter
