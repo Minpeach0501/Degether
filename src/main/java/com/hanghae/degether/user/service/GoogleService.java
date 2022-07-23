@@ -148,7 +148,7 @@ public class GoogleService   {
     private User registerKakaoUserIfNeed(SocialUserInfoDto googleUserInfo) {
         // DB 에 중복된 email이 있는지 확인
         String username = "google"+googleUserInfo.getId();
-        String nickname = googleUserInfo.getNickname();
+        String nickname = googleUserInfo.getNickName();
         String profileUrl = googleUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)
                 .orElse(null);

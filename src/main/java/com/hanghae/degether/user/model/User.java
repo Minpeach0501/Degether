@@ -22,7 +22,7 @@ public class User {
     private  String username;
 
     @Column(nullable = false)
-    private  String nickname;
+    private  String nickName;
 
     @Column(nullable = false)
     private  String password;
@@ -57,9 +57,9 @@ public class User {
 
 
     @Builder
-    public User(String username, String nickname, String profileUrl, String password){
+    public User(String username, String nickName, String profileUrl, String password){
         this.username = username;
-        this.nickname = nickname;
+        this.nickName = nickName;
         this.profileUrl = profileUrl;
         this.password = password;
     }
@@ -67,7 +67,7 @@ public class User {
     public void update(String profileUrl, String role, String nickname, List<Language> language, String github, String figma, String intro, String phoneNumber, String email) {
         this.profileUrl =profileUrl;
         this.role = role;
-        this.nickname = nickname;
+        this.nickName = nickName;
         this.language.clear();
         this.language.addAll(language);
         this.github = github;

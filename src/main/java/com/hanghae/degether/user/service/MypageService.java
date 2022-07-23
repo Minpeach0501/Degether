@@ -80,7 +80,7 @@ public class MypageService {
         ResultDto resultDto = ResultDto.builder()
                 .profileUrl(user.getProfileUrl())
                 .role(user.getRole())
-                .nickname(user.getNickname())
+                .nickname(user.getNickName())
                 .language(language)
                 .github(user.getGithub())
                 .figma(user.getFigma())
@@ -94,7 +94,7 @@ public class MypageService {
         return new UserResponseDto<>(true, "마이페이지 정보를 가져왔습니다.", resultDto);
     }
 
-
+// db 상에서의 user의 값들은 삭제되지않고 상태값이 True >>> false로 바뀐다.
     @Transactional
     public UserResponseDto deleteUser(UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
@@ -113,6 +113,7 @@ public class MypageService {
 
         String profileUrl = user.getProfileUrl();
 
+// s3 업로드할때 실패시 s3에 올라간 이미지 삭제예외처리 필요 !
         if (file!=null) {
             //이미지 업로드
             s3Uploader.deleteFromS3(s3Uploader.getFileName(user.getProfileUrl()));
@@ -153,7 +154,8 @@ public class MypageService {
                 .email(reqDto.getEmail())
                 .build();
 
-        user.update(resDto.getProfileUrl(),
+        user.update(
+                resDto.getProfileUrl(),
                 resDto.getRole(),
                 resDto.getNickname(),
                 language,
@@ -182,7 +184,7 @@ public class MypageService {
         ProfileResDto profileResDto = ProfileResDto.builder()
                 .profileUrl(user.getProfileUrl())
                 .role(user.getRole())
-                .nickname(user.getNickname())
+                .nickname(user.getNickName())
                 .language(language)
                 .github(user.getGithub())
                 .figma(user.getFigma())

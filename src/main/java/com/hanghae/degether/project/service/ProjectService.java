@@ -1,12 +1,12 @@
 package com.hanghae.degether.project.service;
 
 import com.hanghae.degether.doc.repository.DocRepository;
+import com.hanghae.degether.exception.CustomException;
+import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.project.dto.CommentDto;
 import com.hanghae.degether.project.dto.DocDto;
 import com.hanghae.degether.project.dto.ProjectDto;
 import com.hanghae.degether.project.dto.UserDto;
-import com.hanghae.degether.exception.CustomException;
-import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.project.model.*;
 import com.hanghae.degether.project.repository.ProjectQueryDslRepository;
 import com.hanghae.degether.project.repository.ProjectRepository;
@@ -17,6 +17,8 @@ import com.hanghae.degether.project.util.S3Uploader;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
+import com.hanghae.degether.websocket.dto.UserInfoDto;
+import com.hanghae.degether.websocket.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -48,6 +50,7 @@ public class ProjectService {
     private final String S3InfoFileDir = "projectInfo";
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ChatRoomRepository chatRoomRepository;
 
     @Transactional
     public Long createProject(ProjectDto.Request projectRequestDto, MultipartFile multipartFile, List<MultipartFile> infoFiles) {
@@ -87,6 +90,10 @@ public class ProjectService {
                     .isTeam(true)
                     .user(user)
                     .build());
+
+            UserInfoDto userInfoDto = new UserInfoDto(user);
+            chatRoomRepository.createChatRoom(savedProject,userInfoDto);
+
             return savedProject.getId();
         } catch (Exception e) {
             log.info("delete Img");
@@ -303,7 +310,7 @@ public class ProjectService {
                 .comment(
                         project.getComments().stream().map(comment -> CommentDto.Response.builder()
                                 .commentId(comment.getId())
-                                .nickname(comment.getUser().getNickname())
+                                .nickname(comment.getUser().getNickName())
                                 .comment(comment.getComment())
                                 .build()).collect(Collectors.toList())
                 )
@@ -354,7 +361,7 @@ public class ProjectService {
                                             .userId(userStream.getId())
                                             .profileUrl(userStream.getProfileUrl())
                                             .role(userStream.getRole())
-                                            .nickname(userStream.getNickname())
+                                            .nickname(userStream.getNickName())
                                             .build();
                                 }).collect(Collectors.toList())
                 )
@@ -366,7 +373,7 @@ public class ProjectService {
                                             .userId(userStream.getId())
                                             .profileUrl(userStream.getProfileUrl())
                                             .role(userStream.getRole())
-                                            .nickname(userStream.getNickname())
+                                            .nickname(userStream.getNickName())
                                             .build();
                                 }).collect(Collectors.toList())
                 )
@@ -375,7 +382,7 @@ public class ProjectService {
                             return DocDto.builder()
                                     .docId(doc.getId())
                                     .title(doc.getTitle())
-                                    .nickname(doc.getUser().getNickname())
+                                    .nickname(doc.getUser().getNickName())
                                     .createdDate(doc.getCreatedDate())
                                     .build();
                         }).collect(Collectors.toList())
@@ -385,7 +392,7 @@ public class ProjectService {
                             return DocDto.builder()
                                     .docId(doc.getId())
                                     .title(doc.getTitle())
-                                    .inCharge(doc.getInCharge().getNickname())
+                                    .inCharge(doc.getInCharge().getNickName())
                                     .createdDate(doc.getCreatedDate())
                                     .docStatus(doc.getDocStatus())
                                     .startDate(doc.getStartDate())

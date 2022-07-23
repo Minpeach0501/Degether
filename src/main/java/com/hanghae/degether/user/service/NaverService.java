@@ -153,7 +153,7 @@ public class NaverService {
         // DB 에 중복된 username이 있는지 확인
         //email은 선택동의라 선택하지않으면 username이  null값으로 들어가버림
         String username = "naver"+naverUserInfo.getId();
-        String nickname = naverUserInfo.getNickname();
+        String nickname = naverUserInfo.getNickName();
         String profileUrl = naverUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)
                 .orElse(null);
