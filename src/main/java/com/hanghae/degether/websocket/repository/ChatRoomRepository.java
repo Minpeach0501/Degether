@@ -7,6 +7,7 @@ import com.hanghae.degether.websocket.dto.UserInfoDto;
 import com.hanghae.degether.websocket.model.ChatRoom;
 import com.hanghae.degether.websocket.service.RedisSubscriber;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Repository
+@Slf4j
 public class ChatRoomRepository {
 
     // 채팅방(topic)에 발행되는 메시지를 처리할 Listner
@@ -70,8 +72,24 @@ public class ChatRoomRepository {
         roomRepository.save(chatRoom);
     }
 
+    @Transactional
+    public ChatRoom createChatRoom2(String roomId ) {
+
+        ChatRoom chatRoom = ChatRoom.create2(roomId);
+
+        // redis 저장
+        opsHashChatRoom.put(CHAT_ROOMS, roomId, chatRoom);
+
+        // DB 저장
+        roomRepository.save(chatRoom);
+        return chatRoom;
+    }
+
     public static ChannelTopic getTopic(String roomId) {
-        return topics.get(roomId);
+        ChannelTopic channelTopic = new ChannelTopic(roomId);
+        log.info(channelTopic.toString());
+        return channelTopic;
+
     }
 
 }

@@ -23,10 +23,13 @@ public class ChatMessage {
 
     @Column
     private String roomId; // 프로젝트 아이디값이 들어간다다
-   @Column
+
+    @Column
     private MessageType type; // 메시지 타입
+
     @Column
     private String sender; // 메시지 보낸사람 닉네임 값이 들어간다
+
     @Column
     private String message; // 메시지
 

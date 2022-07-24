@@ -308,7 +308,7 @@ public class ProjectService {
                 .comment(
                         project.getComments().stream().map(comment -> CommentDto.Response.builder()
                                 .commentId(comment.getId())
-                                .nickname(comment.getUser().getNickName())
+                                .nickname(comment.getUser().getNickname())
                                 .comment(comment.getComment())
                                 .build()).collect(Collectors.toList())
                 )
@@ -359,7 +359,7 @@ public class ProjectService {
                                             .userId(userStream.getId())
                                             .profileUrl(userStream.getProfileUrl())
                                             .role(userStream.getRole())
-                                            .nickname(userStream.getNickName())
+                                            .nickname(userStream.getNickname())
                                             .build();
                                 }).collect(Collectors.toList())
                 )
@@ -371,7 +371,7 @@ public class ProjectService {
                                             .userId(userStream.getId())
                                             .profileUrl(userStream.getProfileUrl())
                                             .role(userStream.getRole())
-                                            .nickname(userStream.getNickName())
+                                            .nickname(userStream.getNickname())
                                             .build();
                                 }).collect(Collectors.toList())
                 )
@@ -380,7 +380,7 @@ public class ProjectService {
                             return DocDto.builder()
                                     .docId(doc.getId())
                                     .title(doc.getTitle())
-                                    .nickname(doc.getUser().getNickName())
+                                    .nickname(doc.getUser().getNickname())
                                     .createdDate(doc.getCreatedDate())
                                     .build();
                         }).collect(Collectors.toList())
@@ -390,7 +390,7 @@ public class ProjectService {
                             return DocDto.builder()
                                     .docId(doc.getId())
                                     .title(doc.getTitle())
-                                    .inCharge(doc.getInCharge().getNickName())
+                                    .inCharge(doc.getInCharge().getNickname())
                                     .createdDate(doc.getCreatedDate())
                                     .docStatus(doc.getDocStatus())
                                     .startDate(doc.getStartDate())

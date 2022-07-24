@@ -18,11 +18,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Long Id;
 
-    @Column
+    @Column(nullable = false)
     private  String username;
 
     @Column(nullable = false)
-    private  String nickName;
+    private  String nickname;
 
     @Column(nullable = false)
     private  String password;
@@ -59,15 +59,15 @@ public class User {
     @Builder
     public User(String username, String nickName, String profileUrl, String password){
         this.username = username;
-        this.nickName = nickName;
+        this.nickname = nickName;
         this.profileUrl = profileUrl;
         this.password = password;
     }
     @Builder
-    public void update(String profileUrl, String role, String nickname, List<Language> language, String github, String figma, String intro, String phoneNumber, String email) {
+    public void update(String profileUrl, String role, String nickName, List<Language> language, String github, String figma, String intro, String phoneNumber, String email) {
         this.profileUrl =profileUrl;
         this.role = role;
-        this.nickName = nickName;
+        this.nickname = nickName;
         this.language.clear();
         this.language.addAll(language);
         this.github = github;

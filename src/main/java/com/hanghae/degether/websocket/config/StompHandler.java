@@ -19,9 +19,8 @@ import java.util.Optional;
 public class StompHandler implements ChannelInterceptor {
 
     private final JwtTokenProvider jwtTokenProvider;
+
     private final ChatRoomService chatRoomService;
-
-
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {

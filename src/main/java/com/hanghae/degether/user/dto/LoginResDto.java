@@ -33,7 +33,7 @@ public class LoginResDto {
         this.username = user.get().getUsername();
         this.profileUrl = user.get().getProfileUrl();
         this.role = user.get().getRole();
-        this.nickname = user.get().getNickName();
+        this.nickname = user.get().getNickname();
         if(user.get().getLanguage() != null){
             this.language =user.get().getLanguage().stream().map(Language::getLanguage).collect(Collectors.toList());
         } else {

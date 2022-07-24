@@ -35,12 +35,12 @@ public class DocResponseDto {
         this.title = doc.getTitle();
         this.content = doc.getContent();
         this.docStatus = doc.getDocStatus();
-        this.inCharge = doc.getInCharge().getNickName();
+        this.inCharge = doc.getInCharge().getNickname();
         this.notice = doc.getNotice();
         this.onGoing = doc.getOnGoing();
         this.startDate = doc.getStartDate();
         this.endDate = doc.getEndDate();
-        this.nickname = doc.getUser().getNickName();
+        this.nickname = doc.getUser().getNickname();
         this.createdDate = doc.getCreatedDate();
     }
 
@@ -48,7 +48,7 @@ public class DocResponseDto {
         this.id = doc.getId();
         this.title = doc.getTitle();
         this.docStatus = doc.getDocStatus();
-        this.inCharge = user.getNickName();
+        this.inCharge = user.getNickname();
         this.startDate = doc.getStartDate();
         this.endDate = doc.getEndDate();
     }

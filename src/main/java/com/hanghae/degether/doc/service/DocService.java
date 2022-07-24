@@ -53,7 +53,7 @@ public class DocService {
         Project project = projectRepository.findById(projectId).orElseThrow(()->new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
         List<DocResponseDto> docs = new ArrayList<>();
         for(Doc doc : docRepository.findAllByProjectOrderByCreatedDateDesc(project)){
-            docs.add(new DocResponseDto(doc.getId(), doc.getTitle(), doc.getUser().getNickName(), doc.getFolder().getId()));
+            docs.add(new DocResponseDto(doc.getId(), doc.getTitle(), doc.getUser().getNickname(), doc.getFolder().getId()));
         }
         return new ResponseDto<>(true, "요청성공", docs);
     }

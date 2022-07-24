@@ -24,7 +24,7 @@ public class UserInfoDto {
     public UserInfoDto(User user) {
         this.username = user.getUsername();
         this.password = user.getPassword();
-        this.nickName = user.getNickName();
+        this.nickName = user.getNickname();
         this.profileUrl = user.getProfileUrl();
         this.intro = user.getIntro();
     }

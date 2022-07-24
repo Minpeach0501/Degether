@@ -16,22 +16,21 @@ public class ChatRoom implements Serializable {
     private static final long serialVersionUID = 6494678977089006639L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long Id;
+
     @Column
     private String roomId;
 
-    private String username;
 
     //프로젝트 생성시 채팅방 생성
     public static ChatRoom create(Project project, UserInfoDto userDto) {
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.roomId = String.valueOf(project.getId());
-        chatRoom.username = userDto.getUsername();
         return chatRoom;
     }
 
-    public static ChatRoom create2(String roomId) {
+    public static ChatRoom create2(String roomId ) {
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.roomId = roomId;
         return chatRoom;
