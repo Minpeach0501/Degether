@@ -14,7 +14,9 @@ import java.util.List;
 public class ProjectDto {
     @Getter
     @Setter
+    @Builder
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class Request{
         @NotEmpty(message = "프로젝트명을 입력해 주세요.")
         @Size(min = 2, max = 20, message = "2글자 이상, 20글자 이하로 입력해 주세요.")
