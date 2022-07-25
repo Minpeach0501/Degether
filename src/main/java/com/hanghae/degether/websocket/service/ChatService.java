@@ -92,24 +92,12 @@ public class ChatService {
         messageDto.setUserId(user.getId());
         messageDto.setMessage(messageDto.getMessage());
 
+        log.info("sender: {}", messageDto.getSender());
         log.info("type : {}", messageDto.getType());
 
         ChatRoom chatRoom = roomRepository.findByRoomId(messageDto.getRoomId());
         log.info(String.valueOf(chatRoom));
 
-
-        // 값 들어오는지 확인용
-        String profileUrl2 = messageDto.getProfileUrl();
-        String nickName2 = messageDto.getSender();
-        String createdAt = messageDto.getCreatedAt();
-        String roomId1 = messageDto.getRoomId();
-        String sender = messageDto.getSender();
-
-        log.info(nickName2);
-        log.info(profileUrl2);
-        log.info(createdAt);
-        log.info(roomId1);
-        log.info(sender);
 
         chatRoom = createChatRoom(messageDto);
 
