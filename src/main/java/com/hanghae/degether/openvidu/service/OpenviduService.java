@@ -43,7 +43,6 @@ public class OpenviduService {
     private final ProjectRepository projectRepository;
     private final UtteranceRepository utteranceRepository;
     private final UserProjectRepository userProjectRepository;
-    private final UserRepository userRepository;
     private final JwtTokenProvider tokenProvider;
     @Value("${openvidu.url}")
     private String OPENVIDU_URL;
@@ -229,10 +228,8 @@ public class OpenviduService {
     }
 
     public ResponseDto<?> openvidu(String token, Long projectId) {
-        User user = userRepository.findByUsername(tokenProvider.getUserPk(token)).orElseThrow(
-                ()->new IllegalArgumentException("잘못된 토큰정보입니다."));
-        Project project = projectRepository.findById(projectId).orElseThrow(
-                ()->new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
+        User user = CommonUtil.getUserByToken(token, tokenProvider);
+        Project project = CommonUtil.getProject(projectId, projectRepository);
         return userProjectRepository.existsByProjectAndUserAndIsTeam(project, user, true) ?
                 ResponseDto.builder()
                 .ok(true)
