@@ -22,7 +22,12 @@ public enum ErrorCode {
     MALFORMED_TOKEN(423,"토큰형식이 맞지 않습니다."),
     DELETED_USER(424,"탈퇴한 회원입니다."),
     NAVER_TOKEN(425,"네이버 오류입니다."),
-    FAILED_MESSAGE(426, "메세지 보내기에 실패했습니다.")
+    VITO_H0002(426,"STT 토큰 오류 입니다." ),
+    VITO_H0010(427,"STT 서비스 오류 입니다."),
+    NOT_EXIST_MEETING_NOTE(428,"존재하지 않는 프로젝트 입니다."),
+    OPENVIDU_ERROR(429,"화상채팅 서버 오류 입니다."),
+    MANY_PROJECT(430,"프로젝트 생성 수 초과"),
+    FAILED_MESSAGE(431, "메세지 보내기에 실패했습니다.")
 
     ;
     private final int code;
