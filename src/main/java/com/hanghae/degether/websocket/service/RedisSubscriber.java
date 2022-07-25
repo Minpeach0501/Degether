@@ -42,6 +42,7 @@ public class RedisSubscriber implements MessageListener {
             log.info("onMessage : {}", roomMessage.getType());
             messagingTemplate.convertAndSend("/sub/chat/room/" + roomMessage.getRoomId(), roomMessage);
 
+            log.info("메세지 받기도 성공 ");
         } catch (Exception e) {
             throw new CustomException(ErrorCode. FAILED_MESSAGE);
         }

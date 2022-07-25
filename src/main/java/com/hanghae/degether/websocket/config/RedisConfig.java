@@ -36,7 +36,9 @@ public class RedisConfig {
 
     /*
      * redisTemplate
-     * 설정하는곳
+     * setKeySerializer, setValueSerializer 설정해주는 이유
+     * RedisTemplate를 사용할 때 Spring - Redis 간 데이터 직렬화, 역직렬화 시 사용하는 방식이 Jdk 직렬화 방식이기 때문입니다
+     * 직렬화와 역직렬화를 통해 redis-cli 를 이용해 데이터 값을 볼 수 있다.
      */
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {

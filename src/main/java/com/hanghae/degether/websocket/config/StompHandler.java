@@ -24,23 +24,31 @@ public class StompHandler implements ChannelInterceptor {
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
+
         log.info(String.valueOf(message));
+
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        log.info("simpDestination : {}", message.getHeaders().get("simpDestination"));
-        log.info("sessionId : {}", message.getHeaders().get("simpSessionId"));
+
         String sessionId = (String) message.getHeaders().get("simpSessionId");
 
-        // websocket 연결시 헤더의 jwt token 검증
+        log.info("simpDestination : {}", message.getHeaders().get("simpDestination"));
+        log.info("sessionId : {}", sessionId);
+
+
+        // websocket 연결시 헤더의 security를 통해 jwt token 검증
         if (StompCommand.CONNECT == accessor.getCommand()) {
+
             log.info("CONNECT : {}", sessionId);
+
             jwtTokenProvider.validateToken(accessor.getFirstNativeHeader("Authorization"));
 
             // 구독 요청시 유저의 카운트수를 저장하고 최대인원수를 관리하며 , 세션정보를 저장한다.
         } else if (StompCommand.SUBSCRIBE == accessor.getCommand()) {
-
             log.info("SUBSCRIBE : {}", sessionId);
+
             String roomId = chatRoomService.getRoomId((String) Optional.ofNullable(message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
             log.info("roomId : {}", roomId);
+
 
 
             // 채팅방 나간 유저의 카운트 수를 반영하고, 방에서 세션정보를 지움

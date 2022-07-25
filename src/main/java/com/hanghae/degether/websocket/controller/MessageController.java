@@ -8,7 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,19 +25,17 @@ public class MessageController {
 
     // 메세지 보내기
     @MessageMapping({"/chat/message"})
-    public void message(ChatMessageDto message, @Header("Authorization") String token) {
+    public void message(ChatMessageDto messageDto, @Header("Authorization") String token) {
         log.info("요청 메서드 [message] /chat/message");
-            chatService.save(message, token);
+            chatService.save(messageDto, token);
     }
 
-//    //이전에 채팅 기록들 모두 조회
-//    @GetMapping("/chat/message/{roomId}")
-//    @ResponseBody
-//    public List<ChatMessageDto> getMessage(@PathVariable String roomId) {
-//        log.info("요청 메서드 [GET] /chat/message/{roomId}");
-//        return chatService.getMessages(roomId);
-//    }
-
+    //이전에 채팅 기록  조회
+    @GetMapping("/chat/message/{roomId}")
+    @ResponseBody
+    public  List<ChatMessageDto> getAllMessage(@PathVariable String roomId){
+        return chatService.getAllMessage(roomId);
+    }
 
 
 }

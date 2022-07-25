@@ -37,4 +37,15 @@ public class ChatMessageDto {
         this.userId = chatMessage.getUserId();
         this.createdAt = chatMessage.getCreatedAt();
     }
+
+    public ChatMessageDto(ChatMessage chatMessage) {
+        this.type = chatMessage.getType();
+        this.roomId = chatMessage.getRoomId();
+        this.message =chatMessage.getMessage();
+        this.sender = chatMessage.getSender();
+        this.profileUrl = chatMessage.getProfileUrl();
+        this.userId = chatMessage.getUserId();
+        this.createdAt = chatMessage.getCreatedAt();
+    }
+
 }

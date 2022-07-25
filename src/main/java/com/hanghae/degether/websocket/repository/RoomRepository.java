@@ -8,4 +8,5 @@ public interface RoomRepository extends JpaRepository<ChatRoom, Long> {
     ChatRoom findByRoomId(String roomId);
 
     void deleteByRoomId(String roomId);
+
 }

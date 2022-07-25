@@ -1,7 +1,5 @@
 package com.hanghae.degether.websocket.model;
 
-import com.hanghae.degether.project.model.Project;
-import com.hanghae.degether.websocket.dto.UserInfoDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,13 +22,7 @@ public class ChatRoom implements Serializable {
 
 
     //프로젝트 생성시 채팅방 생성
-    public static ChatRoom create(Project project, UserInfoDto userDto) {
-        ChatRoom chatRoom = new ChatRoom();
-        chatRoom.roomId = String.valueOf(project.getId());
-        return chatRoom;
-    }
-
-    public static ChatRoom create2(String roomId ) {
+    public static ChatRoom create(String roomId ) {
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.roomId = roomId;
         return chatRoom;

@@ -54,6 +54,8 @@ public class ChatMessage {
         this.message = chatMessageDto.getMessage();
         this.sender = chatMessageDto.getSender();
         this.profileUrl = chatMessageDto.getProfileUrl();
+        this.createdAt = chatMessageDto.getCreatedAt();
+        this.userId = chatMessageDto.getUserId();
         this.chatRoom = chatRoom;
     }
 
