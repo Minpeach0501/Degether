@@ -48,7 +48,7 @@ public class RedisPublisher {
 
     // websocket 에서 받아온 메세지를 convertAndsend를 통하여 Redis의 메세지 리스너로 발행
     // redisrepository 를 이용해 저장
-    public void publishsave(ChannelTopic topic, ChatMessageDto messageDto){
+    public void publishsave( ChatMessageDto messageDto){
 
         ChannelTopic topic1 = new ChannelTopic(messageDto.getRoomId());
 

@@ -25,7 +25,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .withSockJS();
     }
 
-
+    //
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker( "/sub");
@@ -33,7 +33,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
 
-    // 핸들러 인터셉터 설정
+    // stomp 핸들러 인터셉터 설정
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration

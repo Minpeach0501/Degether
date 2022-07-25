@@ -41,8 +41,10 @@ public class ChatService {
 
 
     //redis 관련
+    public static final String ENTER_INFO = "ENTER_INFO"; // 채팅룸에 입장한 클라이언트의 sessionId와 채팅룸 id를 맵핑한 정보 저장
     private static final String CHAT_MESSAGE = "CHAT_MESSAGE"; // 채팅룸에 메세지들을 저장
     private final RedisTemplate<String, Object> redisTemplate;
+    private HashOperations<String, String, String> hashOpsEnterInfo; // Redis 의 Hashes 사용
     private HashOperations<String, String, List<ChatMessageDto>> opsHashChatMessage; // Redis 의 Hashes 사용
     // 채팅방의 대화 메시지를 발행하기 위한 redis topic 정보. 서버별로 채팅방에 매치되는 topic정보를 Map에 넣어 roomId로 찾을수 있도록 한다.
     private static Map<String, ChannelTopic> topics;
@@ -52,6 +54,8 @@ public class ChatService {
     @PostConstruct
     private void init() {
         opsHashChatRoom = redisTemplate.opsForHash();
+        opsHashChatMessage = redisTemplate.opsForHash();
+        hashOpsEnterInfo = redisTemplate.opsForHash();
         topics = new HashMap<>();
     }
 
@@ -107,7 +111,7 @@ public class ChatService {
         log.info(roomId1);
         log.info(sender);
 
-        chatRoom = createChatRoom(messageDto, chatRoom);
+        chatRoom = createChatRoom(messageDto);
 
 
         //받아온 메세지의 타입이 ENTER 일때 알림 메세지와 함께 채팅방 입장 !
@@ -121,8 +125,7 @@ public class ChatService {
 
 
         // Websocket 에 발행된 메시지를 redis 로 발행한다(publish)
-//        redisPublisher.publishsave(ChatRoomRepository.getTopic(messageDto.getRoomId()), messageDto);
-        redisPublisher.publishsave(topics.get(messageDto.getRoomId()),messageDto);
+        redisPublisher.publishsave(messageDto);
 
         //캐시 저장후 entity 값 설정
         ChatMessage chatMessage = new ChatMessage(messageDto, chatRoom);
@@ -182,7 +185,10 @@ public class ChatService {
     }
 
     // 채팅방생성 메서드 추출
-    private ChatRoom createChatRoom(ChatMessageDto messageDto, ChatRoom chatRoom) {
+    private ChatRoom createChatRoom(ChatMessageDto messageDto) {
+
+        ChatRoom chatRoom = roomRepository.findByRoomId(messageDto.getRoomId());
+
         // 채팅방이 없을때 생성 하는 곳
         if (chatRoom == null || chatRoom.equals("null")) {
             ChatRoom chatRoom2 = ChatRoom.create(messageDto.getRoomId());
@@ -195,8 +201,21 @@ public class ChatService {
             chatRoom = chatRoom2;
         }
 
+
+
         log.info(String.valueOf(chatRoom));
         return chatRoom;
+    }
+    // 구독 요청시
+    public void setUserEnterInfo(String roomId, String sessionId) {
+        hashOpsEnterInfo.put(ENTER_INFO, sessionId, roomId);
+        log.info("hashPosEnterInfo.put : {}", hashOpsEnterInfo.get(ENTER_INFO, sessionId));
+    }
+
+    // 구독 취소하거나 or 세션연결이 끊겼을 시
+    public void removeUserEnterInfo(String sessionId, String roomId) {
+        hashOpsEnterInfo.delete(ENTER_INFO, sessionId, roomId);
+        log.info("hashPosEnterInfo.put : {}", hashOpsEnterInfo.get(ENTER_INFO, sessionId));
     }
 
 }

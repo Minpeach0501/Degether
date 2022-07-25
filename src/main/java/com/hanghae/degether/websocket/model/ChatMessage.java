@@ -24,6 +24,7 @@ public class ChatMessage {
     @Column
     private String roomId; // 프로젝트 아이디값이 들어간다다
 
+    @Enumerated(EnumType.STRING)
     @Column
     private MessageType type; // 메시지 타입
 

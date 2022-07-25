@@ -2,6 +2,7 @@ package com.hanghae.degether.websocket.config;
 
 import com.hanghae.degether.user.security.JwtTokenProvider;
 import com.hanghae.degether.websocket.service.ChatRoomService;
+import com.hanghae.degether.websocket.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -22,6 +23,9 @@ public class StompHandler implements ChannelInterceptor {
 
     private final ChatRoomService chatRoomService;
 
+    private final ChatService chatService;
+
+
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
 
@@ -39,24 +43,27 @@ public class StompHandler implements ChannelInterceptor {
         if (StompCommand.CONNECT == accessor.getCommand()) {
 
             log.info("CONNECT : {}", sessionId);
-
             jwtTokenProvider.validateToken(accessor.getFirstNativeHeader("Authorization"));
 
-            // 구독 요청시 유저의 카운트수를 저장하고 최대인원수를 관리하며 , 세션정보를 저장한다.
+            // 구독 요청시 유저 세션정보를 저장한다.
         } else if (StompCommand.SUBSCRIBE == accessor.getCommand()) {
             log.info("SUBSCRIBE : {}", sessionId);
-
             String roomId = chatRoomService.getRoomId((String) Optional.ofNullable(message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
+
+            chatService.setUserEnterInfo(roomId,sessionId);
+
             log.info("roomId : {}", roomId);
 
 
 
-            // 채팅방 나간 유저의 카운트 수를 반영하고, 방에서 세션정보를 지움
+            // 채팅방 나간 유저를 방에서 세션정보를 지움
         } else if (StompCommand.UNSUBSCRIBE == accessor.getCommand() || StompCommand.DISCONNECT == accessor.getCommand()) {
             log.info("UNSUBSCRIBE : {}", sessionId);
+
             String roomId = chatRoomService.getRoomId((String) Optional.ofNullable(message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
             log.info("roomId : {}", roomId);
 
+            chatService.removeUserEnterInfo(roomId,sessionId);
         }
         return message;
     }

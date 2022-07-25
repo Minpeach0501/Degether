@@ -7,19 +7,23 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+
 @Slf4j
-public class MessageController {
+public class AllChatController {
     private final ChatService chatService;
 
+    // 특정 채팅방 입장
+    @PostMapping("/chat/room/{roomId}")
+    @ResponseBody
+    public String roomInfo(@PathVariable String roomId) {
+        return roomId;
+    }
 
     // 메세지 보내기
     @MessageMapping({"/chat/message"})

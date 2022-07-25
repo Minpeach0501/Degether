@@ -9,5 +9,4 @@ public interface RedisMessageRepository extends CrudRepository<ChatMessage, Long
 
     List<ChatMessage> findAllMessageByRoomId(String roomId);
 
-
 }
