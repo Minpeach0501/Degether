@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,7 +19,6 @@ import java.util.List;
 @Slf4j
 public class MessageController {
     private final ChatService chatService;
-    private final SimpMessageSendingOperations sendingOperations;
 
 
     // 메세지 보내기
@@ -36,6 +34,7 @@ public class MessageController {
     public  List<ChatMessageDto> getAllMessage(@PathVariable String roomId){
         return chatService.getAllMessage(roomId);
     }
+
 
 
 }

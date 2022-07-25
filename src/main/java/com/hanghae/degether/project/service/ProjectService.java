@@ -17,7 +17,7 @@ import com.hanghae.degether.project.util.S3Uploader;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
-import com.hanghae.degether.websocket.repository.ChatRoomRepository;
+import com.hanghae.degether.websocket.model.ChatRoom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -49,7 +49,6 @@ public class ProjectService {
     private final String S3InfoFileDir = "projectInfo";
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
-    private final ChatRoomRepository chatRoomRepository;
 
 
     @Transactional
@@ -93,7 +92,8 @@ public class ProjectService {
 
             // 채팅방생성
             String roomId = String.valueOf(savedProject.getId());
-            chatRoomRepository.createChatRoom(roomId);
+            ChatRoom chatRoom = new ChatRoom();
+            chatRoom.create(roomId);
 
             return savedProject.getId();
         } catch (Exception e) {

@@ -15,9 +15,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -27,18 +30,30 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class ChatService {
-
+    //의존성 주입
     private final RedisPublisher redisPublisher;
-    private final ChatRoomRepository chatRoomRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final RoomRepository roomRepository;
     private final RedisMessageRepository redisMessageRepository;
+    private final RedisRoomRepository redisRoomRepository;
 
+
+    //redis 관련
     private static final String CHAT_MESSAGE = "CHAT_MESSAGE"; // 채팅룸에 메세지들을 저장
     private final RedisTemplate<String, Object> redisTemplate;
     private HashOperations<String, String, List<ChatMessageDto>> opsHashChatMessage; // Redis 의 Hashes 사용
+    // 채팅방의 대화 메시지를 발행하기 위한 redis topic 정보. 서버별로 채팅방에 매치되는 topic정보를 Map에 넣어 roomId로 찾을수 있도록 한다.
+    private static Map<String, ChannelTopic> topics;
+    private HashOperations<String, String, ChatRoom> opsHashChatRoom;
+    private final RedisMessageListenerContainer redisMessageListener;
+    private final RedisSubscriber redisSubscriber;
+    @PostConstruct
+    private void init() {
+        opsHashChatRoom = redisTemplate.opsForHash();
+        topics = new HashMap<>();
+    }
 
     @Transactional
     public void save(ChatMessageDto messageDto, String token) {
@@ -92,45 +107,62 @@ public class ChatService {
         log.info(roomId1);
         log.info(sender);
 
-        if (chatRoom == null || chatRoom.equals("null")) {
-            ChatRoom chatRoom1;
-            chatRoom1 = chatRoomRepository.createChatRoom(messageDto.getRoomId());
-            roomRepository.save(chatRoom1);
-            chatRoom = chatRoom1;
-        }
-
-        log.info(String.valueOf(chatRoom));
+        chatRoom = createChatRoom(messageDto, chatRoom);
 
 
         //받아온 메세지의 타입이 ENTER 일때 알림 메세지와 함께 채팅방 입장 !
         if (ChatMessage.MessageType.ENTER.equals(messageDto.getType())) {
-            chatRoomRepository.enterChatRoom(messageDto.getRoomId());
+           // 토픽 가져오는 메서드 사용
+            getTopic(messageDto);
+
             messageDto.setMessage("[알림] " + messageDto.getSender() + "님이 입장하셨습니다.");
-            String roomId = messageDto.getRoomId();
         }
         log.info("ENTER : {}", messageDto.getMessage());
-//        ChatRoom chatRoom = roomRepository.findByUsername(username);
-
-
-        //캐시 저장
-//        chatMessageRepository.save(messageDto);
-
-//        //캐시 저장후 entity 값 설정
-//        ChatMessage chatMessage = new ChatMessage(messageDto,chatRoom);
-//
-//       // DB 저장
-//        messageRepository.save(chatMessage);
 
 
         // Websocket 에 발행된 메시지를 redis 로 발행한다(publish)
-        redisPublisher.publishsave(ChatRoomRepository.getTopic(messageDto.getRoomId()), messageDto);
-
+//        redisPublisher.publishsave(ChatRoomRepository.getTopic(messageDto.getRoomId()), messageDto);
+        redisPublisher.publishsave(topics.get(messageDto.getRoomId()),messageDto);
 
         //캐시 저장후 entity 값 설정
         ChatMessage chatMessage = new ChatMessage(messageDto, chatRoom);
 
         // DB 저장
         messageRepository.save(chatMessage);
+    }
+
+    private void getTopic(ChatMessageDto messageDto) {
+        String roomId = messageDto.getRoomId();
+        log.info(roomId);
+        //enterChatroom 채팅방 들어가는 로직
+        ChannelTopic topic = topics.get(roomId);
+        if (topic == null) {
+            topic = new ChannelTopic(roomId);
+            log.info(topic.toString());
+            redisMessageListener.addMessageListener(redisSubscriber, topic);
+            log.info("메세지 리스너 작동확인 ");
+
+            topics.put(roomId, topic);
+        }
+    }
+
+
+    // 채팅방생성
+    private ChatRoom createChatRoom(ChatMessageDto messageDto, ChatRoom chatRoom) {
+        // 채팅방이 없을때 생성 하는 곳
+        if (chatRoom == null || chatRoom.equals("null")) {
+            ChatRoom chatRoom2 = ChatRoom.create(messageDto.getRoomId());
+            // redis 저장
+            redisRoomRepository.save(chatRoom2);
+//            opsHashChatRoom.put(CHAT_ROOMS, roomId, chatRoom);
+            // DB 저장
+            roomRepository.save(chatRoom2);
+
+            chatRoom = chatRoom2;
+        }
+
+        log.info(String.valueOf(chatRoom));
+        return chatRoom;
     }
 
 

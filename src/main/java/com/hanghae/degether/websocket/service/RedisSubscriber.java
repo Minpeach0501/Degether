@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class RedisSubscriber implements MessageListener {
     private final ObjectMapper objectMapper;
-    private final RedisTemplate redisTemplate;
     private final SimpMessageSendingOperations messagingTemplate;
+    private final RedisTemplate redisTemplate;
 
 
     /**
