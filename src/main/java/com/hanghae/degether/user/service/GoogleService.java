@@ -1,4 +1,4 @@
-package com.hanghae.degether.doc.repository.service;
+package com.hanghae.degether.user.service;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;

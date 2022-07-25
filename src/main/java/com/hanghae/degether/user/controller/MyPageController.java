@@ -5,7 +5,7 @@ import com.hanghae.degether.user.dto.MypageReqDto;
 import com.hanghae.degether.user.dto.UserResponseDto;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.UserDetailsImpl;
-import com.hanghae.degether.doc.repository.service.MypageService;
+import com.hanghae.degether.user.service.MypageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
