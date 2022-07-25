@@ -51,9 +51,9 @@ public class ProjectService {
         User user = CommonUtil.getUser();
 
         //유지보수 중이 아닌 프로젝트가 3개 이상일때 생성 불가능
-        if(projectRepository.countByUserAndStepIsNot(user, "유지보수")>=3){
-            throw new CustomException(ErrorCode.MANY_PROJECT);
-        }
+        // if(projectRepository.countByUserAndStepIsNot(user, "유지보수")>=3){
+        //     throw new CustomException(ErrorCode.MANY_PROJECT);
+        // }
 
         String thumbnailUrl = "";
         List<String> infoFileUrls = new ArrayList<>();
