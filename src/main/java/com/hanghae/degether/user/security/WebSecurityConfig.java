@@ -63,7 +63,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/post/**").permitAll()
                 .antMatchers("/**").permitAll()
-                .antMatchers("/api/openvidu/**").permitAll()
                 .anyRequest().permitAll()
                 //                .anyRequest().authenticated()
                 .and()

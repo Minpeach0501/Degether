@@ -37,7 +37,7 @@ public class OpenviduController {
 
     @GetMapping("/api/openvidu/{projectId}")
     public ResponseDto<?> openvidu(HttpServletRequest request, @PathVariable Long projectId ){
-        String token = request.getHeader("token");
+        String token = request.getHeader("Authorization");
         return openviduService.openvidu(token, projectId);
     }
 }
