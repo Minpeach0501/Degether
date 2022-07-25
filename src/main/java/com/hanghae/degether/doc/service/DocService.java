@@ -33,17 +33,14 @@ public class DocService {
     private final UserRepository userRepository;
     private final FolderRepository folderRepository;
 
-    private final UserProjectRepository userProjectRepository;
-    private final JwtTokenProvider tokenProvider;
+
 
     @Autowired
-    public DocService(DocRepository docRepository, ProjectRepository projectRepository, UserRepository userRepository, FolderRepository folderRepository, JwtTokenProvider tokenProvider, UserProjectRepository userProjectRepository){
+    public DocService(DocRepository docRepository, ProjectRepository projectRepository, UserRepository userRepository, FolderRepository folderRepository){
         this.docRepository = docRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
         this.folderRepository = folderRepository;
-        this.tokenProvider = tokenProvider;
-        this.userProjectRepository = userProjectRepository;
     }
 
     @Transactional
@@ -122,11 +119,5 @@ public class DocService {
         return  new ResponseDto<>(true,"이동 성공.");
     }
 
-    public ResponseDto<?> openvidu(String token, Long projectId) {
-        User user = userRepository.findByUsername(tokenProvider.getUserPk(token)).orElseThrow(
-                ()->new IllegalArgumentException("유저X"));
-        Project project = projectRepository.findById(projectId).orElseThrow(
-                ()->new IllegalArgumentException("프로젝트X"));
-        return userProjectRepository.existsByProjectAndUserAndIsTeam(project, user, true) ? new ResponseDto<>(true,"생성가능") : new ResponseDto<>(false,"생성불가");
-    }
+
 }
