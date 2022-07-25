@@ -131,41 +131,7 @@ public class ChatService {
         messageRepository.save(chatMessage);
     }
 
-    private void getTopic(ChatMessageDto messageDto) {
-        String roomId = messageDto.getRoomId();
-        log.info(roomId);
-        //enterChatroom 채팅방 들어가는 로직
-        ChannelTopic topic = topics.get(roomId);
-        if (topic == null) {
-            topic = new ChannelTopic(roomId);
-            log.info(topic.toString());
-            redisMessageListener.addMessageListener(redisSubscriber, topic);
-            log.info("메세지 리스너 작동확인 ");
-
-            topics.put(roomId, topic);
-        }
-    }
-
-
-    // 채팅방생성
-    private ChatRoom createChatRoom(ChatMessageDto messageDto, ChatRoom chatRoom) {
-        // 채팅방이 없을때 생성 하는 곳
-        if (chatRoom == null || chatRoom.equals("null")) {
-            ChatRoom chatRoom2 = ChatRoom.create(messageDto.getRoomId());
-            // redis 저장
-            redisRoomRepository.save(chatRoom2);
-//            opsHashChatRoom.put(CHAT_ROOMS, roomId, chatRoom);
-            // DB 저장
-            roomRepository.save(chatRoom2);
-
-            chatRoom = chatRoom2;
-        }
-
-        log.info(String.valueOf(chatRoom));
-        return chatRoom;
-    }
-
-
+    // 이전 채팅 기록 조회
     public List<ChatMessageDto> getAllMessage(String roomId) {
 
         List<ChatMessageDto> chatMessageDtoList = new ArrayList<>();
@@ -198,6 +164,40 @@ public class ChatService {
         return chatMessageDtoList;
     }
 
+
+    //토픽 가져오는것 메서드 추출.
+    private void getTopic(ChatMessageDto messageDto) {
+        String roomId = messageDto.getRoomId();
+        log.info(roomId);
+        //enterChatroom 채팅방 들어가는 로직
+        ChannelTopic topic = topics.get(roomId);
+        if (topic == null) {
+            topic = new ChannelTopic(roomId);
+            log.info(topic.toString());
+            redisMessageListener.addMessageListener(redisSubscriber, topic);
+            log.info("메세지 리스너 작동확인 ");
+
+            topics.put(roomId, topic);
+        }
+    }
+
+    // 채팅방생성 메서드 추출
+    private ChatRoom createChatRoom(ChatMessageDto messageDto, ChatRoom chatRoom) {
+        // 채팅방이 없을때 생성 하는 곳
+        if (chatRoom == null || chatRoom.equals("null")) {
+            ChatRoom chatRoom2 = ChatRoom.create(messageDto.getRoomId());
+            // redis 저장
+            redisRoomRepository.save(chatRoom2);
+//            opsHashChatRoom.put(CHAT_ROOMS, roomId, chatRoom);
+            // DB 저장
+            roomRepository.save(chatRoom2);
+
+            chatRoom = chatRoom2;
+        }
+
+        log.info(String.valueOf(chatRoom));
+        return chatRoom;
+    }
 
 }
 
