@@ -15,6 +15,8 @@ import com.hanghae.degether.project.repository.ProjectRepository;
 import com.hanghae.degether.project.repository.UserProjectRepository;
 import com.hanghae.degether.project.util.CommonUtil;
 import com.hanghae.degether.user.model.User;
+import com.hanghae.degether.user.repository.UserRepository;
+import com.hanghae.degether.user.security.JwtTokenProvider;
 import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +43,8 @@ public class OpenviduService {
     private final ProjectRepository projectRepository;
     private final UtteranceRepository utteranceRepository;
     private final UserProjectRepository userProjectRepository;
+    private final UserRepository userRepository;
+    private final JwtTokenProvider tokenProvider;
     @Value("${openvidu.url}")
     private String OPENVIDU_URL;
     // Secret shared with our OpenVidu server
@@ -222,5 +226,22 @@ public class OpenviduService {
         String sttId = sttService.getSttId("https://hh99.s3.ap-northeast-2.amazonaws.com/1_3.webm", true);
         VitoResponseDto vitoResponseDto = sttService.getSttUtterance(sttId, true);
         return ResponseDto.builder().result(vitoResponseDto).build();
+    }
+
+    public ResponseDto<?> openvidu(String token, Long projectId) {
+        User user = userRepository.findByUsername(tokenProvider.getUserPk(token)).orElseThrow(
+                ()->new IllegalArgumentException("잘못된 토큰정보입니다."));
+        Project project = projectRepository.findById(projectId).orElseThrow(
+                ()->new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
+        return userProjectRepository.existsByProjectAndUserAndIsTeam(project, user, true) ?
+                ResponseDto.builder()
+                .ok(true)
+                .message("참여 가능한 세션입니다.")
+                .build()
+                :
+                ResponseDto.builder()
+                .ok(false)
+                .message("참여 불가능한 세션입니다.")
+                .build();
     }
 }

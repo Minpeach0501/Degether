@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @RestController
@@ -32,5 +33,11 @@ public class OpenviduController {
     @GetMapping("/openvidu/api/test")
     public ResponseDto<?> testRecording() throws OpenViduJavaClientException, OpenViduHttpException, IOException {
         return openviduService.testRecording();
+    }
+
+    @GetMapping("/api/openvidu/{projectId}")
+    public ResponseDto<?> openvidu(HttpServletRequest request, @PathVariable Long projectId ){
+        String token = request.getHeader("token");
+        return openviduService.openvidu(token, projectId);
     }
 }

@@ -75,9 +75,5 @@ public class DocController {
     }
 
     //오픈비듀 세션 권한확인
-    @GetMapping("/api/openvidu/{projectId}")
-    public ResponseDto<?> openvidu(HttpServletRequest request,@PathVariable Long projectId ){
-        String token = request.getHeader("token");
-        return docService.openvidu(token, projectId);
-    }
+
 }
