@@ -21,7 +21,8 @@ public enum ErrorCode {
     UNSUPPORT_TOKEN(422,"지원하지 않는 토큰입니다."),
     MALFORMED_TOKEN(423,"토큰형식이 맞지 않습니다."),
     DELETED_USER(424,"탈퇴한 회원입니다."),
-    NAVER_TOKEN(425,"네이버 오류입니다.")
+    NAVER_TOKEN(425,"네이버 오류입니다."),
+    MANY_PROJECT(426,"프로젝트 생성 수 초과")
 
     ;
     private final int code;
