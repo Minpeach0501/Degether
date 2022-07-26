@@ -1,9 +1,12 @@
 package com.hanghae.degether.project.service;
 
 import com.hanghae.degether.doc.repository.DocRepository;
-import com.hanghae.degether.project.dto.*;
 import com.hanghae.degether.exception.CustomException;
 import com.hanghae.degether.exception.ErrorCode;
+import com.hanghae.degether.project.dto.CommentDto;
+import com.hanghae.degether.project.dto.DocDto;
+import com.hanghae.degether.project.dto.ProjectDto;
+import com.hanghae.degether.project.dto.UserDto;
 import com.hanghae.degether.project.model.*;
 import com.hanghae.degether.project.repository.ProjectQueryDslRepository;
 import com.hanghae.degether.project.repository.ProjectRepository;
@@ -14,6 +17,7 @@ import com.hanghae.degether.project.util.S3Uploader;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
+import com.hanghae.degether.websocket.model.ChatRoom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -45,6 +49,7 @@ public class ProjectService {
     private final String S3InfoFileDir = "projectInfo";
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+
 
     @Transactional
     public Long createProject(ProjectDto.Request projectRequestDto, MultipartFile multipartFile, List<MultipartFile> infoFiles) {
@@ -90,6 +95,12 @@ public class ProjectService {
                     .isTeam(true)
                     .user(user)
                     .build());
+
+            // 채팅방생성
+            String roomId = String.valueOf(savedProject.getId());
+            ChatRoom chatRoom = new ChatRoom();
+            chatRoom.create(roomId);
+
             return savedProject.getId();
         } catch (Exception e) {
             log.info("delete Img");
@@ -288,6 +299,7 @@ public class ProjectService {
     public ProjectDto.Response getProject(Long projectId) {
         // User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
+        System.out.println(project.getComments());
         return ProjectDto.Response.builder()
                 .thumbnail(project.getThumbnail())
                 .projectName(project.getProjectName())

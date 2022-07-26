@@ -50,10 +50,10 @@ public class NaverService {
 
 
     @Transactional
-    public UserResponseDto naverLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
+    public UserResponseDto naverLogin(String code, String state, HttpServletResponse response, String redirectUrl) throws JsonProcessingException {
         //todo 프론트에서 받은 인가코드를 기반으로 인증서버에게 인증 받고,
         // 인증받은 사용자의 정보를 이용하여 SocialUserInfoDto를 생성하여 반환한다.
-        String accessToken = getAccessToken(code,state);
+        String accessToken = getAccessToken(code,state,redirectUrl);
         //프론트에서 받은 인가코드를 기반으로 인증서버에게 인증 받고,
         SocialUserInfoDto naverUserInfo = getUserInfo(accessToken);
 
@@ -70,7 +70,7 @@ public class NaverService {
     }
 
     // 1. "인가 코드"로 "액세스 토큰" 요청 (네이버는 state를 추가로 사용한다)
-    public String getAccessToken(String code, String state) throws JsonProcessingException {
+    public String getAccessToken(String code, String state,String redirectUrl) throws JsonProcessingException {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -80,7 +80,7 @@ public class NaverService {
         body.add("grant_type", "authorization_code");
         body.add("client_id", naver_client_id);
         body.add("client_secret", secret_key);
-        body.add("redirect_uri", "http://localhost:3000/auth/naver/callback");
+        body.add("redirect_uri", redirectUrl);
         body.add("code", code);
         body.add("state", state);
 
@@ -153,7 +153,7 @@ public class NaverService {
         // DB 에 중복된 username이 있는지 확인
         //email은 선택동의라 선택하지않으면 username이  null값으로 들어가버림
         String username = "naver"+naverUserInfo.getId();
-        String nickname = naverUserInfo.getNickname();
+        String nickname = naverUserInfo.getNickName();
         String profileUrl = naverUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)
                 .orElse(null);

@@ -1,10 +1,7 @@
 package com.hanghae.degether.project.model;
 
 import com.hanghae.degether.user.model.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -28,5 +25,8 @@ public class UserProject {
 
     public void changeIsTeam(boolean isTeam) {
         this.isTeam = isTeam;
+    }
+    public void updateProject(Project project){
+        this.project = project;
     }
 }

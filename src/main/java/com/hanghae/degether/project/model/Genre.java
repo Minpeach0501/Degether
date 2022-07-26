@@ -18,4 +18,7 @@ public class Genre {
     private Long id;
     @Column
     private String genre;
+    @ManyToOne
+    @JoinColumn(name = "project_id",nullable = false)
+    private Project project;
 }

@@ -42,6 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web
                 .ignoring()
                 .antMatchers("/h2-console/**")
+                .antMatchers("/ws/chat/**")
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
@@ -60,8 +61,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 //                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 // 회원 관리 처리 API 전부를 login 없이 허용
+
                 .antMatchers("/user/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/post/**").permitAll()
+                .antMatchers("ws/chat").permitAll()
                 .antMatchers("/**").permitAll()
                 .anyRequest().permitAll()
                 //                .anyRequest().authenticated()
