@@ -56,14 +56,14 @@ public class User {
     private boolean status = true ;
 
 
-    @Builder
+
     public User(String username, String nickName, String profileUrl, String password){
         this.username = username;
         this.nickname = nickName;
         this.profileUrl = profileUrl;
         this.password = password;
     }
-    @Builder
+
     public void update(String profileUrl, String role, String nickName, List<Language> language, String github, String figma, String intro, String phoneNumber, String email) {
         this.profileUrl =profileUrl;
         this.role = role;

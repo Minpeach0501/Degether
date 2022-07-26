@@ -194,17 +194,6 @@ public class ChatService {
         log.info(String.valueOf(chatRoom));
         return chatRoom;
     }
-    // 구독 요청시
-    public void setUserEnterInfo(String roomId, String sessionId) {
-        hashOpsEnterInfo.put(ENTER_INFO, sessionId, roomId);
-        log.info("hashPosEnterInfo.put : {}", hashOpsEnterInfo.get(ENTER_INFO, sessionId));
-    }
-
-    // 구독 취소하거나 or 세션연결이 끊겼을 시
-    public void removeUserEnterInfo(String sessionId, String roomId) {
-        hashOpsEnterInfo.delete(ENTER_INFO, sessionId, roomId);
-        log.info("hashPosEnterInfo.put : {}", hashOpsEnterInfo.get(ENTER_INFO, sessionId));
-    }
 
 }
 

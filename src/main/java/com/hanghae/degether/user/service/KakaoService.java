@@ -31,6 +31,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class KakaoService {
+
+
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 

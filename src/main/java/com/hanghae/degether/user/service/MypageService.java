@@ -52,11 +52,10 @@ public class MypageService {
     @Transactional
     public UserResponseDto<?> getuserInfo(MypageReqDto mypageReqDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        User user2 = userDetails.getUser();
-        User user = userRepository.findById(user2.getId()).orElseThrow(
-                ()-> new CustomException(ErrorCode.NOT_EXIST_USER)
-        );
-
+        User user = userDetails.getUser();
+        if (user == null ){
+            throw  new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
 
         List<Zzim> Zzims = zzimRepository.findAllByUser(user);
 
@@ -105,12 +104,11 @@ public class MypageService {
 
     @Transactional
     public UserResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto) {
-        String username = userDetails.getUsername();
-
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_EXIST_USER)
-        );
-
+        User user = userDetails.getUser();
+        if (user == null ){
+            throw  new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
+        String username  = user.getUsername();
         String profileUrl = user.getProfileUrl();
 
 // s3 업로드할때 실패시 s3에 올라간 이미지 삭제예외처리 필요 !
