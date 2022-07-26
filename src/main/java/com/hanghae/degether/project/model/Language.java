@@ -21,4 +21,7 @@ public class Language {
     @ManyToOne
     @JoinColumn(name = "USER_ID")
     private User user;
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private Project project;
 }
