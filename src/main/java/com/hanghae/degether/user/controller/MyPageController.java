@@ -3,6 +3,7 @@ package com.hanghae.degether.user.controller;
 
 import com.hanghae.degether.user.dto.MypageReqDto;
 import com.hanghae.degether.user.dto.UserResponseDto;
+import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.UserDetailsImpl;
 import com.hanghae.degether.user.service.MypageService;
@@ -35,7 +36,8 @@ public class MyPageController {
     @PutMapping("/user/userDelete")
     public UserResponseDto deleteUser(@AuthenticationPrincipal UserDetailsImpl userDetails)
     {
-        return mypageService.deleteUser(userDetails);
+        User user = userDetails.getUser();
+        return mypageService.deleteUser(user);
     }
 
 

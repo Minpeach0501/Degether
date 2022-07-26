@@ -84,10 +84,9 @@ public class MypageService {
     }
 
 // db 상에서의 user의 값들은 삭제되지않고 상태값이 True >>> false로 바뀐다.
-    @Transactional
-    public UserResponseDto deleteUser(UserDetailsImpl userDetails) {
-        User user = userDetails.getUser();
+    public UserResponseDto deleteUser(User user) {
         user.setStatus(false);
+        System.out.println(user.isStatus());
         userRepository.save(user);
         return new UserResponseDto(true, "삭제성공");
     }

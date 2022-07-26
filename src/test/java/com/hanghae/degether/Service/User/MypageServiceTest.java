@@ -8,6 +8,7 @@ import com.hanghae.degether.user.dto.ProfileResDto;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
+import com.hanghae.degether.user.service.MypageService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,17 +18,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.annotation.Rollback;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
-@Transactional
+@Rollback
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(MockitoExtension.class)
 public class MypageServiceTest {
@@ -39,7 +41,7 @@ public class MypageServiceTest {
     ProfileResDto profileResDto;
 
     @Autowired
-    UserRepository userRepository;
+    UserRepository userRepository2;
 
 //    @Autowired
 //    UserProjectRepository userProjectRepository;
@@ -56,6 +58,9 @@ public class MypageServiceTest {
 
     @Autowired
     JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    MypageService mypageService;
 
 
      User setupUser;
@@ -84,7 +89,7 @@ public class MypageServiceTest {
                 .phoneNumber("01012345678")
                 .status(true)
                 .build();
-        userRepository.save(setupUser);
+        userRepository2.save(setupUser);
 
         token = jwtTokenProvider.createToken(setupUser.getUsername());
         Authentication authentication =jwtTokenProvider.getAuthentication(token);
@@ -138,7 +143,7 @@ public class MypageServiceTest {
     @Order(1)
     @DisplayName("마이페이지 정보수정")
     void updateUserInfo(){
-        User user = userRepository.findByUsername(setupUser.getUsername()).orElseThrow(
+        User user = userRepository2.findByUsername(setupUser.getUsername()).orElseThrow(
                 ()->  new NullPointerException("없는 사용자 입니다.")
         );
 
@@ -178,7 +183,7 @@ public class MypageServiceTest {
                 .email(reqDto.getEmail())
                 .build();
 
-        userRepository.save(updatedUser);
+        userRepository2.save(updatedUser);
 
         assertThat(reqDto.getProfileUrl().equals(updatedUser.getProfileUrl()));
         assertThat(reqDto.getEmail().equals(updatedUser.getEmail()));
@@ -189,29 +194,13 @@ public class MypageServiceTest {
     @Order(2)
     @DisplayName("회원 삭제")
     void deleteUser(){
-        User user = new User();
-         user = User.builder()
-                 .email("test2@test.com")
-                 .password("testPassword")
-                 .nickname("접니다")
-                 .username("kakaoTest22")
-                 .language(Arrays.asList(
-                         Language.builder().language("java").build(),
-                         Language.builder().language("python").build()
-                 ))
-                 .profileUrl("https://ossack.s3.ap-northeast-2.amazonaws.com/basicprofile.png")
-                 .role("백엔드 개발자")
-                 .github("github.com")
-                 .figma("figma.com")
-                 .intro("안녕")
-                 .phoneNumber("01011112222")
-                 .status(true)
-                 .build();
 
-                 userRepository.save(user);
+        mypageService.deleteUser(setupUser);
 
-                 //우리 서비스는 회원가입시 유저의 status 값을 바꾼다
-                 user.setStatus(false);
+        Optional<User> savedUser = userRepository2.findByUsername(setupUser.getUsername());
+
+
+        assertThat(savedUser.get().isStatus() == false);
 
     }
 
@@ -221,7 +210,7 @@ public class MypageServiceTest {
     void getOtherUserInfo(){
 
 
-        User user2 =userRepository.findByUsername(setupUser.getUsername()).orElseThrow(
+        User user2 =userRepository2.findByUsername(setupUser.getUsername()).orElseThrow(
                 () -> new NullPointerException("존재하지 않습니다.")
         );
         List<String> language = user2.getLanguage().stream().map(Language::getLanguage).collect(Collectors.toList());
