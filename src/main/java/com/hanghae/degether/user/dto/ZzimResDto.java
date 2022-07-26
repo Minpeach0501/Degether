@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -15,8 +16,8 @@ public class ZzimResDto {
     private String projectName;
     private String projectDescription;
     private String thumbnail;
-    private List<Language> language;
-    private List<Genre> genre;
+    private List<String> language;
+    private List<String> genre;
     private String step;
 
     public ZzimResDto(Zzim zzim) {
@@ -25,8 +26,8 @@ public class ZzimResDto {
      this.projectName = zzim.getProject().getProjectName();
      this.projectDescription = zzim.getProject().getProjectDescription();
      this.thumbnail = zzim.getProject().getThumbnail();
-     this.language = zzim.getProject().getLanguages();
-     this.genre = zzim.getProject().getGenres();
+     this.language = zzim.getProject().getLanguages().stream().map(Language::getLanguage).collect(Collectors.toList());
+     this.genre = zzim.getProject().getGenres().stream().map(Genre::getGenre).collect(Collectors.toList());
      this.step = zzim.getProject().getStep();
     }
 }
