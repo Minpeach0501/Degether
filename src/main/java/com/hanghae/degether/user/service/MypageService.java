@@ -5,6 +5,7 @@ import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.project.model.Language;
 import com.hanghae.degether.project.model.UserProject;
 import com.hanghae.degether.project.model.Zzim;
+import com.hanghae.degether.project.repository.LanguageRepository;
 import com.hanghae.degether.project.repository.UserProjectRepository;
 import com.hanghae.degether.project.repository.ZzimRepository;
 import com.hanghae.degether.project.util.S3Uploader;
@@ -12,6 +13,7 @@ import com.hanghae.degether.user.dto.*;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.UserDetailsImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MypageService {
 
     private final ZzimRepository zzimRepository;
@@ -34,20 +37,9 @@ public class MypageService {
     private final UserRepository userRepository;
 
     private final S3Uploader s3Uploader;
+    private final LanguageRepository languageRepository;
 
-    @Autowired
-    public MypageService(
-            ZzimRepository zzimRepository,
-            UserProjectRepository userProjectRepository,
-            UserRepository userRepository,
-            S3Uploader s3Uploader
-    ) {
-        this.zzimRepository = zzimRepository;
-        this.userProjectRepository = userProjectRepository;
-        this.userRepository = userRepository;
-        this.s3Uploader = s3Uploader;
 
-    }
 
     @Transactional
     public UserResponseDto<?> getuserInfo(MypageReqDto mypageReqDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -56,7 +48,6 @@ public class MypageService {
         if (user == null ){
             throw  new CustomException(ErrorCode.NOT_EXIST_USER);
         }
-
         List<Zzim> Zzims = zzimRepository.findAllByUser(user);
 
         List<ZzimResDto> Zzim = new ArrayList<>();
@@ -74,7 +65,7 @@ public class MypageService {
             myProjectResDtos.add(myProjectResDto1);
         }
 
-        List<String> language = user.getLanguage().stream().map(Language::getLanguage).collect(Collectors.toList());
+        List<String> language = languageRepository.findAllByUser(user).stream().map(Language::getLanguage).collect(Collectors.toList());
 
         ResultDto resultDto = ResultDto.builder()
                 .profileUrl(user.getProfileUrl())

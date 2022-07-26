@@ -1,5 +1,6 @@
 package com.hanghae.degether.project.model;
 
+import com.hanghae.degether.user.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,4 +18,7 @@ public class Language {
     private Long id;
     @Column
     private String language;
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    private User user;
 }
