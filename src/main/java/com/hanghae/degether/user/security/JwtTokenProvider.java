@@ -1,7 +1,10 @@
 package com.hanghae.degether.user.security;
 
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +33,7 @@ public class JwtTokenProvider {
 
     // 토큰 유효시간
     // 프론트엔드와 약속해야 함
-    private Long tokenValidTime = 24 * 60 * 60 * 1000L; // 24시간
+    private Long tokenValidTime = 12 * 60 * 60 * 1000L; // 24시간
 
     private final UserDetailsService userDetailsService;
 
@@ -78,7 +81,10 @@ public class JwtTokenProvider {
     // 토큰의 유효성 + 만료일자 확인
     public boolean validateToken(String token) {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            log.info(claims.toString());
+            log.info(claims.getBody().getExpiration().toString());
             return !claims.getBody().getExpiration().before(new Date());
+
     }
 
 }
