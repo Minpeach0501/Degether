@@ -12,6 +12,7 @@ import com.hanghae.degether.project.util.CommonUtil;
 import com.hanghae.degether.project.util.S3Uploader;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
+import com.hanghae.degether.user.security.JwtTokenProvider;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Nested;
@@ -23,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,40 +48,38 @@ class ProjectServiceTest {
     ProjectService projectService;
     @Autowired
     UserRepository userRepository;
-    public static MockedStatic<CommonUtil> mCommonUtil;
-    @BeforeAll
-    public static void beforeAllStatic(){
-        System.out.println("static");
-        mCommonUtil = Mockito.mockStatic(CommonUtil.class);
-    }
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
-    @AfterAll
-    public static void afterAll() {
-        mCommonUtil.close();
-    }
+
+    User user;
+    String token;
+
     @BeforeEach
     void beforeEach(){
-        mCommonUtil.when(()->CommonUtil.getUser()).thenReturn(
-                userRepository.save(
-                        User.builder()
-                                .username("username")
-                                .nickname("nickname")
-                                .password("password")
-                                .language(Arrays.asList(
-                                        Language.builder().language("java").build(),
-                                        Language.builder().language("python").build()
-                                ))
-                                .profileUrl("profileUrl")
-                                .role("백엔드 개발자")
-                                .github("github.com")
-                                .figma("figma.com")
-                                .intro("안녕하세요")
-                                .email("test@test.com")
-                                .phoneNumber("01011112222")
-                                .status(true)
-                                .build()
-                )
+        user = userRepository.save(
+                User.builder()
+                        .username("username")
+                        .nickname("nickname")
+                        .password("password")
+                        .language(Arrays.asList(
+                                Language.builder().language("java").build(),
+                                Language.builder().language("python").build()
+                        ))
+                        .profileUrl("profileUrl")
+                        .role("백엔드 개발자")
+                        .github("github.com")
+                        .figma("figma.com")
+                        .intro("안녕하세요")
+                        .email("test@test.com")
+                        .phoneNumber("01011112222")
+                        .status(true)
+                        .build()
         );
+        token = jwtTokenProvider.createToken(user.getUsername());
+        Authentication authentication = jwtTokenProvider.getAuthentication(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
     }
 
     @DisplayName("프로젝트 생성")
