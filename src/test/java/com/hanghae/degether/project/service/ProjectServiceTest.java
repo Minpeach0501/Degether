@@ -11,9 +11,9 @@ import com.hanghae.degether.project.repository.UserProjectRepository;
 import com.hanghae.degether.project.util.CommonUtil;
 import com.hanghae.degether.project.util.S3Uploader;
 import com.hanghae.degether.user.model.User;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import com.hanghae.degether.user.repository.UserRepository;
+import org.aspectj.lang.annotation.Before;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Nested;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -21,6 +21,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,16 +37,49 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
 class ProjectServiceTest {
-    @Mock
-    ProjectRepository projectRepository;
 
-    @Mock
+    @MockBean
     S3Uploader s3Uploader;
-    @Mock
-    UserProjectRepository userProjectRepository;
-    @InjectMocks
-    ProjectService projectService;
 
+    @Autowired
+    ProjectService projectService;
+    @Autowired
+    UserRepository userRepository;
+    public static MockedStatic<CommonUtil> mCommonUtil;
+    @BeforeAll
+    public static void beforeAllStatic(){
+        System.out.println("static");
+        mCommonUtil = Mockito.mockStatic(CommonUtil.class);
+    }
+
+    @AfterAll
+    public static void afterAll() {
+        mCommonUtil.close();
+    }
+    @BeforeEach
+    void beforeEach(){
+        mCommonUtil.when(()->CommonUtil.getUser()).thenReturn(
+                userRepository.save(
+                        User.builder()
+                                .username("username")
+                                .nickname("nickname")
+                                .password("password")
+                                .language(Arrays.asList(
+                                        Language.builder().language("java").build(),
+                                        Language.builder().language("python").build()
+                                ))
+                                .profileUrl("profileUrl")
+                                .role("백엔드 개발자")
+                                .github("github.com")
+                                .figma("figma.com")
+                                .intro("안녕하세요")
+                                .email("test@test.com")
+                                .phoneNumber("01011112222")
+                                .status(true)
+                                .build()
+                )
+        );
+    }
 
     @DisplayName("프로젝트 생성")
     @Test
@@ -68,115 +102,15 @@ class ProjectServiceTest {
         MockMultipartFile infoFile1 = new MockMultipartFile("data", "infoFile1", "img", "infoFile1".getBytes());
         MockMultipartFile infoFile2 = new MockMultipartFile("data", "infoFile2", "img", "infoFile2".getBytes());
         List<MultipartFile> infoFiles = Arrays.asList(infoFile1, infoFile2);
-        MockedStatic<CommonUtil> mCommonUtil = Mockito.mockStatic(CommonUtil.class);
-        // mCommonUtil = Mockito.mockStatic(CommonUtil.class);
-        mCommonUtil.when(()->CommonUtil.getUser()).thenReturn(
-                User.builder()
-                        .Id(1L)
-                        .username("username")
-                        .nickname("nickname")
-                        .password("password")
-                        .language(Arrays.asList(
-                                Language.builder().language("java").build(),
-                                Language.builder().language("python").build()
-                        ))
-                        .profileUrl("profileUrl")
-                        .role("백엔드 개발자")
-                        .github("github.com")
-                        .figma("figma.com")
-                        .intro("안녕하세요")
-                        .email("test@test.com")
-                        .phoneNumber("01011112222")
-                        .status(true)
-                        .build()
-        );
         Mockito.when(s3Uploader.upload(multipartFile, "projectThumbnail")).thenReturn("thumbnailUrl");
         Mockito.when(s3Uploader.upload(infoFile1, "projectInfo")).thenReturn("infoFileUrl1");
         Mockito.when(s3Uploader.upload(infoFile2, "projectInfo")).thenReturn("infoFileUrl2");
-        String thumbnailUrl = "thumbnailUrl";
-        List<String> infoFileUrls = Arrays.asList("infoFileUrl1", "infoFileUrl2");
-        Mockito.when(projectRepository.save(
-                Mockito.mock(Project.class)
-        )).thenReturn(
-                Mockito.mock(Project.class)
-        );
-        // Mockito.when(projectRepository.save(
-        //         Project.builder()
-        //                 .thumbnail(thumbnailUrl)
-        //                 .projectName(requestDto.getProjectName())
-        //                 .projectDescription(requestDto.getProjectDescription())
-        //                 .feCount(requestDto.getFeCount())
-        //                 .beCount(requestDto.getBeCount())
-        //                 .deCount(requestDto.getDeCount())
-        //                 .github(requestDto.getGithub())
-        //                 .figma(requestDto.getFigma())
-        //                 .deadLine(requestDto.getDeadLine())
-        //                 .step(requestDto.getStep())
-        //                 .languages(requestDto.getLanguage().stream().map((string) -> Language.builder().language(string).build()).collect(Collectors.toList()))
-        //                 .genres(requestDto.getGenre().stream().map((string) -> Genre.builder().genre(string).build()).collect(Collectors.toList()))
-        //                 .user(User.builder()
-        //                         .Id(1L)
-        //                         .username("username")
-        //                         .nickname("nickname")
-        //                         .password("password")
-        //                         .language(Arrays.asList(
-        //                                 Language.builder().language("java").build(),
-        //                                 Language.builder().language("python").build()
-        //                         ))
-        //                         .profileUrl("profileUrl")
-        //                         .role("백엔드 개발자")
-        //                         .github("github.com")
-        //                         .figma("figma.com")
-        //                         .intro("안녕하세요")
-        //                         .email("test@test.com")
-        //                         .phoneNumber("01011112222")
-        //                         .status(true)
-        //                         .build()
-        //                 )
-        //                 .infoFiles(infoFileUrls)
-        //                 .build()
-        // )).thenReturn(
-        //         Project.builder()
-        //                 .id(1L)
-        //                 .thumbnail(thumbnailUrl)
-        //                 .projectName(requestDto.getProjectName())
-        //                 .projectDescription(requestDto.getProjectDescription())
-        //                 .feCount(requestDto.getFeCount())
-        //                 .beCount(requestDto.getBeCount())
-        //                 .deCount(requestDto.getDeCount())
-        //                 .github(requestDto.getGithub())
-        //                 .figma(requestDto.getFigma())
-        //                 .deadLine(requestDto.getDeadLine())
-        //                 .step(requestDto.getStep())
-        //                 .languages(requestDto.getLanguage().stream().map((string) -> Language.builder().language(string).build()).collect(Collectors.toList()))
-        //                 .genres(requestDto.getGenre().stream().map((string) -> Genre.builder().genre(string).build()).collect(Collectors.toList()))
-        //                 .user(User.builder()
-        //                         .Id(1L)
-        //                         .username("username")
-        //                         .nickname("nickname")
-        //                         .password("password")
-        //                         .language(Arrays.asList(
-        //                                 Language.builder().language("java").build(),
-        //                                 Language.builder().language("python").build()
-        //                         ))
-        //                         .profileUrl("profileUrl")
-        //                         .role("백엔드 개발자")
-        //                         .github("github.com")
-        //                         .figma("figma.com")
-        //                         .intro("안녕하세요")
-        //                         .email("test@test.com")
-        //                         .phoneNumber("01011112222")
-        //                         .status(true)
-        //                         .build())
-        //                 .infoFiles(infoFileUrls)
-        //                 .build()
-        // );
-        Mockito.when(userProjectRepository.save(UserProject.builder().build())).thenReturn(null);
 
         //when
         Long savedProjectId = projectService.createProject(requestDto,multipartFile, infoFiles);
+        System.out.println(savedProjectId);
         //then
-        Assertions.assertEquals(1L,savedProjectId);
+        Assertions.assertTrue(savedProjectId > 0L);
     }
 
     @Test
