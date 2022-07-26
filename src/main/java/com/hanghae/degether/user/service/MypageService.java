@@ -15,7 +15,6 @@ import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,8 +110,6 @@ public class MypageService {
 
         // 프론트쪽으로 정보를 줄때에는 language라는 엔티티대신 스트링값을 줘야한다.
         List<Language> language = reqDto.getLanguage().stream().map((string) -> Language.builder().language(string).build()).collect(Collectors.toList());
-        String nickname = reqDto.getNickname();
-        String intro = reqDto.getIntro();
 
         LoginResDto resDto = LoginResDto.builder()
                 .userId(user.getId())
