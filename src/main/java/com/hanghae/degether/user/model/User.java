@@ -57,17 +57,17 @@ public class User {
 
 
 
-    public User(String username, String nickName, String profileUrl, String password){
+    public User(String username, String nickname, String profileUrl, String password){
         this.username = username;
-        this.nickname = nickName;
+        this.nickname = nickname;
         this.profileUrl = profileUrl;
         this.password = password;
     }
 
-    public void update(String profileUrl, String role, String nickName, List<Language> language, String github, String figma, String intro, String phoneNumber, String email) {
+    public void update(String profileUrl, String role, String nickname, List<Language> language, String github, String figma, String intro, String phoneNumber, String email) {
         this.profileUrl =profileUrl;
         this.role = role;
-        this.nickname = nickName;
+        this.nickname = nickname;
         this.language.clear();
         this.language.addAll(language);
         this.github = github;

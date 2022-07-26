@@ -299,6 +299,7 @@ public class ProjectService {
     public ProjectDto.Response getProject(Long projectId) {
         // User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
+        System.out.println(project.getComments());
         return ProjectDto.Response.builder()
                 .thumbnail(project.getThumbnail())
                 .projectName(project.getProjectName())
