@@ -51,10 +51,10 @@ public class GoogleService   {
 
     // 구글 로그인
     @Transactional
-    public UserResponseDto googleLogin(String code, String state, HttpServletResponse response) throws JsonProcessingException {
+    public UserResponseDto googleLogin(String code, HttpServletResponse response, String redirectUrl) throws JsonProcessingException {
 
         // 인가코드로 엑세스토큰 가져오기
-        String accessToken = getAccessToken(code, state);
+        String accessToken = getAccessToken(code, redirectUrl);
 
         SocialUserInfoDto googleUserInfo = getUserInfo(accessToken);
         // 엑세스토큰으로 유저정보 가져오기
@@ -70,7 +70,7 @@ public class GoogleService   {
     }
 
     // 인가코드로 엑세스토큰 가져오기
-    public String getAccessToken(String code, String state) throws JsonProcessingException {
+    public String getAccessToken(String code,  String redirectUrl) throws JsonProcessingException {
 
         // 헤더에 Content-type 지정
         HttpHeaders headers = new HttpHeaders();
@@ -81,7 +81,7 @@ public class GoogleService   {
         body.add("client_id", "");
         body.add("client_secret", "");
         body.add("code", code);
-        body.add("redirect_uri", "http://localhost:3000/auth/google/callback");
+        body.add("redirect_uri", redirectUrl);
         body.add("grant_type", "authorization_code");
 
         // POST 요청 보내기
@@ -148,7 +148,7 @@ public class GoogleService   {
     private User registerKakaoUserIfNeed(SocialUserInfoDto googleUserInfo) {
         // DB 에 중복된 email이 있는지 확인
         String username = "google"+googleUserInfo.getId();
-        String nickname = googleUserInfo.getNickname();
+        String nickname = googleUserInfo.getNickName();
         String profileUrl = googleUserInfo.getProfileUrl();
         User user = userRepository.findByUsername(username)
                 .orElse(null);

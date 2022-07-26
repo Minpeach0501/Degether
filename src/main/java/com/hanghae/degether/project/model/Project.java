@@ -43,10 +43,10 @@ public class Project extends Timestamped {
     @Column
     private String step;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "project_id")
     private List<Language> languages;
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "project_id")
     private List<Genre> genres;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -88,7 +88,10 @@ public class Project extends Timestamped {
         this.step = step;
         this.languages.clear();
         this.languages.addAll(language);
-        this.genres = genre;
+        // this.languages=language;
+        this.genres.clear();
+        this.genres.addAll(genre);
+        // this.genres = genre;
         this.thumbnail = thumbnail;
         return ProjectDto.Response.builder()
                 .projectName(projectName)

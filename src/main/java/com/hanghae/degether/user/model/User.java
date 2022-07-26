@@ -18,7 +18,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Long Id;
 
-    @Column
+    @Column(nullable = false,unique = true)
     private  String username;
 
     @Column(nullable = false)
@@ -27,8 +27,7 @@ public class User {
     @Column(nullable = false)
     private  String password;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "USER_ID")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Language> language;
 
     @Column
@@ -56,14 +55,14 @@ public class User {
     private boolean status = true ;
 
 
-    @Builder
+
     public User(String username, String nickname, String profileUrl, String password){
         this.username = username;
         this.nickname = nickname;
         this.profileUrl = profileUrl;
         this.password = password;
     }
-    @Builder
+
     public void update(String profileUrl, String role, String nickname, List<Language> language, String github, String figma, String intro, String phoneNumber, String email) {
         this.profileUrl =profileUrl;
         this.role = role;

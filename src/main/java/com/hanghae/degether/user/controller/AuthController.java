@@ -7,6 +7,7 @@ import com.hanghae.degether.user.service.GoogleService;
 import com.hanghae.degether.user.service.KakaoService;
 import com.hanghae.degether.user.service.NaverService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,14 +44,26 @@ public class AuthController {
     }
     // 네이버 로그인
     @PostMapping("/user/naver")
-    public UserResponseDto naverLogin(@RequestParam  String code, @RequestParam  String state, HttpServletResponse response ) throws JsonProcessingException {
-        return naverService.naverLogin(code,state,response);
+    public UserResponseDto naverLogin(@RequestParam  String code, @RequestParam  String state,@RequestParam String redirectUrl, HttpServletResponse response ) throws JsonProcessingException {
+        return naverService.naverLogin(code,state,response, redirectUrl);
     }
 
     //구글 서비스 로그인
     @PostMapping("/user/google")
-    public UserResponseDto googleLogin(@RequestParam String code, @RequestParam String state, HttpServletResponse response ) throws JsonProcessingException {
-        return googleService.googleLogin(code,state,response);
+    public UserResponseDto googleLogin(@RequestParam String code,@RequestParam String redirectUrl, HttpServletResponse response ) throws JsonProcessingException {
+        return googleService.googleLogin(code,response, redirectUrl);
     }
+
+    //controller 합치기 노력
+    @PostMapping("/user/{query}")
+    public  UserResponseDto AuthLogin(@PathVariable String query,@RequestParam String state, @RequestParam String redirectUrl, @RequestParam  String code, HttpServletResponse response ) throws JsonProcessingException {
+        if (query == "kakao"){
+            kakaoService.kakaoLogin(code, response, redirectUrl);
+        } else if(query =="naver") {
+            naverService.naverLogin(code, state, response,redirectUrl);
+        }
+        return googleService.googleLogin(code, response,redirectUrl);
+    }
+
 
 }

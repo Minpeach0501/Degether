@@ -1,6 +1,5 @@
 package com.hanghae.degether.project.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 @Getter
@@ -13,4 +12,6 @@ public class UserDto {
     private String profileUrl;
     private String role;
     private String nickname;
+
+
 }

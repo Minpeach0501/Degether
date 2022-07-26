@@ -5,6 +5,7 @@ import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.project.model.Language;
 import com.hanghae.degether.project.model.UserProject;
 import com.hanghae.degether.project.model.Zzim;
+import com.hanghae.degether.project.repository.LanguageRepository;
 import com.hanghae.degether.project.repository.UserProjectRepository;
 import com.hanghae.degether.project.repository.ZzimRepository;
 import com.hanghae.degether.project.util.S3Uploader;
@@ -12,6 +13,7 @@ import com.hanghae.degether.user.dto.*;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.UserDetailsImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MypageService {
 
     private final ZzimRepository zzimRepository;
@@ -34,30 +37,17 @@ public class MypageService {
     private final UserRepository userRepository;
 
     private final S3Uploader s3Uploader;
+    private final LanguageRepository languageRepository;
 
-    @Autowired
-    public MypageService(
-            ZzimRepository zzimRepository,
-            UserProjectRepository userProjectRepository,
-            UserRepository userRepository,
-            S3Uploader s3Uploader
-    ) {
-        this.zzimRepository = zzimRepository;
-        this.userProjectRepository = userProjectRepository;
-        this.userRepository = userRepository;
-        this.s3Uploader = s3Uploader;
 
-    }
 
     @Transactional
     public UserResponseDto<?> getuserInfo(MypageReqDto mypageReqDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        User user2 = userDetails.getUser();
-        User user = userRepository.findById(user2.getId()).orElseThrow(
-                ()-> new CustomException(ErrorCode.NOT_EXIST_USER)
-        );
-
-
+        User user = userDetails.getUser();
+        if (user == null ){
+            throw  new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
         List<Zzim> Zzims = zzimRepository.findAllByUser(user);
 
         List<ZzimResDto> Zzim = new ArrayList<>();
@@ -75,7 +65,7 @@ public class MypageService {
             myProjectResDtos.add(myProjectResDto1);
         }
 
-        List<String> language = user.getLanguage().stream().map(Language::getLanguage).collect(Collectors.toList());
+        List<String> language = languageRepository.findAllByUser(user).stream().map(Language::getLanguage).collect(Collectors.toList());
 
         ResultDto resultDto = ResultDto.builder()
                 .profileUrl(user.getProfileUrl())
@@ -94,7 +84,7 @@ public class MypageService {
         return new UserResponseDto<>(true, "마이페이지 정보를 가져왔습니다.", resultDto);
     }
 
-
+// db 상에서의 user의 값들은 삭제되지않고 상태값이 True >>> false로 바뀐다.
     @Transactional
     public UserResponseDto deleteUser(UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
@@ -105,14 +95,14 @@ public class MypageService {
 
     @Transactional
     public UserResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto) {
-        String username = userDetails.getUsername();
-
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_EXIST_USER)
-        );
-
+        User user = userDetails.getUser();
+        if (user == null ){
+            throw  new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
+        String username  = user.getUsername();
         String profileUrl = user.getProfileUrl();
 
+// s3 업로드할때 실패시 s3에 올라간 이미지 삭제예외처리 필요 !
         if (file!=null) {
             //이미지 업로드
             s3Uploader.deleteFromS3(s3Uploader.getFileName(user.getProfileUrl()));
@@ -123,21 +113,6 @@ public class MypageService {
         List<Language> language = reqDto.getLanguage().stream().map((string) -> Language.builder().language(string).build()).collect(Collectors.toList());
         String nickname = reqDto.getNickname();
         String intro = reqDto.getIntro();
-
-//        int nicknameL = nickname.length();
-//        int introL = intro.length();
-
-//        유효성검사는 validation으로 교체
-//        if (nicknameL > 10) {
-//            throw new IllegalArgumentException("글자수가 초과되었습니다.");
-//        }
-//        if (nicknameL < 2) {
-//            throw new IllegalArgumentException("글자수가 부족합니다.");
-//        }
-//        if (introL > 20) {
-//            throw new IllegalArgumentException("글자수가 초과되었습니다.");
-//        }
-
 
         LoginResDto resDto = LoginResDto.builder()
                 .userId(user.getId())
@@ -153,7 +128,8 @@ public class MypageService {
                 .email(reqDto.getEmail())
                 .build();
 
-        user.update(resDto.getProfileUrl(),
+        user.update(
+                resDto.getProfileUrl(),
                 resDto.getRole(),
                 resDto.getNickname(),
                 language,
