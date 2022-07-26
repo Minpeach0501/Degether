@@ -10,15 +10,16 @@ import lombok.Setter;
 
 public class SocialUserInfoDto {
     private String id;
-    private String nickname;
+    private String nickName;
     private String email;
     private String profileUrl;
 
 
     public SocialUserInfoDto(String id, String nickname, String profileUrl) {
         this.id = id;
-        this.nickname = nickname;
+        this.nickName = nickname;
         this.profileUrl = profileUrl;
     }
+
 
 }

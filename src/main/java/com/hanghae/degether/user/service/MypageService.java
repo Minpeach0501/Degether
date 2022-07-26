@@ -52,11 +52,10 @@ public class MypageService {
     @Transactional
     public UserResponseDto<?> getuserInfo(MypageReqDto mypageReqDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        User user2 = userDetails.getUser();
-        User user = userRepository.findById(user2.getId()).orElseThrow(
-                ()-> new CustomException(ErrorCode.NOT_EXIST_USER)
-        );
-
+        User user = userDetails.getUser();
+        if (user == null ){
+            throw  new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
 
         List<Zzim> Zzims = zzimRepository.findAllByUser(user);
 
@@ -94,7 +93,7 @@ public class MypageService {
         return new UserResponseDto<>(true, "마이페이지 정보를 가져왔습니다.", resultDto);
     }
 
-
+// db 상에서의 user의 값들은 삭제되지않고 상태값이 True >>> false로 바뀐다.
     @Transactional
     public UserResponseDto deleteUser(UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
@@ -105,14 +104,14 @@ public class MypageService {
 
     @Transactional
     public UserResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto) {
-        String username = userDetails.getUsername();
-
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new CustomException(ErrorCode.NOT_EXIST_USER)
-        );
-
+        User user = userDetails.getUser();
+        if (user == null ){
+            throw  new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
+        String username  = user.getUsername();
         String profileUrl = user.getProfileUrl();
 
+// s3 업로드할때 실패시 s3에 올라간 이미지 삭제예외처리 필요 !
         if (file!=null) {
             //이미지 업로드
             s3Uploader.deleteFromS3(s3Uploader.getFileName(user.getProfileUrl()));
@@ -123,21 +122,6 @@ public class MypageService {
         List<Language> language = reqDto.getLanguage().stream().map((string) -> Language.builder().language(string).build()).collect(Collectors.toList());
         String nickname = reqDto.getNickname();
         String intro = reqDto.getIntro();
-
-//        int nicknameL = nickname.length();
-//        int introL = intro.length();
-
-//        유효성검사는 validation으로 교체
-//        if (nicknameL > 10) {
-//            throw new IllegalArgumentException("글자수가 초과되었습니다.");
-//        }
-//        if (nicknameL < 2) {
-//            throw new IllegalArgumentException("글자수가 부족합니다.");
-//        }
-//        if (introL > 20) {
-//            throw new IllegalArgumentException("글자수가 초과되었습니다.");
-//        }
-
 
         LoginResDto resDto = LoginResDto.builder()
                 .userId(user.getId())
@@ -153,7 +137,8 @@ public class MypageService {
                 .email(reqDto.getEmail())
                 .build();
 
-        user.update(resDto.getProfileUrl(),
+        user.update(
+                resDto.getProfileUrl(),
                 resDto.getRole(),
                 resDto.getNickname(),
                 language,
