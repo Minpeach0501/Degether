@@ -98,9 +98,11 @@ public class ChatService {
         ChatRoom chatRoom = roomRepository.findByRoomId(messageDto.getRoomId());
         log.info(String.valueOf(chatRoom));
 
-
+        // 챗룸 생성
         chatRoom = createChatRoom(messageDto);
-
+        log.info(chatRoom.getRoomId());
+        log.info(chatRoom.toString());
+        log.info("여기야");
 
         //받아온 메세지의 타입이 ENTER 일때 알림 메세지와 함께 채팅방 입장 !
         if (ChatMessage.MessageType.ENTER.equals(messageDto.getType())) {
@@ -113,7 +115,7 @@ public class ChatService {
 
 
         // Websocket 에 발행된 메시지를 redis 로 발행한다(publish)
-        redisPublisher.publishsave(messageDto);
+        redisPublisher.publishsave(topics.get(messageDto.getRoomId()),messageDto);
 
         //캐시 저장후 entity 값 설정
         ChatMessage chatMessage = new ChatMessage(messageDto, chatRoom);
@@ -195,6 +197,17 @@ public class ChatService {
         return chatRoom;
     }
 
+    // 구독 요청시
+    public void setUserEnterInfo(String roomId, String sessionId) {
+        hashOpsEnterInfo.put(ENTER_INFO, sessionId, roomId);
+        log.info("hashPosEnterInfo.put : {}", hashOpsEnterInfo.get(ENTER_INFO, sessionId));
+    }
+
+    // 구독 취소하거나 or 세션연결이 끊겼을 시
+    public void removeUserEnterInfo(String sessionId, String roomId) {
+        hashOpsEnterInfo.delete(ENTER_INFO, sessionId, roomId);
+        log.info("hashPosEnterInfo.put : {}", hashOpsEnterInfo.get(ENTER_INFO, sessionId));
+    }
 }
 
 

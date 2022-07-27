@@ -25,7 +25,7 @@ public class RedisConfig {
     }
     /**
      * redis pub/sub 메시지를 처리하는 listener 설정
-     * redis.publist 할때 여기로 와서 container에 담음
+     * redis.publish 할때 여기로 와서 container에 담음
      */
     @Bean
     public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory) {

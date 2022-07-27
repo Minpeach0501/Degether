@@ -2,6 +2,7 @@ package com.hanghae.degether.websocket.config;
 
 import com.hanghae.degether.user.security.JwtTokenProvider;
 import com.hanghae.degether.websocket.service.ChatRoomService;
+import com.hanghae.degether.websocket.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.HashOperations;
@@ -23,9 +24,9 @@ public class StompHandler implements ChannelInterceptor {
 
     private HashOperations<String, String, String> hashOpsEnterInfo; // Redis 의 Hashes 사용
 
-    public static final String ENTER_INFO = "ENTER_INFO"; // 채팅룸에 입장한 클라이언트의 sessionId와 채팅룸 id를 맵핑한 정보 저장
-
     private final ChatRoomService chatRoomService;
+
+    private final ChatService chatService;
 
 
 
@@ -56,7 +57,7 @@ public class StompHandler implements ChannelInterceptor {
 
 
             //setUserEnterInfo  입장시 정보저장
-            hashOpsEnterInfo.put(ENTER_INFO, sessionId, roomId);
+            chatService.setUserEnterInfo(roomId,sessionId);
 
             log.info("roomId : {}", roomId);
 
@@ -70,7 +71,7 @@ public class StompHandler implements ChannelInterceptor {
             log.info("roomId : {}", roomId);
 
             //removeEnterInfo 퇴장시 정보 삭제
-            hashOpsEnterInfo.delete(ENTER_INFO, sessionId, roomId);
+            chatService.removeUserEnterInfo(roomId,sessionId);
 
         }
         return message;

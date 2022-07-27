@@ -45,9 +45,10 @@ public class RedisPublisher {
 
     // websocket 에서 받아온 메세지를 convertAndsend를 통하여 Redis의 메세지 리스너로 발행
     // redisrepository 를 이용해 저장
-    public void publishsave( ChatMessageDto messageDto){
+    public void publishsave(ChannelTopic topic,ChatMessageDto messageDto){
 
         ChannelTopic topic1 = new ChannelTopic(messageDto.getRoomId());
+        log.info(topic1.toString());
 
         ChatRoom chatRoom = roomRepository.findByRoomId(messageDto.getRoomId());
 
@@ -56,7 +57,8 @@ public class RedisPublisher {
         //chatMessageDto 를 redis 에 저장하기 위하여 직렬화 한다.
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(ChatMessage.class));
         String roomId = messageDto.getRoomId();
-
+        log.info("퍼블리시세이브");
+        log.info(roomId);
         //redis에 저장되어있는 리스트를 가져와, 새로 받아온 chatmessageDto를 더하여 다시 저장한다.
         List<ChatMessageDto> chatMessageList = opsHashChatMessage.get(CHAT_MESSAGE, roomId);
 
@@ -73,7 +75,8 @@ public class RedisPublisher {
         redisMessageRepository.save(chatMessage);
 
         redisTemplate.convertAndSend(topic1.getTopic(), messageDto);
-
+        log.info(topic1.getTopic().toString());
+        log.info("마지막부분");
 
     }
 
