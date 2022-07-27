@@ -17,7 +17,6 @@ import com.hanghae.degether.project.util.S3Uploader;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
-import com.hanghae.degether.websocket.model.ChatRoom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -95,11 +94,6 @@ public class ProjectService {
                     .isTeam(true)
                     .user(user)
                     .build());
-
-            // 채팅방생성
-            String roomId = String.valueOf(savedProject.getId());
-            ChatRoom chatRoom = new ChatRoom();
-            chatRoom.create(roomId);
 
             return savedProject.getId();
         } catch (Exception e) {
