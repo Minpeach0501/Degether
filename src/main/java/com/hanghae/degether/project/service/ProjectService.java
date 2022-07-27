@@ -95,11 +95,6 @@ public class ProjectService {
                     .user(user)
                     .build());
 
-            // 채팅방생성
-            String roomId = String.valueOf(savedProject.getId());
-            ChatRoom chatRoom = new ChatRoom();
-            chatRoom.create(roomId);
-
             return savedProject.getId();
         } catch (Exception e) {
             log.info("delete Img");

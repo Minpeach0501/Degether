@@ -2,6 +2,7 @@ package com.hanghae.degether.websocket.controller;
 
 
 import com.hanghae.degether.websocket.dto.ChatMessageDto;
+import com.hanghae.degether.websocket.dto.FindChatMessageDto;
 import com.hanghae.degether.websocket.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +28,10 @@ public class AllChatController {
     }
 
     //이전에 채팅 기록  조회
-    @GetMapping("/chat/message/{roomId}")
+    @GetMapping("/chat/message/{projectId}")
     @ResponseBody
-    public  List<ChatMessageDto> getAllMessage(@PathVariable String roomId){
-        return chatService.getAllMessage(roomId);
+    public  List<FindChatMessageDto> getAllMessage(@PathVariable String projectId){
+        return chatService.getAllMessage(projectId);
     }
 
 

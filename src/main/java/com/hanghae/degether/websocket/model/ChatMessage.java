@@ -12,7 +12,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class ChatMessage extends Timestamped {
+public class ChatMessage{
 
     // 메시지 타입 : 입장, 퇴장, 채팅
     public enum MessageType {
@@ -36,19 +36,8 @@ public class ChatMessage extends Timestamped {
 
     @Column
     private String message; // 메시지
-
-
-    // 변수에 값 집어넣기 위한 생성자
-    public ChatMessage(ChatMessageDto chatMessageDto, ChatRoom chatRoom) {
-        this.type = chatMessageDto.getType();
-        this.roomId = chatMessageDto.getRoomId();
-        this.message = chatMessageDto.getMessage();
-        this.sender = chatMessageDto.getSender();
-        this.profileUrl = chatMessageDto.getProfileUrl();
-        this.createdAt = chatMessageDto.getCreatedAt();
-        this.userId = chatMessageDto.getUserId();
-        this.chatRoom = chatRoom;
-    }
+    @Column
+    private String createdAt;
 
 
 }
