@@ -21,6 +21,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry
                 .addEndpoint("/ws/chat")
                 .setAllowedOrigins("http://localhost:3000")
+                .setAllowedOrigins("https://degather.shop.s3-website.ap-northeast-2.amazonaws.com")
+                .setAllowedOrigins("https://degether.one")
+                .setAllowedOrigins("https://degether.shop")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
