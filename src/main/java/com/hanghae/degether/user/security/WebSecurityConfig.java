@@ -54,7 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // 토큰 인증이므로 세션 사용x
         http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.headers().frameOptions().deny();
+        http.headers().frameOptions().disable();
         //        http.authorizeRequests().antMatchers("/ws-stomp");
         //        http.authorizeRequests().antMatchers("/pub/**");
         //        http.authorizeRequests().antMatchers("/sub/**");
