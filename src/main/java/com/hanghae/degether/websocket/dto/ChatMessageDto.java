@@ -19,5 +19,5 @@ public class ChatMessageDto {
 
     private String message; // 메시지
     private String createdDate;
-    private UserDto user;
+    private SenderDto user;
 }
