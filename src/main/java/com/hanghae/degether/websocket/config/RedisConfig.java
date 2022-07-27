@@ -31,8 +31,6 @@ public class RedisConfig {
         return new ChannelTopic("sse");
     }
 
-    @Value("${spring.redis.host}")
-    String hostname;
     // myredis 연결
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {

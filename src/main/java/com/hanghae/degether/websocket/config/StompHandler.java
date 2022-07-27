@@ -1,13 +1,11 @@
 package com.hanghae.degether.websocket.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hanghae.degether.exception.CustomException;
-import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.user.security.JwtTokenProvider;
-import com.hanghae.degether.websocket.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -15,24 +13,12 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class StompHandler implements ChannelInterceptor {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final ObjectMapper objectMapper;
-
-    private HashOperations<String, String, String> hashOpsEnterInfo; // Redis 의 Hashes 사용
-
-    private final RedisTemplate redisTemplate;
-    public static final String ENTER_INFO = "ENTER_INFO"; // 채팅룸에 입장한 클라이언트의 sessionId와 채팅룸 id를 맵핑한 정보 저장
-
-
-
-
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
