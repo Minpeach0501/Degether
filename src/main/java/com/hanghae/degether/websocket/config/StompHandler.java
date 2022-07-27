@@ -1,7 +1,6 @@
 package com.hanghae.degether.websocket.config;
 
 import com.hanghae.degether.user.security.JwtTokenProvider;
-import com.hanghae.degether.websocket.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.HashOperations;

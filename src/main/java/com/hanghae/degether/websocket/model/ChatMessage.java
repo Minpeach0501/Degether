@@ -1,5 +1,7 @@
 package com.hanghae.degether.websocket.model;
 
+import com.hanghae.degether.project.model.Timestamped;
+import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.websocket.dto.ChatMessageDto;
 import lombok.*;
 
@@ -10,7 +12,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class ChatMessage {
+public class ChatMessage extends Timestamped {
 
     // 메시지 타입 : 입장, 퇴장, 채팅
     public enum MessageType {
@@ -22,30 +24,18 @@ public class ChatMessage {
     private Long id;
 
     @Column
-    private String roomId; // 프로젝트 아이디값이 들어간다다
+    private String projectId; // 프로젝트 아이디값이 들어간다다
 
     @Enumerated(EnumType.STRING)
     @Column
     private MessageType type; // 메시지 타입
 
-    @Column
-    private String sender; // 메시지 보낸사람 닉네임 값이 들어간다
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user; // 메시지 보낸사람
 
     @Column
     private String message; // 메시지
-
-    @Column
-    private String profileUrl; // 프로필 사진
-
-    @Column
-    private String createdAt;  // 생성 날짜
-
-    @Column
-    private Long userId;  // DB에 저장된 USER의 ID 값
-
-    @JoinColumn(name = "CHAT_ROOM_ID")
-    @ManyToOne
-    private ChatRoom chatRoom;
 
 
     // 변수에 값 집어넣기 위한 생성자

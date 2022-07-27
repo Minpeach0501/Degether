@@ -18,18 +18,12 @@ import java.util.List;
 public class AllChatController {
     private final ChatService chatService;
 
-    // 특정 채팅방 입장
-    @PostMapping("/chat/room/{roomId}")
-    @ResponseBody
-    public String roomInfo(@PathVariable String roomId) {
-        return roomId;
-    }
 
     // 메세지 보내기
     @MessageMapping({"/chat/message"})
     public void message(ChatMessageDto messageDto, @Header("Authorization") String token) {
         log.info("요청 메서드 [message] /chat/message");
-            chatService.save(messageDto, token);
+        chatService.save(messageDto, token);
     }
 
     //이전에 채팅 기록  조회

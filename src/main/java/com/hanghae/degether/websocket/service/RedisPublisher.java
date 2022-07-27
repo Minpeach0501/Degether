@@ -2,16 +2,13 @@ package com.hanghae.degether.websocket.service;
 
 import com.hanghae.degether.websocket.dto.ChatMessageDto;
 import com.hanghae.degether.websocket.model.ChatMessage;
-import com.hanghae.degether.websocket.model.ChatRoom;
 import com.hanghae.degether.websocket.repository.RedisMessageRepository;
-import com.hanghae.degether.websocket.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Service;
 
@@ -47,10 +44,6 @@ public class RedisPublisher {
     // redisrepository 를 이용해 저장
     public void publishsave( ChatMessageDto messageDto){
 
-        ChannelTopic topic1 = new ChannelTopic(messageDto.getRoomId());
-
-        ChatRoom chatRoom = roomRepository.findByRoomId(messageDto.getRoomId());
-
         ChatMessage chatMessage = new ChatMessage(messageDto,chatRoom);
 
         //chatMessageDto 를 redis 에 저장하기 위하여 직렬화 한다.
@@ -67,12 +60,12 @@ public class RedisPublisher {
         chatMessageList.add(messageDto);
 
 
-        //redis 의 hashes 자료구조 ---->> key : CHAT_MESSAGE , filed : roomId, value : chatMessageList
+        //redis 의 hashes 자료구조 ---->> key : CHAT_MESSAGE , field : roomId, value : chatMessageList
         opsHashChatMessage.put(CHAT_MESSAGE, roomId, chatMessageList);
         redisTemplate.expire(CHAT_MESSAGE,30, TimeUnit.MINUTES);
-        redisMessageRepository.save(chatMessage);
+        // redisMessageRepository.save(chatMessage);
 
-        redisTemplate.convertAndSend(topic1.getTopic(), messageDto);
+        redisTemplate.convertAndSend(roomId, messageDto);
 
 
     }
