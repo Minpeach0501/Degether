@@ -18,6 +18,6 @@ public class ChatMessageDto {
     private String projectId; // 프로젝트 번호
 
     private String message; // 메시지
-    private String createdDate;
+    private String createdAt;
     private SenderDto user;
 }
