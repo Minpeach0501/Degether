@@ -1,6 +1,8 @@
 package com.hanghae.degether.user.controller;
 
 
+import com.hanghae.degether.exception.CustomException;
+import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.user.dto.MypageReqDto;
 import com.hanghae.degether.user.dto.UserResponseDto;
 import com.hanghae.degether.user.model.User;
@@ -36,7 +38,10 @@ public class MyPageController {
     @PutMapping("/user/userDelete")
     public UserResponseDto deleteUser(@AuthenticationPrincipal UserDetailsImpl userDetails)
     {
-        User user = userDetails.getUser();
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(
+                ()-> new CustomException(ErrorCode.NOT_EXIST_USER)
+        );
+
         return mypageService.deleteUser(user);
     }
 
@@ -55,8 +60,11 @@ public class MyPageController {
             @RequestPart(value = "updateDto") MypageReqDto reqDto
 
     ){
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(
+                ()-> new CustomException(ErrorCode.NOT_EXIST_USER)
+        );
 
-        return mypageService.updateUserInfo(userDetails,file,reqDto);
+        return mypageService.updateUserInfo(user,file,reqDto);
     }
 
     // 프로젝트 메인 페이지에서 프로필 보는용

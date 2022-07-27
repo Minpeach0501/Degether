@@ -15,6 +15,7 @@ import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@EnableCaching
 @RequiredArgsConstructor
 public class MypageService {
 
@@ -92,11 +94,9 @@ public class MypageService {
     }
 
     @Transactional
-    public UserResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto) {
-        User user = userDetails.getUser();
-        if (user == null ){
-            throw  new CustomException(ErrorCode.NOT_EXIST_USER);
-        }
+    public UserResponseDto<?> updateUserInfo(User user1, MultipartFile file, MypageReqDto reqDto) {
+        User user = userRepository.findByUsername(user1.getUsername()).get();
+
         String username  = user.getUsername();
         String profileUrl = user.getProfileUrl();
 
