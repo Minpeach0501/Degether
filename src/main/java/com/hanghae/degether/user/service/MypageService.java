@@ -15,6 +15,7 @@ import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@EnableCaching
 @RequiredArgsConstructor
 public class MypageService {
 
@@ -84,20 +86,17 @@ public class MypageService {
     }
 
 // db 상에서의 user의 값들은 삭제되지않고 상태값이 True >>> false로 바뀐다.
-    @Transactional
-    public UserResponseDto deleteUser(UserDetailsImpl userDetails) {
-        User user = userDetails.getUser();
+    public UserResponseDto deleteUser(User user) {
         user.setStatus(false);
+        System.out.println(user.isStatus());
         userRepository.save(user);
         return new UserResponseDto(true, "삭제성공");
     }
 
     @Transactional
-    public UserResponseDto<?> updateUserInfo(UserDetailsImpl userDetails, MultipartFile file, MypageReqDto reqDto) {
-        User user = userDetails.getUser();
-        if (user == null ){
-            throw  new CustomException(ErrorCode.NOT_EXIST_USER);
-        }
+    public UserResponseDto<?> updateUserInfo(User user1, MultipartFile file, MypageReqDto reqDto) {
+        User user = userRepository.findByUsername(user1.getUsername()).get();
+
         String username  = user.getUsername();
         String profileUrl = user.getProfileUrl();
 
