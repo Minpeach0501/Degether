@@ -50,11 +50,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.cors().configurationSource(corsConfigurationSource());
-        // x-frame 오류 해결용
-        http.headers().frameOptions().sameOrigin();
+
         // 토큰 인증이므로 세션 사용x
         http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.headers().frameOptions().sameOrigin();
+
+        http.headers().frameOptions().deny();
         //        http.authorizeRequests().antMatchers("/ws-stomp");
         //        http.authorizeRequests().antMatchers("/pub/**");
         //        http.authorizeRequests().antMatchers("/sub/**");
