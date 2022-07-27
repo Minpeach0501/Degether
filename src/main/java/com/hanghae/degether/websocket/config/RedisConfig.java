@@ -19,6 +19,7 @@ public class RedisConfig {
 
     @Value("${spring.redis.host}")
     String hostname;
+
     // myredis 연결
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
