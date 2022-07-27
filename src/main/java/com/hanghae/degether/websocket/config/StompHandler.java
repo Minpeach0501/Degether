@@ -56,7 +56,7 @@ public class StompHandler implements ChannelInterceptor {
 
 
             //setUserEnterInfo  입장시 정보저장
-            hashOpsEnterInfo.put(ENTER_INFO, sessionId, roomId);
+//            hashOpsEnterInfo.put(ENTER_INFO, sessionId, roomId);
 
             log.info("roomId : {}", roomId);
 
@@ -69,8 +69,8 @@ public class StompHandler implements ChannelInterceptor {
             String roomId = chatRoomService.getRoomId((String) Optional.ofNullable(message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
             log.info("roomId : {}", roomId);
 
-            //removeEnterInfo 퇴장시 정보 삭제
-            hashOpsEnterInfo.delete(ENTER_INFO, sessionId, roomId);
+//            //removeEnterInfo 퇴장시 정보 삭제
+//            hashOpsEnterInfo.delete(ENTER_INFO, sessionId, roomId);
 
         }
         return message;
