@@ -1,5 +1,7 @@
 package com.hanghae.degether.websocket.config;
 
+import com.hanghae.degether.sse.SseRedisSubscriber;
+import com.hanghae.degether.websocket.service.RedisSubscriber;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -9,13 +11,25 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @RequiredArgsConstructor
 @Configuration
 public class RedisConfig {
+    @Value("${spring.redis.host}")
+    String hostname;
+    @Bean
+    public ChannelTopic channelTopic() {
+        return new ChannelTopic("project");
+    }
+    @Bean
+    public ChannelTopic sseTopic() {
+        return new ChannelTopic("sse");
+    }
 
     @Value("${spring.redis.host}")
     String hostname;
@@ -31,12 +45,21 @@ public class RedisConfig {
      * redis.publist 할때 여기로 와서 container에 담음
      */
     @Bean
-    public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory) {
+    public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory,MessageListenerAdapter listenerAdapter,MessageListenerAdapter sseListenerAdapter, ChannelTopic channelTopic, ChannelTopic sseTopic) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(sseListenerAdapter, sseTopic);
+        container.addMessageListener(listenerAdapter, channelTopic);
         return container;
     }
-
+    @Bean
+    public MessageListenerAdapter listenerAdapter(RedisSubscriber subscriber) {
+        return new MessageListenerAdapter(subscriber, "sendMessage");
+    }
+    @Bean
+    public MessageListenerAdapter sseListenerAdapter(SseRedisSubscriber subscriber) {
+        return new MessageListenerAdapter(subscriber, "sendMessage");
+    }
     /*
      * redisTemplate
      * setKeySerializer, setValueSerializer 설정해주는 이유

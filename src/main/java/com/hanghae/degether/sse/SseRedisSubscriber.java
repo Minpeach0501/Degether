@@ -1,4 +1,4 @@
-package com.hanghae.degether.websocket.service;
+package com.hanghae.degether.sse;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,8 +7,6 @@ import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.websocket.dto.ChatMessageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.Message;
-import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
@@ -16,10 +14,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class RedisSubscriber {
+public class SseRedisSubscriber {
     private final ObjectMapper objectMapper;
     private final SimpMessageSendingOperations messagingTemplate;
     private final RedisTemplate redisTemplate;
+    private final NotificationService notificationService;
 
 
     /**
@@ -30,15 +29,11 @@ public class RedisSubscriber {
         try {
 
             // ChatMessage 객채로 맵핑
-            ChatMessageDto roomMessage = objectMapper.readValue(message, ChatMessageDto.class);
+            NotificationDto.Publish sseMessage = objectMapper.readValue(message, NotificationDto.Publish.class);
 
-            // Websocket 구독자에게 채팅 메시지 Send
-            log.info("roomMessage.getMessage : {}", roomMessage.getMessage());
-            log.info("roomMessage.getRoomId : {}", roomMessage.getProjectId());
-            log.info("onMessage : {}", roomMessage.getType());
-            messagingTemplate.convertAndSend("/sub/chat/room/" + roomMessage.getProjectId(), roomMessage);
 
-            log.info("메세지 받기도 성공 ");
+            notificationService.send(sseMessage);
+            log.info("SSE 메세지 받기도 성공 ");
         } catch (Exception e) {
             throw new CustomException(ErrorCode. FAILED_MESSAGE);
         }

@@ -1,5 +1,8 @@
 package com.hanghae.degether.websocket.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hanghae.degether.exception.CustomException;
+import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.user.security.JwtTokenProvider;
 import com.hanghae.degether.websocket.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +23,13 @@ import java.util.Optional;
 public class StompHandler implements ChannelInterceptor {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final ObjectMapper objectMapper;
 
     private HashOperations<String, String, String> hashOpsEnterInfo; // Redis 의 Hashes 사용
 
+    private final RedisTemplate redisTemplate;
     public static final String ENTER_INFO = "ENTER_INFO"; // 채팅룸에 입장한 클라이언트의 sessionId와 채팅룸 id를 맵핑한 정보 저장
 
-    private final ChatRoomService chatRoomService;
 
 
 
@@ -42,7 +46,6 @@ public class StompHandler implements ChannelInterceptor {
         log.info("simpDestination : {}", message.getHeaders().get("simpDestination"));
         log.info("sessionId : {}", sessionId);
 
-
         // websocket 연결시 헤더의 security를 통해 jwt token 검증
         if (StompCommand.CONNECT == accessor.getCommand()) {
 
@@ -51,26 +54,9 @@ public class StompHandler implements ChannelInterceptor {
 
             // 구독 요청시 유저 세션정보를 저장한다.
         } else if (StompCommand.SUBSCRIBE == accessor.getCommand()) {
-            log.info("SUBSCRIBE : {}", sessionId);
-            String roomId = chatRoomService.getRoomId((String) Optional.ofNullable(message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
-
-
-            //setUserEnterInfo  입장시 정보저장
-//            hashOpsEnterInfo.put(ENTER_INFO, sessionId, roomId);
-
-            log.info("roomId : {}", roomId);
-
-
 
             // 채팅방 나간 유저를 방에서 세션정보를 지움
         } else if (StompCommand.UNSUBSCRIBE == accessor.getCommand() || StompCommand.DISCONNECT == accessor.getCommand()) {
-            log.info("UNSUBSCRIBE : {}", sessionId);
-
-            String roomId = chatRoomService.getRoomId((String) Optional.ofNullable(message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
-            log.info("roomId : {}", roomId);
-
-//            //removeEnterInfo 퇴장시 정보 삭제
-//            hashOpsEnterInfo.delete(ENTER_INFO, sessionId, roomId);
 
         }
         return message;
