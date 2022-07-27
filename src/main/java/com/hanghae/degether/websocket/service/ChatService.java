@@ -57,7 +57,7 @@ public class ChatService {
                         .role(user.getRole())
                         .nickname(user.getNickname())
                 .build());
-        messageDto.setCreatedDate(LocalDate.now().toString());
+        messageDto.setCreatedAt(LocalDate.now().toString());
 
         // DB 저장
         ChatMessage chatMessage = ChatMessage.builder()

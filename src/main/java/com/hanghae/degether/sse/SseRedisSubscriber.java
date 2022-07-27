@@ -4,7 +4,6 @@ package com.hanghae.degether.sse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hanghae.degether.exception.CustomException;
 import com.hanghae.degether.exception.ErrorCode;
-import com.hanghae.degether.websocket.dto.ChatMessageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
