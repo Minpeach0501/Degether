@@ -19,7 +19,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
-                .addEndpoint("/ws/chat")
+                .addEndpoint("/wss/chat")
                 .setAllowedOrigins("http://localhost:3000")
                 .setAllowedOrigins("https://degather.shop.s3-website.ap-northeast-2.amazonaws.com")
                 .setAllowedOrigins("https://degether.one")
