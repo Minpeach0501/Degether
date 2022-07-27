@@ -10,6 +10,7 @@ import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
 import com.hanghae.degether.websocket.dto.ChatMessageDto;
 import com.hanghae.degether.websocket.dto.FindChatMessageDto;
+import com.hanghae.degether.websocket.dto.SenderDto;
 import com.hanghae.degether.websocket.model.ChatMessage;
 import com.hanghae.degether.websocket.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -50,8 +51,8 @@ public class ChatService {
 
 
         // 메세지 보내는 사람의 정보값 넣기
-        messageDto.setUser(UserDto.builder()
-                        .userId(user.getId())
+        messageDto.setUser(SenderDto.builder()
+                        .id(user.getId())
                         .profileUrl(user.getProfileUrl())
                         .role(user.getRole())
                         .nickname(user.getNickname())
