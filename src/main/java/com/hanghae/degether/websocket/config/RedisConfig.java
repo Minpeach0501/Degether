@@ -1,7 +1,9 @@
 package com.hanghae.degether.websocket.config;
 
+import com.hanghae.degether.sse.SseRedisSubscriber;
 import com.hanghae.degether.websocket.service.RedisSubscriber;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -18,15 +20,21 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @RequiredArgsConstructor
 @Configuration
 public class RedisConfig {
+    @Value("${spring.redis.host}")
+    String hostname;
     @Bean
     public ChannelTopic channelTopic() {
         return new ChannelTopic("project");
+    }
+    @Bean
+    public ChannelTopic sseTopic() {
+        return new ChannelTopic("sse");
     }
 
     // myredis 연결
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration("localhost", 49155);
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(hostname, 6379);
         redisStandaloneConfiguration.setPassword("redispw");
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
@@ -35,14 +43,19 @@ public class RedisConfig {
      * redis.publist 할때 여기로 와서 container에 담음
      */
     @Bean
-    public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory,MessageListenerAdapter listenerAdapter, ChannelTopic channelTopic) {
+    public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory,MessageListenerAdapter listenerAdapter,MessageListenerAdapter sseListenerAdapter, ChannelTopic channelTopic, ChannelTopic sseTopic) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(sseListenerAdapter, sseTopic);
         container.addMessageListener(listenerAdapter, channelTopic);
         return container;
     }
     @Bean
     public MessageListenerAdapter listenerAdapter(RedisSubscriber subscriber) {
+        return new MessageListenerAdapter(subscriber, "sendMessage");
+    }
+    @Bean
+    public MessageListenerAdapter sseListenerAdapter(SseRedisSubscriber subscriber) {
         return new MessageListenerAdapter(subscriber, "sendMessage");
     }
     /*
