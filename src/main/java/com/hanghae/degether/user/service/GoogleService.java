@@ -87,8 +87,8 @@ public class GoogleService   {
 
         // 바디에 필요한 정보 담기
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("client_id", "");
-        body.add("client_secret", "");
+        body.add("client_id", google_client_id);
+        body.add("client_secret", secret_key);
         body.add("code", code);
         body.add("redirect_uri", redirectUrl);
         body.add("grant_type", "authorization_code");
