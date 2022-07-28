@@ -14,6 +14,7 @@ import com.hanghae.degether.project.repository.UserProjectRepository;
 import com.hanghae.degether.project.repository.ZzimRepository;
 import com.hanghae.degether.project.util.CommonUtil;
 import com.hanghae.degether.project.util.S3Uploader;
+import com.hanghae.degether.sse.NotificationService;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
@@ -48,6 +49,7 @@ public class ProjectService {
     private final String S3InfoFileDir = "projectInfo";
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final NotificationService notificationService;
 
 
     @Transactional
@@ -339,6 +341,7 @@ public class ProjectService {
                 .project(project)
                 .isTeam(false)
                 .build());
+        notificationService.publishSse(project.getUser().getId(),"프로젝트 "+project.getProjectName()+"에 "+user.getNickname()+" 님이 지원하였습니다.");
     }
 
     public ProjectDto.Response getProjectMain(Long projectId) {
@@ -414,7 +417,7 @@ public class ProjectService {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         User userSearch = userRepository.findById(userId).orElseThrow(()->
-                new IllegalArgumentException("??")
+                new CustomException(ErrorCode.NOT_EXIST_USER)
         );
         UserProject userProject = userProjectRepository.findByProjectAndUser(project, userSearch).orElseThrow(()->
                 new CustomException(ErrorCode.NOT_APPLY)
@@ -423,6 +426,7 @@ public class ProjectService {
             throw new CustomException(ErrorCode.DUPLICATED_JOIN);
         }
         userProject.changeIsTeam(true);
+        notificationService.publishSse(userSearch.getId(),"프로젝트 "+project.getProjectName()+"에 지원 요청이 승낙되었습니다.");
     }
 
     public void kickUser(Long projectId, Long userId) {
@@ -437,6 +441,10 @@ public class ProjectService {
         UserProject userProject = userProjectRepository.findByProjectAndUser(project, userSearch).orElseThrow(()->
             new CustomException(ErrorCode.NOT_APPLY)
         );
+        if(!userProject.isTeam()){
+            // 지원 거절
+            notificationService.publishSse(userSearch.getId(),"프로젝트 "+project.getProjectName()+"에 지원 요청이 거절되었습니다.");
+        }
         userProjectRepository.delete(userProject);
     }
 
