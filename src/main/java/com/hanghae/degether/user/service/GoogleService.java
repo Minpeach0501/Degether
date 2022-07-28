@@ -136,7 +136,7 @@ public class GoogleService   {
 
         // 유저정보 작성
 
-        String username = googleUserInfo.get("id").asText();
+        String username = googleUserInfo.get("sub").asText();
         String nickname = googleUserInfo.get("name").asText();
         String profileUrl = "";
         try {
