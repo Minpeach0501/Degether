@@ -1,7 +1,12 @@
 package com.hanghae.degether.sse;
 
+import com.hanghae.degether.exception.CustomException;
+import com.hanghae.degether.exception.ErrorCode;
 import com.hanghae.degether.user.model.User;
+import com.hanghae.degether.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -15,10 +20,11 @@ public class NotificationService {
 
     private final EmitterRepository emitterRepository;
     private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
 
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public SseEmitter subscribe(Long userId, String lastEventId) {
-        System.out.println("2222222222");
         // 1
         String id = userId + "_" + System.currentTimeMillis();
 
@@ -30,7 +36,6 @@ public class NotificationService {
 
         // 3
         // 503 에러를 방지하기 위한 더미 이벤트 전송
-        System.out.println("3333333333");
         sendToClient(emitter, id, "EventStream Created. [userId=" + userId + "]");
 
         // 4
@@ -44,14 +49,24 @@ public class NotificationService {
 
         return emitter;
     }
+    public void publishSse(Long reciverId, String message){
+
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>( NotificationDto.Publish.class));
+        redisTemplate.convertAndSend("sse",
+                NotificationDto.Publish.builder()
+                        .content(message)
+                        .reciverId(reciverId)
+                        .build());
+    }
     public void send(NotificationDto.Publish message) {
+        User reciverUser = userRepository.findById(message.getReciverId()).orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_USER));
         Notification notification = Notification.builder()
                 .content(message.getContent())
-                .receiver(message.getReciver())
+                .receiver(reciverUser)
                 .isRead(false)
                 .build();
         notificationRepository.save(notification);
-        String id = String.valueOf(message.getReciver().getId());
+        String id = String.valueOf(reciverUser.getId());
 
         // 로그인 한 유저의 SseEmitter 모두 가져오기
         Map<String, SseEmitter> sseEmitters = emitterRepository.findAllStartWithById(id);
@@ -71,7 +86,6 @@ public class NotificationService {
 
     private void sendToClient(SseEmitter emitter, String id, Object data) {
         try {
-            System.out.println("444444444");
             emitter.send(SseEmitter.event()
                     .id(id)
                     .name("sse")
