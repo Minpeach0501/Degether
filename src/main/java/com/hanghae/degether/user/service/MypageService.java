@@ -108,7 +108,7 @@ public class MypageService {
         }
 
         // 프론트쪽으로 정보를 줄때에는 language라는 엔티티대신 스트링값을 줘야한다.
-        List<Language> language = reqDto.getLanguage().stream().map((string) -> Language.builder().language(string).build()).collect(Collectors.toList());
+        List<Language> language = reqDto.getLanguage().stream().map((string) -> Language.builder().language(string).user(user).build()).collect(Collectors.toList());
 
         LoginResDto resDto = LoginResDto.builder()
                 .userId(user.getId())
