@@ -28,6 +28,6 @@ public class NotificationDto {
         private Long id;
         private String content;
         private Boolean isRead;
-        private User reciver;
+        private Long reciverId;
     }
 }
