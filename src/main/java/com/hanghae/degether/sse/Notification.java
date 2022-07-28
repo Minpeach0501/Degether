@@ -33,4 +33,8 @@ public class Notification extends Timestamped {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User receiver;
+
+    public void updateRead(){
+        isRead = true;
+    }
 }
