@@ -51,6 +51,14 @@ public class NotificationController {
                 .result(notificationService.sseGet())
                 .build();
     }
+    @GetMapping(value = "/api/readsse")
+    public ResponseDto<?> sseReadGet(){
+        return ResponseDto.builder()
+                .ok(true)
+                .message("요청 성공")
+                .result(notificationService.sseIsReadGet())
+                .build();
+    }
 
 
     // @GetMapping(value = "/ssetest")

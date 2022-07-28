@@ -127,4 +127,8 @@ public class NotificationService {
                         .build()
         ).collect(Collectors.toList());
     }
+    public boolean sseIsReadGet() {
+        User user = CommonUtil.getUser();
+        return notificationRepository.existsByReceiverAndIsRead(user,false);
+    }
 }
