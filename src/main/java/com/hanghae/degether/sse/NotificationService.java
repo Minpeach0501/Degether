@@ -2,16 +2,20 @@ package com.hanghae.degether.sse;
 
 import com.hanghae.degether.exception.CustomException;
 import com.hanghae.degether.exception.ErrorCode;
+import com.hanghae.degether.project.util.CommonUtil;
 import com.hanghae.degether.user.model.User;
 import com.hanghae.degether.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -94,5 +98,33 @@ public class NotificationService {
             emitterRepository.deleteById(id);
             // throw new RuntimeException("연결 오류!");
         }
+    }
+    @Transactional
+    public void sseRead(Long notificationId) {
+        User user = CommonUtil.getUser();
+        Notification notification = notificationRepository.findByIdAndReceiver(notificationId, user);
+        if(notification == null){
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+        notification.updateRead();
+    }
+    @Transactional
+    public void sseDelete(Long notificationId) {
+        User user = CommonUtil.getUser();
+        Notification notification = notificationRepository.findByIdAndReceiver(notificationId, user);
+        if(notification == null){
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+        notificationRepository.delete(notification);
+    }
+    public List<NotificationDto.Response> sseGet() {
+        User user = CommonUtil.getUser();
+        return notificationRepository.findAllByReceiver(user).stream().map(notification ->
+                NotificationDto.Response.builder()
+                        .id(notification.getId())
+                        .content(notification.getContent())
+                        .isRead(notification.getIsRead())
+                        .build()
+        ).collect(Collectors.toList());
     }
 }
