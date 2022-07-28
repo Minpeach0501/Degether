@@ -14,6 +14,7 @@ import com.hanghae.degether.user.repository.UserRepository;
 import com.hanghae.degether.user.security.JwtTokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -33,11 +34,19 @@ import java.util.UUID;
 @Slf4j
 public class GoogleService   {
 
+
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
 
     private final JwtTokenProvider jwtTokenProvider;
+
+
+    @Value("${google.client.id}")
+    private String google_client_id;
+
+    @Value("${google.key}")
+    private String secret_key;
 
     @Autowired
     public GoogleService(UserRepository userRepository,
