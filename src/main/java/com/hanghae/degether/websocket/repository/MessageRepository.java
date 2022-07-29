@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MessageRepository extends JpaRepository<ChatMessage, Long> {
-    List<FindChatMessageDto> findTop10ByProjectIdOrderByIdDesc(String projectId);
+    List<FindChatMessageDto> findTop100ByProjectIdOrderByIdDesc(String projectId);
 
 
 }
