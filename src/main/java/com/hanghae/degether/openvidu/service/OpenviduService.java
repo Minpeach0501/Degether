@@ -126,6 +126,7 @@ public class OpenviduService {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         try {
+            System.out.println("stop recording");
             Recording recording = openVidu.stopRecording(sessionRecordingMap.get(sessionId));
             sessionRecordingMap.remove(sessionId);
             String sttId = sttService.getSttId(recording.getUrl(), true);
