@@ -433,7 +433,7 @@ public class ProjectService {
     public void kickUser(Long projectId, Long userId) {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
-        if (!project.getUser().getId().equals(user.getId()) || userId.equals(user.getId())) {
+        if (!project.getUser().getId().equals(user.getId()) && !userId.equals(user.getId())) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         User userSearch = userRepository.findById(userId).orElseThrow(()->
