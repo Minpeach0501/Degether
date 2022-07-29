@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
-    private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
+    private static final Long DEFAULT_TIMEOUT = 60L * 1000;
 
     private final EmitterRepository emitterRepository;
     private final NotificationRepository notificationRepository;
@@ -30,13 +30,23 @@ public class NotificationService {
 
     public SseEmitter subscribe(Long userId, String lastEventId) {
         // 1
+        // emitterRepository.deleteStartWithById(userId);
         String id = userId + "_" + System.currentTimeMillis();
-
+        System.out.println("Subscribe");
         // 2
         SseEmitter emitter = emitterRepository.save(id, new SseEmitter(DEFAULT_TIMEOUT));
 
-        emitter.onCompletion(() -> emitterRepository.deleteById(id));
-        emitter.onTimeout(() -> emitterRepository.deleteById(id));
+        emitter.onCompletion(() ->{
+            System.out.println("Sse onCompletion");
+                emitterRepository.deleteById(id);
+            }
+
+        );
+        emitter.onTimeout(() -> {
+                    System.out.println("Sse onTimeout");
+                    emitterRepository.deleteById(id);
+                }
+        );
 
         // 3
         // 503 에러를 방지하기 위한 더미 이벤트 전송
@@ -53,6 +63,10 @@ public class NotificationService {
 
         return emitter;
     }
+    public void ssetest(){
+        publishSse(29L,"sse test, size=" + emitterRepository.getSize());
+
+    }
     public void publishSse(Long reciverId, String message){
 
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>( NotificationDto.Publish.class));
@@ -61,6 +75,16 @@ public class NotificationService {
                         .content(message)
                         .reciverId(reciverId)
                         .build());
+    }
+    @Transactional
+    public void save(User user, String message){
+
+        Notification notification = Notification.builder()
+                .content(message)
+                .receiver(user)
+                .isRead(false)
+                .build();
+        notificationRepository.save(notification);
     }
     public void send(NotificationDto.Publish message) {
         User reciverUser = userRepository.findById(message.getReciverId()).orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_USER));

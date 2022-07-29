@@ -341,7 +341,7 @@ public class ProjectService {
                 .project(project)
                 .isTeam(false)
                 .build());
-        notificationService.publishSse(project.getUser().getId(),"프로젝트 "+project.getProjectName()+"에 "+user.getNickname()+" 님이 지원하였습니다.");
+        notificationService.save(project.getUser(),"프로젝트 "+project.getProjectName()+"에 "+user.getNickname()+" 님이 지원하였습니다.");
     }
 
     public ProjectDto.Response getProjectMain(Long projectId) {
@@ -426,7 +426,8 @@ public class ProjectService {
             throw new CustomException(ErrorCode.DUPLICATED_JOIN);
         }
         userProject.changeIsTeam(true);
-        notificationService.publishSse(userSearch.getId(),"프로젝트 "+project.getProjectName()+"에 지원 요청이 승낙되었습니다.");
+        notificationService.save(userSearch,"프로젝트 "+project.getProjectName()+"에 지원 요청이 승낙되었습니다.");
+
     }
 
     public void kickUser(Long projectId, Long userId) {
@@ -443,7 +444,7 @@ public class ProjectService {
         );
         if(!userProject.isTeam()){
             // 지원 거절
-            notificationService.publishSse(userSearch.getId(),"프로젝트 "+project.getProjectName()+"에 지원 요청이 거절되었습니다.");
+            notificationService.save(userSearch,"프로젝트 "+project.getProjectName()+"에 지원 요청이 거절되었습니다.");
         }
         userProjectRepository.delete(userProject);
     }
