@@ -89,7 +89,7 @@ public class ChatService {
         //from mysql
 
         // redis 에서 가져온 메세지 리스트의 값이 null 일때  Mysql db에서 데이터를 불러와 레디스에 저장후 리턴
-        List<FindChatMessageDto> chatMessages = messageRepository.findTop10ByProjectIdOrderByCreatedAtDesc(projectId);
+        List<FindChatMessageDto> chatMessages = messageRepository.findTop10ByProjectIdOrderByIdDesc(projectId);
 
         // ChatRoom chatRoom2 = roomRepository.findByRoomId(projectId);
         redisTemplate.opsForHash().put(CHAT_MESSAGE, projectId, chatMessages);
