@@ -27,6 +27,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -48,7 +49,7 @@ public class ChatService {
 
         // 유저 정보값을 토큰으로 찾아오기
         User user = CommonUtil.getUserByToken(token, jwtTokenProvider);
-
+        String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd HH:mm"));
 
         // 메세지 보내는 사람의 정보값 넣기
         messageDto.setUser(SenderDto.builder()
@@ -57,7 +58,7 @@ public class ChatService {
                         .role(user.getRole())
                         .nickname(user.getNickname())
                 .build());
-        messageDto.setCreatedAt(LocalDate.now().toString());
+        messageDto.setCreatedAt(now);
 
         // DB 저장
         ChatMessage chatMessage = ChatMessage.builder()
@@ -65,7 +66,7 @@ public class ChatService {
                 .projectId(messageDto.getProjectId())
                 .type(messageDto.getType())
                 .user(user)
-                .createdAt(LocalDateTime.now().toString())
+                .createdAt(now)
                 .build();
 
         messageRepository.save(chatMessage);
