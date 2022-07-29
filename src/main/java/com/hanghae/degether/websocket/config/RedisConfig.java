@@ -51,6 +51,7 @@ public class RedisConfig {
         container.addMessageListener(listenerAdapter, channelTopic);
         return container;
     }
+
     @Bean
     public MessageListenerAdapter listenerAdapter(RedisSubscriber subscriber) {
         return new MessageListenerAdapter(subscriber, "sendMessage");
