@@ -35,7 +35,7 @@
 
 
 
-🛠 Tech Tools
+🛠 Tools
 
 
 <img src="https://img.shields.io/badge/JAVA8-007396?style=for-the-badge&logo=java&logoColor=white">
