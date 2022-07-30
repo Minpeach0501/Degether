@@ -17,7 +17,7 @@
 | FrontEnd | 조해솔 | https://github.com/sol-pine | 부팀장 |
 | BackEnd | 김이안 | https://github.com/eank0108 | 팀원 |
 | BackEnd | 박민수 | https://github.com/Minpeach0501  | 팀원 |
-
+| Designer | 황서환 | http://artdesign.woobi.co.kr/ | 팀원 |
 
 # Degether
 ![degether](https://user-images.githubusercontent.com/105037035/181914211-32c60631-afcd-43f5-b050-731eecc7ee06.png)
