@@ -6,10 +6,10 @@
 
 | 포지션 | 팀원 | 개인블로그나 깃허브  | 연락처 | 역할 |
 | --- | --- | --- | --- | --- |
-| BackEnd | 김태범 | https://github.com/kshee9 | 01085036779 | 팀장 |
-| FrontEnd | 조해솔 | https://github.com/sol-pine | 010-4920-2560 | 부팀장 |
-| BackEnd | 김이안 | https://github.com/eank0108 | 010-2497-1512 | 팀원 |
-| BackEnd | 박민수 | https://github.com/Minpeach0501 | 010-9600-0151 | 팀원 |
+| BackEnd | 김태범 | https://github.com/kshee9  | 팀장 |
+| FrontEnd | 조해솔 | https://github.com/sol-pine   | 부팀장 |
+| BackEnd | 김이안 | https://github.com/eank0108  | 팀원 |
+| BackEnd | 박민수 | https://github.com/Minpeach0501   | 팀원 |
 
 
 
