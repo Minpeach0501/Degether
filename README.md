@@ -35,7 +35,9 @@
 
 
 
-🛠 Tools
+🛠 Tech Tools
+
+
 <img src="https://img.shields.io/badge/JAVA8-007396?style=for-the-badge&logo=java&logoColor=white">
 <img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=Spring&logoColor=white">
 <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
