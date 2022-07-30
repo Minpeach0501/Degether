@@ -51,23 +51,23 @@ public class SttService {
         map.add("config", new VitoConfigDto());
         String url = "https://openapi.vito.ai/v1/transcribe";
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
-        VitoResponseDto vitoResponseDto = restTemplate.postForObject(url, requestEntity, VitoResponseDto.class);
-        if (vitoResponseDto.getId() == null) {
-            if ("H0002".equals(vitoResponseDto.getCode())) {
-                //유효하지 않은 토큰
-                if(resend){
-                    System.out.println("resend");
-                    getSttToken();
-                    return getSttId(fileUrl,false);
-                }else {
-                    throw new CustomException(ErrorCode.VITO_H0002);
-                }
-            }else {
-                throw new CustomException(ErrorCode.VITO_H0010);
-            }
+        try {
+            VitoResponseDto vitoResponseDto = restTemplate.postForObject(url, requestEntity, VitoResponseDto.class);
 
+            return vitoResponseDto.getId();
+        }catch (Exception e){
+            System.out.println(e.getClass());
+            System.out.println(e.getMessage());
+            if(resend){
+                System.out.println("resend");
+                getSttToken();
+                return getSttId(fileUrl,false);
+            }else {
+                throw new CustomException(ErrorCode.VITO_H0002);
+            }
         }
-        return vitoResponseDto.getId();
+
+
     }
 
 
@@ -83,10 +83,17 @@ public class SttService {
 
         String url = "https://openapi.vito.ai/v1/transcribe/"+sttId;
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
-        ResponseEntity<VitoResponseDto> vitoResponseDtoResponseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity , VitoResponseDto.class);
-        VitoResponseDto vitoResponseDto = vitoResponseDtoResponseEntity.getBody();
-        if ("H0002".equals(vitoResponseDto.getCode())) {
-            //유효하지 않은 토큰
+
+        try {
+
+            ResponseEntity<VitoResponseDto> vitoResponseDtoResponseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity , VitoResponseDto.class);
+
+            VitoResponseDto vitoResponseDto = vitoResponseDtoResponseEntity.getBody();
+
+            return vitoResponseDto;
+        }catch (Exception e){
+            System.out.println(e.getClass());
+            System.out.println(e.getMessage());
             if(resend){
                 System.out.println("resend");
                 getSttToken();
@@ -95,6 +102,6 @@ public class SttService {
                 throw new CustomException(ErrorCode.VITO_H0002);
             }
         }
-        return vitoResponseDto;
+
     }
 }
