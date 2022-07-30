@@ -4,7 +4,7 @@
 
 👨‍👨‍👦‍👦 **팀원**
 
-| 포지션 | 팀원 | 개인블로그나 깃허브  | 연락처 | 역할 |
+| 포지션 | 팀원 | 개인블로그나 깃허브  | 역할 |
 | --- | --- | --- | --- | --- |
 | BackEnd | 김태범 | https://github.com/kshee9  | 팀장 |
 | FrontEnd | 조해솔 | https://github.com/sol-pine   | 부팀장 |
