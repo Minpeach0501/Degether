@@ -21,6 +21,9 @@ public class CommonUtil {
             if (userDetails == null) {
                 throw new CustomException(ErrorCode.REQUIRED_LOGIN);
             }
+            if(!userDetails.getUser().isStatus()){
+                throw new CustomException(ErrorCode.DELETED_USER);
+            }
             return userDetails.getUser();
         } catch (ClassCastException e) {
             throw new CustomException(ErrorCode.REQUIRED_LOGIN);
