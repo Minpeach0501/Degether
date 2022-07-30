@@ -31,14 +31,14 @@ public class GlobalExceptionHandler {
         //         .build();
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> methodArgumentNotValidException(MethodArgumentNotValidException e){
+    public ResponseDto<?> methodArgumentNotValidException(MethodArgumentNotValidException e){
         log.error("MethodArgumentNotValidException",e);
-        return ResponseEntity.status(1000)
-                .body(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
-        // return ResponseDto.builder()
-        //         .ok(false)
-        //         .message(e.getBindingResult().getAllErrors().get(0).getDefaultMessage())
-        //         .build();
+        // return ResponseEntity.status(1000)
+        //         .body(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+        return ResponseDto.builder()
+                .ok(false)
+                .message(e.getBindingResult().getAllErrors().get(0).getDefaultMessage())
+                .build();
     }
 
 //    @ExceptionHandler(NullPointerException.class)
