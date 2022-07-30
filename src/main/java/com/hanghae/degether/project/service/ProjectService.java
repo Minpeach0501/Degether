@@ -51,10 +51,21 @@ public class ProjectService {
     private final JwtTokenProvider jwtTokenProvider;
     private final NotificationService notificationService;
 
-
+    public String addHtmlPrefix(String url){
+        if(!"".equals(url) && url!=null){
+            // null이 아닌 url
+            if (!(url.startsWith("http://") || url.startsWith("https://"))) {
+                // http, https 가 없을때 https 추가
+                return "https://" + url;
+            }
+        }
+        return url;
+    }
     @Transactional
     public Long createProject(ProjectDto.Request projectRequestDto, MultipartFile multipartFile, List<MultipartFile> infoFiles) {
         User user = CommonUtil.getUser();
+
+
 
         // 유지보수 중이 아닌 프로젝트가 3개 이상일때 생성 불가능
         if(projectRepository.countByUserAndStepIsNot(user, "유지보수")>=3){
@@ -73,6 +84,9 @@ public class ProjectService {
                 infoFileUrls.add(infoFileUrl);
             }
         }
+
+        projectRequestDto.setGithub(addHtmlPrefix(projectRequestDto.getGithub()));
+        projectRequestDto.setFigma(addHtmlPrefix(projectRequestDto.getFigma()));
         //save 오류시 업로드된 이미지 삭제
         try {
             Project savedProject = projectRepository.save(Project.builder()
@@ -218,6 +232,8 @@ public class ProjectService {
         if (!project.getUser().getId().equals(user.getId())) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
+
+
         String thumbnail = project.getThumbnail();
         if (multipartFile != null) {
             //프로젝트 수정시 새로운 multipartfile이 오면 이미지 수정
@@ -227,6 +243,8 @@ public class ProjectService {
             thumbnail = s3Uploader.upload(multipartFile, S3ThumbnailDir);
         }
 
+        projectRequestDto.setGithub(addHtmlPrefix(projectRequestDto.getGithub()));
+        projectRequestDto.setFigma(addHtmlPrefix(projectRequestDto.getFigma()));
         return project.update(
                 projectRequestDto.getProjectName(),
                 projectRequestDto.getProjectDescription(),
