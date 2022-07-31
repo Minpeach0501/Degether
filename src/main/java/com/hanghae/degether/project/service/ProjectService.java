@@ -67,7 +67,8 @@ public class ProjectService {
 
 
         // 유지보수 중이 아닌 프로젝트가 3개 이상일때 생성 불가능
-        if(projectRepository.countByUserAndStepIsNot(user, "유지보수")>=3){
+        if (userProjectRepository.countByUserAndIsTeamAndProject_StepNot(user, true, "유지보수") > 2) {
+
             throw new CustomException(ErrorCode.MANY_PROJECT);
         }
 
@@ -363,7 +364,7 @@ public class ProjectService {
         if (userProjectRepository.existsByProjectAndUser(project, user)) {
             throw new CustomException(ErrorCode.DUPLICATED_APPLY);
         }
-        if(userProjectRepository.countByUserAndIsTeam(user, true) > 2){
+        if(userProjectRepository.countByUserAndIsTeamAndProject_StepNot(user, true,"유지보수") > 2){
             //지원 불가
             throw new CustomException(ErrorCode.MANY_PROJECT);
         }
@@ -457,7 +458,7 @@ public class ProjectService {
             throw new CustomException(ErrorCode.DUPLICATED_JOIN);
         }
 
-        if(userProjectRepository.countByUserAndIsTeam(userSearch, true) > 2){
+        if(userProjectRepository.countByUserAndIsTeamAndProject_StepNot(userSearch, true,"유지보수") > 2){
             //초대 불가
             throw new CustomException(ErrorCode.MANY_PROJECT);
         }
