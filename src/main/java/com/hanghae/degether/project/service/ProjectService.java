@@ -99,21 +99,21 @@ public class ProjectService {
                     .figma(projectRequestDto.getFigma())
                     .deadLine(projectRequestDto.getDeadLine())
                     .step(projectRequestDto.getStep())
-                    // .languages()
-                    // .genres(projectRequestDto.getGenre().stream().map((string) -> Genre.builder().genre(string).build()).collect(Collectors.toList()))
+                    .languages(projectRequestDto.getLanguage().stream().map((string) -> Language.builder().language(string).build()).collect(Collectors.toList()))
+                    .genres(projectRequestDto.getGenre().stream().map((string) -> Genre.builder().genre(string).build()).collect(Collectors.toList()))
                     .user(user)
                     .infoFiles(infoFileUrls)
                     .build());
 
-            List<Language> languages = projectRequestDto.getLanguage().stream().map((string) -> {
-                return Language.builder().language(string).project(savedProject).build();
-            }).collect(Collectors.toList());
-            languageRepository.saveAll(languages);
-
-            List<Genre> genres = projectRequestDto.getGenre().stream().map((string) -> {
-                return Genre.builder().genre(string).project(savedProject).build();
-            }).collect(Collectors.toList());
-            genreRepository.saveAll(genres);
+            // List<Language> languages = projectRequestDto.getLanguage().stream().map((string) -> {
+            //     return Language.builder().language(string).project(savedProject).build();
+            // }).collect(Collectors.toList());
+            // languageRepository.saveAll(languages);
+            //
+            // List<Genre> genres = projectRequestDto.getGenre().stream().map((string) -> {
+            //     return Genre.builder().genre(string).project(savedProject).build();
+            // }).collect(Collectors.toList());
+            // genreRepository.saveAll(genres);
             userProjectRepository.save(UserProject.builder()
                     .project(savedProject)
                     .isTeam(true)
