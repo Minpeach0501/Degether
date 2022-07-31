@@ -8,10 +8,7 @@ import com.hanghae.degether.project.dto.DocDto;
 import com.hanghae.degether.project.dto.ProjectDto;
 import com.hanghae.degether.project.dto.UserDto;
 import com.hanghae.degether.project.model.*;
-import com.hanghae.degether.project.repository.ProjectQueryDslRepository;
-import com.hanghae.degether.project.repository.ProjectRepository;
-import com.hanghae.degether.project.repository.UserProjectRepository;
-import com.hanghae.degether.project.repository.ZzimRepository;
+import com.hanghae.degether.project.repository.*;
 import com.hanghae.degether.project.util.CommonUtil;
 import com.hanghae.degether.project.util.S3Uploader;
 import com.hanghae.degether.sse.NotificationService;
@@ -50,6 +47,8 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final NotificationService notificationService;
+    private final LanguageRepository languageRepository;
+    private final GenreRepository genreRepository;
 
     public String addHtmlPrefix(String url){
         if(!"".equals(url) && url!=null){
@@ -100,11 +99,21 @@ public class ProjectService {
                     .figma(projectRequestDto.getFigma())
                     .deadLine(projectRequestDto.getDeadLine())
                     .step(projectRequestDto.getStep())
-                    .languages(projectRequestDto.getLanguage().stream().map((string) -> Language.builder().language(string).build()).collect(Collectors.toList()))
-                    .genres(projectRequestDto.getGenre().stream().map((string) -> Genre.builder().genre(string).build()).collect(Collectors.toList()))
+                    // .languages()
+                    // .genres(projectRequestDto.getGenre().stream().map((string) -> Genre.builder().genre(string).build()).collect(Collectors.toList()))
                     .user(user)
                     .infoFiles(infoFileUrls)
                     .build());
+
+            List<Language> languages = projectRequestDto.getLanguage().stream().map((string) -> {
+                return Language.builder().language(string).project(savedProject).build();
+            }).collect(Collectors.toList());
+            languageRepository.saveAll(languages);
+
+            List<Genre> genres = projectRequestDto.getGenre().stream().map((string) -> {
+                return Genre.builder().genre(string).project(savedProject).build();
+            }).collect(Collectors.toList());
+            genreRepository.saveAll(genres);
             userProjectRepository.save(UserProject.builder()
                     .project(savedProject)
                     .isTeam(true)
