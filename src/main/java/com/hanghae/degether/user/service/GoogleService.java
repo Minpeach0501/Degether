@@ -175,12 +175,12 @@ public class GoogleService   {
         return user;
     }
 
-    private UserResponseDto googleUsersAuthorizationInput(User naverUser, HttpServletResponse response) {
-        String token = jwtTokenProvider.createToken(naverUser.getUsername());
+    private UserResponseDto googleUsersAuthorizationInput(User googleUser, HttpServletResponse response) {
+        String token = jwtTokenProvider.createToken(googleUser.getUsername());
         // exception 발생시켜서 stauts 값으로 탈퇴한 회원들을 판별하기때문에
         // 토큰값 안넘겨주고 dto값 반환
 
-        if (naverUser.isStatus() == false) {
+        if (googleUser.isStatus() == false) {
             token = null;
             throw new CustomException(ErrorCode.DELETED_USER);
         }
