@@ -26,8 +26,9 @@ public enum ErrorCode {
     VITO_H0010(427,"STT 서비스 오류 입니다."),
     NOT_EXIST_MEETING_NOTE(428,"존재하지 않는 프로젝트 입니다."),
     OPENVIDU_ERROR(429,"화상채팅 서버 오류 입니다."),
-    MANY_PROJECT(430,"프로젝트 생성 수 초과"),
-    FAILED_MESSAGE(431, "메세지 보내기에 실패했습니다.")
+    MANY_PROJECT(430,"참가 할 수 있는 프로젝트는 총 3개 입니다."),
+    FAILED_MESSAGE(431, "메세지 보내기에 실패했습니다."),
+    APPLY_USER_MANY_PROJECT(432,"지원자의 참가 가능 프로젝트 수 초과 입니다.")
 
     ;
     private final int code;

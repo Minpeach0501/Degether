@@ -363,6 +363,10 @@ public class ProjectService {
         if (userProjectRepository.existsByProjectAndUser(project, user)) {
             throw new CustomException(ErrorCode.DUPLICATED_APPLY);
         }
+        if(userProjectRepository.countByUserAndIsTeam(user, true) > 2){
+            //지원 불가
+            throw new CustomException(ErrorCode.MANY_PROJECT);
+        }
         userProjectRepository.save(UserProject.builder()
                 .user(user)
                 .project(project)
@@ -451,6 +455,11 @@ public class ProjectService {
         );
         if (userProject.isTeam()) {
             throw new CustomException(ErrorCode.DUPLICATED_JOIN);
+        }
+
+        if(userProjectRepository.countByUserAndIsTeam(userSearch, true) > 2){
+            //초대 불가
+            throw new CustomException(ErrorCode.MANY_PROJECT);
         }
         userProject.changeIsTeam(true);
         notificationService.save(userSearch,"프로젝트 "+project.getProjectName()+"에 지원 요청이 승낙되었습니다.");

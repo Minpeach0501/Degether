@@ -19,11 +19,11 @@ public class ProjectDto {
     @AllArgsConstructor
     public static class Request{
         @NotEmpty(message = "프로젝트명을 입력해 주세요.")
-        @Size(min = 2, max = 20, message = "2글자 이상, 20글자 이하로 입력해 주세요.")
+        @Size(min = 2, max = 40, message = "2글자 이상, 20글자 이하로 입력해 주세요.")
         private String projectName;
 
         @NotEmpty(message = "프로젝트 설명을 입력해 주세요.")
-        @Size(min = 2, max = 50, message = "2글자 이상, 50글자 이하로 입력해 주세요.")
+        @Size(min = 2, max = 200, message = "2글자 이상, 100글자 이하로 입력해 주세요.")
         private String projectDescription;
 
         @NotNull(message = "올바른 값을 입력해 주세요.")
