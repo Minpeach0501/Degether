@@ -248,7 +248,9 @@ public class ProjectService {
         if (multipartFile != null) {
             //프로젝트 수정시 새로운 multipartfile이 오면 이미지 수정
             //기존이미지 삭제
-            s3Uploader.deleteFromS3(s3Uploader.getFileName(project.getThumbnail()));
+            if(project.getThumbnail()!=null && !"".equals(project.getThumbnail())){
+                s3Uploader.deleteFromS3(s3Uploader.getFileName(project.getThumbnail()));
+            }
             //새로운 이미지 업로드
             thumbnail = s3Uploader.upload(multipartFile, S3ThumbnailDir);
         }
