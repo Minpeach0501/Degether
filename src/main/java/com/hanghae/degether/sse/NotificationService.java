@@ -29,11 +29,8 @@ public class NotificationService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     public SseEmitter subscribe(Long userId, String lastEventId) {
-        // 1
-        // emitterRepository.deleteStartWithById(userId);
         String id = userId + "_" + System.currentTimeMillis();
         System.out.println("Subscribe");
-        // 2
         SseEmitter emitter = emitterRepository.save(id, new SseEmitter(DEFAULT_TIMEOUT));
 
         emitter.onCompletion(() ->{
@@ -48,11 +45,9 @@ public class NotificationService {
                 }
         );
 
-        // 3
         // 503 에러를 방지하기 위한 더미 이벤트 전송
         sendToClient(emitter, id, "EventStream Created. [userId=" + userId + "]");
 
-        // 4
         // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방
         if (!lastEventId.isEmpty()) {
             Map<String, Object> events = emitterRepository.findAllEventCacheStartWithId(String.valueOf(userId));
@@ -63,12 +58,9 @@ public class NotificationService {
 
         return emitter;
     }
-    public void ssetest(){
-        publishSse(29L,"sse test, size=" + emitterRepository.getSize());
 
-    }
     public void publishSse(Long reciverId, String message){
-
+        //redis message broker로 sse 데이터 전송
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>( NotificationDto.Publish.class));
         redisTemplate.convertAndSend("sse",
                 NotificationDto.Publish.builder()
@@ -120,7 +112,6 @@ public class NotificationService {
                     .data(data));
         } catch (IOException exception) {
             emitterRepository.deleteById(id);
-            // throw new RuntimeException("연결 오류!");
         }
     }
     @Transactional

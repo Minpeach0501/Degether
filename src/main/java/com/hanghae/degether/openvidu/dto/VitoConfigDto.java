@@ -6,6 +6,7 @@ import lombok.Getter;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
+//VITO api 호출시 설정
 public class VitoConfigDto {
     private Diarization diarization = new Diarization();
     @JsonProperty("use_multi_channel?")

@@ -39,7 +39,6 @@ public class ProjectQueryDslRepository {
                 //         project.figma,
                 //         project.deadLine,
                 //         project.step,
-                //         //TODO: Entity가 아닌 ElementCollection select 방법 찾기
                 //         project.languages,
                 //         project.genres
                 //     )

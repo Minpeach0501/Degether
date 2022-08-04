@@ -47,9 +47,7 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final NotificationService notificationService;
-    private final LanguageRepository languageRepository;
-    private final GenreRepository genreRepository;
-
+    // http, https 가 없을때 https 추가
     public String addHtmlPrefix(String url){
         if(!"".equals(url) && url!=null){
             // null이 아닌 url
@@ -60,6 +58,7 @@ public class ProjectService {
         }
         return url;
     }
+    //프로젝트 생성
     @Transactional
     public Long createProject(ProjectDto.Request projectRequestDto, MultipartFile multipartFile, List<MultipartFile> infoFiles) {
         User user = CommonUtil.getUser();
@@ -80,14 +79,15 @@ public class ProjectService {
         }
         if (infoFiles != null) {
             for (MultipartFile infoFile : infoFiles) {
+                //프로젝트 정보 파일 업로드
                 String infoFileUrl = s3Uploader.upload(infoFile, S3InfoFileDir);
                 infoFileUrls.add(infoFileUrl);
             }
         }
 
+        // http, https 가 없을때 https 추가
         projectRequestDto.setGithub(addHtmlPrefix(projectRequestDto.getGithub()));
         projectRequestDto.setFigma(addHtmlPrefix(projectRequestDto.getFigma()));
-        //save 오류시 업로드된 이미지 삭제
         try {
             Project savedProject = projectRepository.save(Project.builder()
                     .thumbnail(thumbnailUrl)
@@ -106,15 +106,6 @@ public class ProjectService {
                     .infoFiles(infoFileUrls)
                     .build());
 
-            // List<Language> languages = projectRequestDto.getLanguage().stream().map((string) -> {
-            //     return Language.builder().language(string).project(savedProject).build();
-            // }).collect(Collectors.toList());
-            // languageRepository.saveAll(languages);
-            //
-            // List<Genre> genres = projectRequestDto.getGenre().stream().map((string) -> {
-            //     return Genre.builder().genre(string).project(savedProject).build();
-            // }).collect(Collectors.toList());
-            // genreRepository.saveAll(genres);
             userProjectRepository.save(UserProject.builder()
                     .project(savedProject)
                     .isTeam(true)
@@ -124,6 +115,7 @@ public class ProjectService {
             return savedProject.getId();
         } catch (Exception e) {
             log.info("delete Img");
+            //save 오류시 업로드된 이미지 삭제
             s3Uploader.deleteFromS3(s3Uploader.getFileName(thumbnailUrl));
             for (String infoFileUrl : infoFileUrls) {
                 s3Uploader.deleteFromS3(s3Uploader.getFileName(infoFileUrl));
@@ -132,12 +124,11 @@ public class ProjectService {
         }
 
     }
-
+    //프로젝트 목록
     @Transactional(readOnly = true)
     public ProjectDto.Slice getProjects(String search, String language, String genre, String step, String token, int page, String sorted) {
+        //유저 유효성 판별
         User user = CommonUtil.getUserByToken(token, jwtTokenProvider);
-        // List<Project> list = projectQueryDslRepository.getProjectsBySearch(search, language, genre, step);
-        // List<Project> list = projectRepository.findAllByProjectNameContainsAndLanguages_LanguageAndGenres_GenreAndStep("프로젝트", "spring", "앱", "기획");
         Sort.Direction direction = Sort.Direction.DESC;
         if("deadLine".equals(sorted)) {
             direction = Sort.Direction.ASC;
@@ -150,6 +141,7 @@ public class ProjectService {
 
             if(user==null) isZzim = false;
             else {
+                //로그인한 상태일 시 해당 프로젝트에 찜 여부 판별
                 isZzim = zzimRepository.existsByProjectAndUser(project,user);
             }
             int devCount = project.getBeCount() + project.getFeCount();
@@ -157,8 +149,10 @@ public class ProjectService {
             for (UserProject userProject : project.getUserProjects()) {
                 String role = userProject.getUser().getRole();
                 if ("백엔드 개발자".equals(role) || "프론트엔드 개발자".equals(role)) {
+                    //참여가능한 개발자 인원수
                     devCount--;
                 } else if ("디자이너".equals(role)) {
+                    //참여가능한 디자이너 인원수
                     deCount--;
                 }
             }
@@ -177,6 +171,7 @@ public class ProjectService {
                     )
                     .step(project.getStep())
                     .language(project.getLanguages().stream().map(Language::getLanguage).collect(Collectors.toList()))
+                    //프론트의 요청으로 language를 string 배열이 아닌 ,를 구분자로 갖는 string으로 변환
                     .languageString(project.getLanguages().stream().map(Language::getLanguage).collect(Collectors.joining(", ")))
                     .genre(project.getGenres().stream().map(Genre::getGenre).collect(Collectors.toList()))
                     .step(project.getStep())
@@ -189,8 +184,9 @@ public class ProjectService {
                 .list(content)
                 .build();
     }
-
+    //마이 프로젝트 목록
     public List<ProjectDto.Response> getMyProjects() {
+        //유저 판별
         User user = CommonUtil.getUser();
 
         return userProjectRepository.findAllByIsTeamAndUser(true,user).stream().map(
@@ -202,8 +198,10 @@ public class ProjectService {
                     for (UserProject userProject2 : project.getUserProjects()) {
                         String role = userProject2.getUser().getRole();
                         if ("백엔드 개발자".equals(role) || "프론트엔드 개발자".equals(role)) {
+                            //참여가능한 개발자 인원수
                             devCount++;
                         } else if ("디자이너".equals(role)) {
+                            //참여가능한 디자이너 인원수
                             deCount++;
                         }
                     }
@@ -217,8 +215,10 @@ public class ProjectService {
                 }).collect(Collectors.toList());
 
     }
+    //프로젝트 찜하기
     @Transactional
     public void projectZzim(Long projectId) {
+        //유저, 프로젝트 판별
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (zzimRepository.existsByUserAndProject(user, project)) {
@@ -233,10 +233,10 @@ public class ProjectService {
         }
 
     }
-
+    //프로젝트 수정
     @Transactional
     public ProjectDto.Response modifyProject(Long projectId, ProjectDto.Request projectRequestDto, MultipartFile multipartFile) {
-        //TODO: language update시 삭제 안되는 문제 해결
+        //프로젝트, 유저 유효성 판별
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!project.getUser().getId().equals(user.getId())) {
@@ -255,6 +255,7 @@ public class ProjectService {
             thumbnail = s3Uploader.upload(multipartFile, S3ThumbnailDir);
         }
 
+        // http, https 가 없을때 https 추가
         projectRequestDto.setGithub(addHtmlPrefix(projectRequestDto.getGithub()));
         projectRequestDto.setFigma(addHtmlPrefix(projectRequestDto.getFigma()));
         return project.update(
@@ -272,9 +273,10 @@ public class ProjectService {
                 thumbnail
         );
     }
-
+    //프로젝트 정보 파일 수정
     @Transactional
     public String modifyInfoFile(Long projectId, String fileUrl, MultipartFile infoFile) {
+        //프로젝트, 유저 유효성 판별
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!project.getUser().getId().equals(user.getId())) {
@@ -296,15 +298,18 @@ public class ProjectService {
         project.infoFilesUpdate(infoFiles);
         return infoFileUrl;
     }
-
+    //프로젝트에 참여중인 유저가 존재하는지 판별
     public boolean existUser(Long projectId) {
+        //프로젝트, 유저 유효성 판별
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         return userProjectRepository.existsByProjectAndUserNot(project, user);
     }
 
+    //프로젝트 삭제
     @Transactional
     public void deleteProject(Long projectId) {
+        //프로젝트, 유저 유효성 판별
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!project.getUser().getId().equals(user.getId())) {
@@ -315,17 +320,18 @@ public class ProjectService {
             s3Uploader.deleteFromS3(s3Uploader.getFileName(project.getThumbnail()));
         }
         for (String infoFileUrl : project.getInfoFiles()) {
+            // 프로젝트 정보파일삭제
             s3Uploader.deleteFromS3(s3Uploader.getFileName(infoFileUrl));
         }
         zzimRepository.deleteByProject(project);
         projectRepository.delete(project);
     }
 
-
+    //프로젝트 상세
     public ProjectDto.Response getProject(Long projectId) {
-        // User user = CommonUtil.getUser();
+        // 프로젝트 유효성 판별
         Project project = CommonUtil.getProject(projectId, projectRepository);
-        System.out.println(project.getComments());
+
         return ProjectDto.Response.builder()
                 .thumbnail(project.getThumbnail())
                 .projectName(project.getProjectName())
@@ -359,7 +365,7 @@ public class ProjectService {
 
                 .build();
     }
-
+    //프로젝트 지원
     public void applyProject(Long projectId) {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
@@ -375,10 +381,12 @@ public class ProjectService {
                 .project(project)
                 .isTeam(false)
                 .build());
+        //sse 이벤트 전송
         notificationService.save(project.getUser(),"프로젝트 "+project.getProjectName()+"에 "+user.getNickname()+" 님이 지원하였습니다.");
     }
-
+    //프로젝트 메인페이지 정보
     public ProjectDto.Response getProjectMain(Long projectId) {
+        //프로젝트, 유저 유효성 판별
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         if (!userProjectRepository.existsByProjectAndUserAndIsTeam(project, user, true)) {
@@ -443,6 +451,7 @@ public class ProjectService {
                 )
                 .build();
     }
+    //유저 초대하기
     @Transactional
     public void addUser(Long projectId, Long userId) {
         User user = CommonUtil.getUser();
@@ -465,10 +474,11 @@ public class ProjectService {
             throw new CustomException(ErrorCode.MANY_PROJECT);
         }
         userProject.changeIsTeam(true);
+        //sse 이벤트 전송
         notificationService.save(userSearch,"프로젝트 "+project.getProjectName()+"에 지원 요청이 승낙되었습니다.");
 
     }
-
+    //유저 프로젝트 탈퇴
     public void kickUser(Long projectId, Long userId) {
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
@@ -483,6 +493,7 @@ public class ProjectService {
         );
         if(!userProject.isTeam()){
             // 지원 거절
+            //sse 이벤트 전송
             notificationService.save(userSearch,"프로젝트 "+project.getProjectName()+"에 지원 요청이 거절되었습니다.");
         }
         userProjectRepository.delete(userProject);

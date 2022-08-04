@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SttController {
     private final OpenviduService openviduService;
+
+    // 회의록 데이터 목록 불러오기
     @GetMapping("/api/meetingNotes/{projectId}")
     public ResponseDto<?> getMeetingNotes(@PathVariable Long projectId){
         return ResponseDto.builder()
@@ -20,6 +22,7 @@ public class SttController {
                 .result(openviduService.getMeetingNotes(projectId))
                 .build();
     }
+    //STT 텍스트 데이터 불러오기
     @GetMapping("/api/meetingNote/{meetingNoteId}")
     public ResponseDto<?> getMeetingNote(@PathVariable Long meetingNoteId){
         return ResponseDto.builder()

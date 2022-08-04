@@ -42,7 +42,6 @@ public class CommonUtil {
     // Util
     public static Project getProject(Long projectId, ProjectRepository projectRepository) {
         return projectRepository.findById(projectId).orElseThrow(()->
-                // new IllegalArgumentException(ExceptionMessage.NOT_EXIST_PROJECT)
                 new CustomException(ErrorCode.NOT_EXIST_PROJECT)
         );
     }

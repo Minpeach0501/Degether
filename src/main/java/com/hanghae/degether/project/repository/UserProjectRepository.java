@@ -16,17 +16,15 @@ public interface UserProjectRepository extends JpaRepository<UserProject, Long> 
     boolean existsByProjectAndUser(Project project, User user);
     boolean existsByProjectAndUserAndIsTeam(Project project, User user, boolean isTeam);
 
-    int countByUserAndIsTeam(User user, boolean isTeam);
     int countByUserAndIsTeamAndProject_StepNot(User user, boolean isTeam,String step);
 
-    List<UserProject> findAllByProject(Project project);
-    // Optional<UserProject> findByProjectAndUserId(Project project, Long userId);
+
     Optional<UserProject> findByProjectAndUser(Project project, User user);
 
 
     List<UserProject> findTop3ByUserAndIsTeam(User user, boolean isTeam);
 
-    List<MyProjectResDto> findAllByUserAndIsTeam(Optional<User> user, boolean isTeam);
+
 
     List<UserProject> findAllByIsTeamAndUser(boolean isTeam, User user);
 }
