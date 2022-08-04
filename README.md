@@ -8,6 +8,16 @@
 📆6월 25일  ~ 8월 4일📆 
 
 
+
+
+🔎프로젝트 상세내용
+바로가기 👉 https://www.notion.so/solwork/Degether-a56b054fdc2a4297996aae121c4224d6
+
+
+
+
+
+
 👨‍👨‍👦‍👦 **팀원**
 
 
