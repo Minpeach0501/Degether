@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class CommentController {
     private final CommentService commentService;
-
+    //댓글 작성
     @PostMapping("/comment/{projectId}")
     public ResponseDto<?> createComment(@PathVariable Long projectId, @RequestBody CommentDto.Request commentRequestDto) {
         return ResponseDto.builder()
@@ -20,6 +20,7 @@ public class CommentController {
                 .result(commentService.createComment(projectId, commentRequestDto))
                 .build();
     }
+    //댓글 삭제
     @DeleteMapping("/comment/{commentId}")
     public ResponseDto<?> deleteComment(@PathVariable Long commentId) {
         commentService.deleteComment(commentId);

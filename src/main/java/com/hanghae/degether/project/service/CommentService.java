@@ -19,9 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
     private final ProjectRepository projectRepository;
     private final CommentRepository commentRepository;
-    private final UserProjectRepository userProjectRepository;
+    // 댓글 생성
     @Transactional
     public Long createComment(Long projectId, CommentDto.Request commentRequestDto) {
+        //프로젝트, 유저 유효성 판별
         User user = CommonUtil.getUser();
         Project project = CommonUtil.getProject(projectId, projectRepository);
         Comment savedComment = commentRepository.save(Comment.builder()
@@ -31,8 +32,10 @@ public class CommentService {
         project.getComments().add(savedComment);
         return savedComment.getId();
     }
+    //댓글 삭제
     @Transactional
     public void deleteComment(Long commentId) {
+        //프로젝트, 유저 유효성 판별
         User user = CommonUtil.getUser();
         Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_COMMENT));
         if (!comment.getUser().getId().equals(user.getId())) {

@@ -26,7 +26,4 @@ public class UserProject {
     public void changeIsTeam(boolean isTeam) {
         this.isTeam = isTeam;
     }
-    public void updateProject(Project project){
-        this.project = project;
-    }
 }

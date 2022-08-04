@@ -19,6 +19,5 @@ public class MeetingNoteDto {
         private Long duration;
         private String url;
         private Boolean status;
-        // private List<UtteranceDto> utterances;
     }
 }

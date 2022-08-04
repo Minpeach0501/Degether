@@ -17,24 +17,22 @@ import java.io.IOException;
 public class OpenviduController {
     private final OpenviduService openviduService;
 
+    //녹음 시작
     @GetMapping("/openvidu/api/recordings/start/{sessionId}")
     public ResponseDto<?> startRecording(@PathVariable String sessionId) {
         return openviduService.startRecording(sessionId);
     }
-
+    //녹음 중지
     @GetMapping("/openvidu/api/recordings/stop/{sessionId}")
     public ResponseDto<?> stopRecording(@PathVariable String sessionId) {
         return openviduService.stopRecording(sessionId);
     }
+    //녹음 목록
     @GetMapping("/openvidu/api/recordings")
     public ResponseDto<?> listRecording() throws OpenViduJavaClientException, OpenViduHttpException {
         return openviduService.listRecording();
     }
-    @GetMapping("/openvidu/api/test")
-    public ResponseDto<?> testRecording() throws OpenViduJavaClientException, OpenViduHttpException, IOException {
-        return openviduService.testRecording();
-    }
-
+    //openvidu 서버에서 토큰을 통해 참여 가능 여부 판별
     @GetMapping("/api/openvidu/{projectId}")
     public ResponseDto<?> openvidu(HttpServletRequest request, @PathVariable Long projectId ){
         String token = request.getHeader("Authorization");

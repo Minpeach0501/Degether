@@ -22,6 +22,7 @@ public class SttService {
     private void init() {
         getSttToken();
     }
+    //vito token 불러오기
     public void getSttToken(){
         System.out.println("getSttToken, " +STT_TOKEN + " -> ");
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
@@ -38,6 +39,7 @@ public class SttService {
         System.out.println(STT_TOKEN);
     }
 
+    //음성 파일로 vito sttId 받아오기
     public String getSttId(String fileUrl, boolean resend) throws IOException {
         // resend 반복 토큰 요청 막기
         System.out.println("getSttId, token = " + STT_TOKEN);
@@ -56,10 +58,9 @@ public class SttService {
 
             return vitoResponseDto.getId();
         }catch (Exception e){
-            System.out.println(e.getClass());
-            System.out.println(e.getMessage());
+            //토큰 만료시 토큰 불러오고 본 함수 다시 호출
             if(resend){
-                System.out.println("resend");
+                //한번만 재호출
                 getSttToken();
                 return getSttId(fileUrl,false);
             }else {
@@ -71,9 +72,9 @@ public class SttService {
     }
 
 
+    //vito sttId로 변환된 텍스트 받아오기
     public VitoResponseDto getSttUtterance(String sttId, boolean resend){
         // resend 반복 토큰 요청 막기
-        System.out.println("getSttUtterance, token = " + STT_TOKEN);
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         HttpStatus httpStatus = HttpStatus.CREATED;
         RestTemplate restTemplate = new RestTemplate();
@@ -92,10 +93,9 @@ public class SttService {
 
             return vitoResponseDto;
         }catch (Exception e){
-            System.out.println(e.getClass());
-            System.out.println(e.getMessage());
+            //토큰 만료시 토큰 불러오고 본 함수 다시 호출
             if(resend){
-                System.out.println("resend");
+                //한번만 재호출
                 getSttToken();
                 return getSttUtterance(sttId,false);
             }else {

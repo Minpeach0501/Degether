@@ -21,5 +21,4 @@ public interface ZzimRepository extends JpaRepository<Zzim, Long> {
 
     List<Zzim> findAllByUser(User user);
 
-    List<Zzim> findAllByUser(Optional<User> user);
 }

@@ -61,9 +61,4 @@ public class NotificationController {
     }
 
 
-    @GetMapping(value = "/ssetest")
-    public void ssetest() {
-        System.out.println("sseTest");
-        notificationService.ssetest();
-    }
 }

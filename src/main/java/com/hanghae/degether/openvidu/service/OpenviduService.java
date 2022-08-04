@@ -54,15 +54,18 @@ public class OpenviduService {
 
     @PostConstruct
     private void init() {
+        //openvidu 서버와 연결
         this.openVidu = new OpenVidu(OPENVIDU_URL, SECRET);
     }
+    //녹음 시작
     public ResponseDto<?> startRecording(String sessionId)  {
-        System.out.println(sessionRecordingMap.toString());
+        //프로젝트, 유저 유효성 판별
         Project project = CommonUtil.getProject(Long.parseLong(sessionId), projectRepository);
         User user = CommonUtil.getUser();
         if (!userProjectRepository.existsByProjectAndUserAndIsTeam(project, user, true)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
+        // 이미 녹음 중일때
         if (sessionRecordingMap.get(sessionId) != null) {
             try{
                 Recording recording = openVidu.getRecording(sessionRecordingMap.get(sessionId));
@@ -73,12 +76,9 @@ public class OpenviduService {
                             .message("녹음중 입니다.")
                             .result(recording)
                             .build();
-                } else if (recording.getStatus().equals(Recording.Status.ready)) {
-                    //녹음 완료, 녹음종료 처리가 안됨
                 }
                 return ResponseDto.builder().message("이미 녹음중 입니다").build();
             }catch (OpenViduJavaClientException | OpenViduHttpException exception){
-                // System.out.println(exception.getMessage());
                 return ResponseDto.builder()
                         .ok(false)
                         .message("화상채팅 서버 오류 입니다.")
@@ -86,16 +86,17 @@ public class OpenviduService {
             }
         }
 
-        //녹음 시작
+        //새로운 녹음 시작
         Recording recording = null;
         try{
+            //openvidu 서버의 녹음 데이터 확인
             recording = openVidu.getRecording(sessionId);
         }catch (OpenViduJavaClientException | OpenViduHttpException exception){
             log.info("not current Recording");
         }
         try{
             if(recording!=null && "started".equals(recording.getStatus())){
-                //녹음중임
+                //openvidu 서버의 녹음 데이터 확인
             }else{
                 RecordingProperties properties = new RecordingProperties.Builder()
                         .outputMode(Recording.OutputMode.COMPOSED)
@@ -112,25 +113,28 @@ public class OpenviduService {
                     .build();
 
         }catch (OpenViduJavaClientException | OpenViduHttpException exception){
+            //녹음 시작 실패
             sessionRecordingMap.remove(sessionId);
-            System.out.println(exception.getMessage());
             throw new CustomException(ErrorCode.OPENVIDU_ERROR);
         }
     }
+    //녹음 중지
     @Transactional
     public ResponseDto<?> stopRecording(String sessionId)  {
-        System.out.println(sessionRecordingMap.toString());
+        //프로젝트, 유저 유효성 판별
         Project project = CommonUtil.getProject(Long.parseLong(sessionId), projectRepository);
         User user = CommonUtil.getUser();
         if (!userProjectRepository.existsByProjectAndUserAndIsTeam(project, user, true)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         try {
-            System.out.println("stop recording");
+            //녹음 중지
             Recording recording = openVidu.stopRecording(sessionRecordingMap.get(sessionId));
             sessionRecordingMap.remove(sessionId);
+            //STT 를 위한 API 전송
             String sttId = sttService.getSttId(recording.getUrl(), true);
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            //회의록에 stt api 를 통해 받은 sttId 저장
             Meetingnote meetingNote = Meetingnote.builder()
                     .sttId(sttId)
                     .createdAt(recording.getCreatedAt())
@@ -141,6 +145,7 @@ public class OpenviduService {
                     .project(project)
                     .build();
             Meetingnote savedMeetingnote = meetingNoteRepository.save(meetingNote);
+            //stt api를 통해 받은 stt id 로 텍스트 불러오기
             getSttUtterance(sttId, savedMeetingnote);
             return ResponseDto.builder()
                     .ok(true)
@@ -149,14 +154,13 @@ public class OpenviduService {
 
         } catch (OpenViduJavaClientException | OpenViduHttpException exception) {
             sessionRecordingMap.remove(sessionId);
-            System.out.println(exception);
             throw new CustomException(ErrorCode.OPENVIDU_ERROR);
         } catch (IOException e) {
-            System.out.println(e);
             throw new CustomException(ErrorCode.VITO_H0010);
         }
 
     }
+    //stt api를 통해 받은 stt id 로 텍스트 불러오기
     @Transactional
     public boolean getSttUtterance(String sttId, Meetingnote savedMeetingnote) {
         VitoResponseDto vitoResponseDto = sttService.getSttUtterance(sttId, true);
@@ -170,12 +174,12 @@ public class OpenviduService {
                     .meetingnote(savedMeetingnote)
                     .build()).collect(Collectors.toList());
             savedMeetingnote.updateUtterances(utterances);
-            // meetingNoteRepository.save(meetingNote);
             return true;
         }
         return false;
     }
 
+    // 회의록 데이터 목록 불러오기
     public List<MeetingNoteDto.Response> getMeetingNotes(Long projectId) {
         Project project = CommonUtil.getProject(projectId, projectRepository);
         User user = CommonUtil.getUser();
@@ -193,6 +197,7 @@ public class OpenviduService {
                         .status(meetingNote.getStatus())
                         .build()).collect(Collectors.toList());
     }
+    //STT 텍스트 데이터 불러오기
     @Transactional
     public List<UtteranceDto.Response> getMeetingNote(Long meetingNoteId){
         Meetingnote meetingNote = meetingNoteRepository.findById(meetingNoteId).orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_MEETING_NOTE));
@@ -216,18 +221,14 @@ public class OpenviduService {
                         .build()
         ).collect(Collectors.toList());
     }
+    //openvidu의 recording 목록 불러오기
     public ResponseDto<?> listRecording() throws OpenViduJavaClientException, OpenViduHttpException {
 
         return ResponseDto.builder().result(openVidu.listRecordings()).build();
     }
-    public ResponseDto<?> testRecording() throws OpenViduJavaClientException, OpenViduHttpException, IOException {
 
-        // String sttId = sttService.getSttId("https://vidutest.shop/openvidu/recordings/ses_LPtXhnb6h8/ses_LPtXhnb6h8.webm", true);
-        String sttId = sttService.getSttId("https://hh99.s3.ap-northeast-2.amazonaws.com/1_3.webm", true);
-        VitoResponseDto vitoResponseDto = sttService.getSttUtterance(sttId, true);
-        return ResponseDto.builder().result(vitoResponseDto).build();
-    }
 
+    //openvidu 서버에서 토큰을 통해 참여 가능 여부 판별
     public ResponseDto<?> openvidu(String token, Long projectId) {
         User user = CommonUtil.getUserByToken(token, tokenProvider);
         Project project = CommonUtil.getProject(projectId, projectRepository);

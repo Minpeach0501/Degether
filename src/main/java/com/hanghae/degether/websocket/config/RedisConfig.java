@@ -25,10 +25,12 @@ public class RedisConfig {
     String hostname;
     @Bean
     public ChannelTopic channelTopic() {
+        //채팅용
         return new ChannelTopic("project");
     }
     @Bean
     public ChannelTopic sseTopic() {
+        //sse용
         return new ChannelTopic("sse");
     }
 
@@ -39,15 +41,14 @@ public class RedisConfig {
         redisStandaloneConfiguration.setPassword("redispw");
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
-    /**
-     * redis pub/sub 메시지를 처리하는 listener 설정
-     * redis.publist 할때 여기로 와서 container에 담음
-     */
+
     @Bean
     public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory,MessageListenerAdapter listenerAdapter,MessageListenerAdapter sseListenerAdapter, ChannelTopic channelTopic, ChannelTopic sseTopic) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
+        //sse용 리스너 등록
         container.addMessageListener(sseListenerAdapter, sseTopic);
+        //채팅용 리스너 등록
         container.addMessageListener(listenerAdapter, channelTopic);
         return container;
     }

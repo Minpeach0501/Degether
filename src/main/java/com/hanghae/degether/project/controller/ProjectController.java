@@ -28,7 +28,7 @@ public class ProjectController {
                 .projectId(projectService.createProject(projectRequestDto, multipartFile, infoFiles))
                 .build();
     }
-
+    //프로젝트 수정
     @PutMapping("/project/{projectId}")
     public ResponseDto<?> modifyProject(
             @PathVariable Long projectId,
@@ -40,6 +40,7 @@ public class ProjectController {
                 .result(projectService.modifyProject(projectId, projectRequestDto, multipartFile))
                 .build();
     }
+    //프로젝트 설명 파일 수정
     @PostMapping("/infoFile/{projectId}")
     public ResponseDto<?> modifyInfoFile(
             @PathVariable Long projectId,
@@ -70,7 +71,7 @@ public class ProjectController {
                 .result(projectService.getProjects(search, language, genre, step, token, page, sorted))
                 .build();
     }
-
+    //마이 프로젝트 목록
     @GetMapping("/myprojects")
     public ResponseDto<?> getMyProjects() {
         return ResponseDto.builder()

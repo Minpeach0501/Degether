@@ -15,15 +15,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class SseRedisSubscriber {
     private final ObjectMapper objectMapper;
-    private final SimpMessageSendingOperations messagingTemplate;
-    private final RedisTemplate redisTemplate;
     private final NotificationService notificationService;
 
 
-    /**
-     * Redis에서 메시지가 발행(publish)되면 대기하고 있던 onMessage가 해당 메시지를 받아 처리한다.
-     */
 
+    //redis에서 publish(topic = sse)로 전송된 데이터 받음
     public void sendMessage(String message) {
         try {
 
