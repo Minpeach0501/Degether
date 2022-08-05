@@ -5,6 +5,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hanghae.degether.exception.CustomException;
 import com.hanghae.degether.exception.ErrorCode;
+import com.hanghae.degether.project.model.Project;
+import com.hanghae.degether.project.model.UserProject;
+import com.hanghae.degether.project.repository.ProjectRepository;
+import com.hanghae.degether.project.repository.UserProjectRepository;
 import com.hanghae.degether.user.dto.LoginResDto;
 import com.hanghae.degether.user.dto.SocialUserInfoDto;
 import com.hanghae.degether.user.dto.UserResponseDto;
@@ -37,6 +41,8 @@ public class KakaoService {
     private final UserRepository userRepository;
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final ProjectRepository projectRepository;
+    private final UserProjectRepository userProjectRepository;
 
     @Value("${kakao.client.id}")
     public String client_id;
@@ -149,7 +155,22 @@ public class KakaoService {
             user = new User(username, nickname, profileUrl, encodedPassword);
             userRepository.save(user);
 
+            // 이벤트 체험용 프로젝트
+            Project project = projectRepository.findById(21261L).orElseThrow(()-> new CustomException(ErrorCode.UNAUTHORIZED));
+            UserProject userProject = userProjectRepository.findByProjectAndUser(project, user).orElseThrow(()->
+                    new CustomException(ErrorCode.NOT_APPLY)
+            );
+            if (userProject.isTeam()) {
+                throw new CustomException(ErrorCode.DUPLICATED_JOIN);
+            }
+            userProjectRepository.save(UserProject.builder()
+                    .user(user)
+                    .project(project)
+                    .isTeam(true)
+                    .build());
+            // 이벤트 체험용 프로젝트
         }
+
         return user;
     }
 
