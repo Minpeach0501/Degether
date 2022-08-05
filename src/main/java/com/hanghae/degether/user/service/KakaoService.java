@@ -157,12 +157,6 @@ public class KakaoService {
 
             // 이벤트 체험용 프로젝트
             Project project = projectRepository.findById(21261L).orElseThrow(()-> new CustomException(ErrorCode.UNAUTHORIZED));
-            UserProject userProject = userProjectRepository.findByProjectAndUser(project, user).orElseThrow(()->
-                    new CustomException(ErrorCode.NOT_APPLY)
-            );
-            if (userProject.isTeam()) {
-                throw new CustomException(ErrorCode.DUPLICATED_JOIN);
-            }
             userProjectRepository.save(UserProject.builder()
                     .user(user)
                     .project(project)
